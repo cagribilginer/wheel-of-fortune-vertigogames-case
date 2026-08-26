@@ -1,0 +1,14 @@
+{
+    "name": "Vertigo.Wheel.Editor",
+    "rootNamespace": "Vertigo.Wheel.Editor",
+    "references": [ "Vertigo.Wheel.Core", "Vertigo.Wheel.Data", "Vertigo.Wheel.Gameplay", "Vertigo.Wheel.UI", "Unity.TextMeshPro" ],
+    "includePlatforms": [ "Editor" ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

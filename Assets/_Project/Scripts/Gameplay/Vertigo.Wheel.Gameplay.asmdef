@@ -1,0 +1,14 @@
+{
+    "name": "Vertigo.Wheel.Gameplay",
+    "rootNamespace": "Vertigo.Wheel.Gameplay",
+    "references": [ "Vertigo.Wheel.Core", "Vertigo.Wheel.Data" ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
