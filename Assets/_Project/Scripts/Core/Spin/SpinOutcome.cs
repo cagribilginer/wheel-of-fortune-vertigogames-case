@@ -16,17 +16,19 @@ namespace Vertigo.Wheel.Core.Spin
         public readonly SliceKind Kind;
         public readonly RewardId Reward;
         public readonly int Amount;
+        public readonly int UnitValue;
 
-        public SpinOutcome(int slotIndex, SliceKind kind, RewardId reward, int amount)
+        public SpinOutcome(int slotIndex, SliceKind kind, RewardId reward, int amount, int unitValue = 1)
         {
             SlotIndex = slotIndex;
             Kind = kind;
             Reward = reward;
             Amount = amount;
+            UnitValue = unitValue;
         }
 
         public static SpinOutcome FromSlice(int slotIndex, WheelSlice slice) =>
-            new SpinOutcome(slotIndex, slice.Kind, slice.Reward, slice.Amount);
+            new SpinOutcome(slotIndex, slice.Kind, slice.Reward, slice.Amount, slice.UnitValue);
 
         public bool IsBomb => Kind == SliceKind.Bomb;
 
