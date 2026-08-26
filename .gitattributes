@@ -1,0 +1,27 @@
+* text=auto
+
+*.cs   text diff=csharp
+*.md   text
+*.json text
+*.asmdef text
+*.gitattributes text
+*.gitignore text
+
+# Unity YAML — text on disk, but never auto-merge
+*.unity     -text merge=binary
+*.prefab    -text merge=binary
+*.asset     -text merge=binary
+*.mat       -text merge=binary
+*.anim      -text merge=binary
+*.controller -text merge=binary
+*.spriteatlas -text merge=binary
+*.meta      text
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.tga binary
+*.psd binary
+*.ttf binary
+*.otf binary
+*.apk binary
