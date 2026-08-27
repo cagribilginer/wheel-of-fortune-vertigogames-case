@@ -288,19 +288,29 @@ namespace Vertigo.Wheel.Editor
             bg.type = Image.Type.Sliced;
             Stretch((RectTransform)bg.transform, 0, 0, 0, 0);
 
+            // Fixed width, left-aligned, vertically stretched: the backdrop bar behind it spans the full
+            // strip, but the scrollable window itself is capped so ~9 tiles are visible at once instead of
+            // the ~20+ a full-width viewport would show, which made "centre the current zone" imperceptible.
+            // Left-aligned (rather than centred) so the frame hugs only the actual track instead of its own
+            // decorative corner brackets sitting in dead space on both sides, and so the freed width on the
+            // right has somewhere to go: the milestone badges.
+            const float trackLeftPadding = 20f;
+
             Image frame = AddImage(NewNode("ui_image_zonemap_frame", zoneMap), "ui_card_zone_map_frame");
             frame.type = Image.Type.Sliced;
-            Stretch((RectTransform)frame.transform, 0, 0, 0, 0);
+            RectTransform frameRect = (RectTransform)frame.transform;
+            frameRect.anchorMin = new Vector2(0f, 0f);
+            frameRect.anchorMax = new Vector2(0f, 1f);
+            frameRect.pivot = new Vector2(0f, 0.5f);
+            frameRect.sizeDelta = new Vector2(ZoneMapViewportWidth, 0f);
+            frameRect.anchoredPosition = new Vector2(trackLeftPadding, 0f);
 
-            // Fixed width, centred, vertically stretched: the backdrop bar behind it spans the full strip,
-            // but the scrollable window itself is capped so ~9 tiles are visible at once instead of the
-            // ~20+ a full-width viewport would show, which made "centre the current zone" imperceptible.
             RectTransform scrollRect = NewNode("ui_scroll_zonemap", zoneMap);
-            scrollRect.anchorMin = new Vector2(0.5f, 0f);
-            scrollRect.anchorMax = new Vector2(0.5f, 1f);
-            scrollRect.pivot = new Vector2(0.5f, 0.5f);
+            scrollRect.anchorMin = new Vector2(0f, 0f);
+            scrollRect.anchorMax = new Vector2(0f, 1f);
+            scrollRect.pivot = new Vector2(0f, 0.5f);
             scrollRect.sizeDelta = new Vector2(ZoneMapViewportWidth, 0f);
-            scrollRect.anchoredPosition = Vector2.zero;
+            scrollRect.anchoredPosition = new Vector2(trackLeftPadding, 0f);
             var scroll = scrollRect.gameObject.AddComponent<ScrollRect>();
             scroll.horizontal = true;
             scroll.vertical = false;
@@ -334,9 +344,50 @@ namespace Vertigo.Wheel.Editor
 
             scroll.content = content;
 
+            BuildMilestoneBadge(zoneMap, "ui_card_zonemap_milestone_super", "ui_text_zonemap_milestone_super_value",
+                "UI_icon_chest_gold_nolight", new Color(0.32f, 0.22f, 0.08f, 0.92f), new Color(1f, 0.85f, 0.35f),
+                new Vector2(-20f, 30f));
+
+            BuildMilestoneBadge(zoneMap, "ui_card_zonemap_milestone_safe", "ui_text_zonemap_milestone_safe_value",
+                "UI_icon_chest_silver_nolight", new Color(0.08f, 0.22f, 0.1f, 0.92f), new Color(0.55f, 0.95f, 0.6f),
+                new Vector2(-20f, -30f));
+
             var view = zoneMap.gameObject.AddComponent<ZoneMapView>();
             view.RebindReferences();
             return view;
+        }
+
+        /// <summary>
+        /// One top-right milestone card ("SAFE ZONE 5", "SUPER ZONE 30"). The interval number baked into the
+        /// placeholder text here is cosmetic only — <c>ZoneMapPresenter</c> overwrites it once, from
+        /// <c>ZoneProgressionConfig</c>, the same "static placeholder now, live value at Awake" pattern the
+        /// header's zone/gold text already uses.
+        /// </summary>
+        private static void BuildMilestoneBadge(
+            RectTransform parent, string cardName, string textName, string iconSpriteName,
+            Color cardTint, Color textColor, Vector2 anchoredPosition)
+        {
+            RectTransform card = NewNode(cardName, parent);
+            card.anchorMin = new Vector2(1f, 0.5f);
+            card.anchorMax = new Vector2(1f, 0.5f);
+            card.pivot = new Vector2(1f, 0.5f);
+            card.sizeDelta = new Vector2(190f, 50f);
+            card.anchoredPosition = anchoredPosition;
+
+            Image bg = AddImage(NewNode(cardName + "_bg", card), "ui_card_frame_4px_zone");
+            bg.type = Image.Type.Sliced;
+            bg.color = cardTint;
+            Stretch((RectTransform)bg.transform, 0, 0, 0, 0);
+
+            Image icon = AddImage(NewNode(cardName + "_icon", card), iconSpriteName);
+            icon.preserveAspect = true;
+            LeftMiddle((RectTransform)icon.transform, 8f, new Vector2(36f, 36f));
+
+            TextMeshProUGUI text = AddText(NewNode(textName, card), "ZONE", 16f);
+            text.alignment = TextAlignmentOptions.MidlineLeft;
+            text.color = textColor;
+            text.lineSpacing = -15f;
+            Stretch((RectTransform)text.transform, 50f, 2f, 8f, 2f);
         }
 
         // ------------------------------------------------------------------ wheel
@@ -379,7 +430,10 @@ namespace Vertigo.Wheel.Editor
             indicator.anchorMax = new Vector2(0.5f, 1f);
             indicator.pivot = new Vector2(0.5f, 0f);
             indicator.sizeDelta = new Vector2(120f, 120f);
-            indicator.anchoredPosition = Vector2.zero;
+            // The top slot's outer edge sits at R+70 = 297 from the wheel's centre (R=227, slot half-size
+            // 70); pulled down from the wheelPanel's own top edge (360) so the indicator's tip lands right
+            // on it instead of pointing at 63px of empty space above the wheel.
+            indicator.anchoredPosition = new Vector2(0f, -60f);
 
             Image indicatorImage = AddImage(NewNode("ui_image_wheel_indicator_value", indicator), "ui_spin_bronze_indicator");
             indicatorImage.preserveAspect = true;
@@ -408,7 +462,7 @@ namespace Vertigo.Wheel.Editor
         private static BankView BuildBank(RectTransform sidePanel, BankEntryView bankEntryPrefab)
         {
             RectTransform bank = NewNode("ui_panel_bank", sidePanel);
-            Stretch(bank, 0, 150f, 0, 0);
+            Stretch(bank, 0, 0f, 0, 74f);
 
             Image bg = AddImage(NewNode("ui_image_bank_bg", bank), "ui_card_frame_12px_neutral");
             bg.type = Image.Type.Sliced;
@@ -465,49 +519,41 @@ namespace Vertigo.Wheel.Editor
             return view;
         }
 
+        /// <summary>
+        /// The single EXIT action, top-left of the side panel above the bank grid — replacing the old
+        /// COLLECT/GIVE UP pair. Which of "cash out" or "give up" it actually triggers is
+        /// <c>IdleState.OnExitRequested</c>'s call, not this button's; the view only raises the click.
+        /// </summary>
         private static ActionBarView BuildActions(RectTransform sidePanel)
         {
             RectTransform actions = NewNode("ui_panel_actions", sidePanel);
-            BottomStrip(actions, 130f);
+            TopStrip(actions, 64f, 0f);
 
-            BuildActionButton(actions, "ui_button_action_collect", "ui_transform_action_collect_anim",
-                "ui_text_action_collect_value", "COLLECT", "UI_button_orange_standard",
-                pivotX: 1f, anchoredX: -20f);
-
-            BuildActionButton(actions, "ui_button_action_giveup", "ui_transform_action_giveup_anim",
-                "ui_text_action_giveup_value", "GIVE UP", "UI_button_grey_standard",
-                pivotX: 0f, anchoredX: 20f);
-
-            var view = actions.gameObject.AddComponent<ActionBarView>();
-            view.RebindReferences();
-            return view;
-        }
-
-        private static void BuildActionButton(
-            RectTransform parent, string buttonName, string animName, string textName,
-            string label, string spriteName, float pivotX, float anchoredX)
-        {
-            RectTransform buttonRect = NewNode(buttonName, parent);
-            buttonRect.anchorMin = new Vector2(0.5f, 0.5f);
-            buttonRect.anchorMax = new Vector2(0.5f, 0.5f);
-            buttonRect.pivot = new Vector2(pivotX, 0.5f);
-            buttonRect.sizeDelta = new Vector2(300f, 90f);
-            buttonRect.anchoredPosition = new Vector2(anchoredX, 0f);
+            RectTransform buttonRect = NewNode("ui_button_action_exit", actions);
+            buttonRect.anchorMin = new Vector2(0f, 0.5f);
+            buttonRect.anchorMax = new Vector2(0f, 0.5f);
+            buttonRect.pivot = new Vector2(0f, 0.5f);
+            buttonRect.sizeDelta = new Vector2(180f, 52f);
+            buttonRect.anchoredPosition = Vector2.zero;
 
             Image image = buttonRect.gameObject.AddComponent<Image>();
-            image.sprite = EditorSpriteUtility.FindSprite(spriteName);
+            image.sprite = EditorSpriteUtility.FindSprite("UI_button_grey_standard");
             image.type = Image.Type.Sliced;
             image.raycastTarget = true;
             image.maskable = false;
             var button = buttonRect.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
 
-            RectTransform anim = NewNode(animName, buttonRect);
+            RectTransform anim = NewNode("ui_transform_action_exit_anim", buttonRect);
             Stretch(anim, 0, 0, 0, 0);
 
-            TextMeshProUGUI text = AddText(NewNode(textName, anim), label, 30f);
+            TextMeshProUGUI text = AddText(NewNode("ui_text_action_exit_value", anim), "EXIT", 26f);
             text.alignment = TextAlignmentOptions.Center;
             Stretch((RectTransform)text.transform, 0, 0, 0, 0);
+
+            var view = actions.gameObject.AddComponent<ActionBarView>();
+            view.RebindReferences();
+            return view;
         }
 
         // ------------------------------------------------------------------ popups
