@@ -22,9 +22,12 @@ namespace Vertigo.Wheel.Editor
     /// or spec change rebuilds the tree from the same source of truth instead of accumulating manual edits.
     /// </para>
     /// <para>
-    /// Deliberately builds a <em>static</em> scene: no DOTween (not yet imported), no presenter wiring, no
-    /// clickable behaviour. Buttons exist and raise their C# events, but nothing subscribes yet — that is
-    /// Day 4's job, once <c>GameInstaller</c> composes the state machine with these views.
+    /// The saved scene itself is still static: the wheel's 8 slots sit stacked at the rotor's centre with no
+    /// icons, and the zone map strip is empty. <c>GameInstaller</c> is built and wired into it (see
+    /// <see cref="BuildGameInstaller"/>), but as a plain <c>MonoBehaviour</c> with no
+    /// <c>[ExecuteAlways]</c>, its <c>Awake()</c> — which lays out the slots, starts the state machine, and
+    /// populates everything — only runs once Unity enters Play Mode. An empty-looking wheel or zone map in
+    /// the Scene view or right after a fresh build is expected; it is not evidence of a bug.
     /// </para>
     /// </summary>
     public static class MainSceneBuilder

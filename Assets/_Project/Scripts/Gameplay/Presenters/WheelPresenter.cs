@@ -84,8 +84,20 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             for (int i = 0; i < wheel.SliceCount && i < _view.Slots.Count; i++)
             {
                 WheelSlice slice = wheel[i];
-                if (slice.IsBomb) _view.Slots[i].SetBomb(_bombIcon);
-                else _view.Slots[i].SetReward(_catalog.IconFor(slice.Reward), slice.Amount);
+                if (slice.IsBomb)
+                {
+                    _view.Slots[i].SetBomb(_bombIcon);
+                    continue;
+                }
+
+                Sprite icon = _catalog.IconFor(slice.Reward);
+                if (icon == null)
+                {
+                    Debug.LogWarning(
+                        $"[Vertigo] WheelPresenter: RewardCatalog has no icon for '{slice.Reward}' " +
+                        $"(slot {i}) — check the RewardDefinition asset's Icon field.");
+                }
+                _view.Slots[i].SetReward(icon, slice.Amount);
             }
         }
 
