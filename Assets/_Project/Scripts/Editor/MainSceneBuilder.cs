@@ -43,6 +43,7 @@ namespace Vertigo.Wheel.Editor
 
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
+            BuildMainCamera();
             BuildEventSystem();
 
             RectTransform canvasRoot = BuildCanvasRoot();
@@ -205,6 +206,22 @@ namespace Vertigo.Wheel.Editor
         private static void BuildEventSystem()
         {
             var go = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+        }
+
+        /// <summary>
+        /// The Screen Space - Overlay canvas renders without any camera, but Unity still needs one tagged
+        /// MainCamera in the scene — otherwise the Game view shows "No cameras rendering" and, on device,
+        /// nothing clears the frame before the UI draws.
+        /// </summary>
+        private static void BuildMainCamera()
+        {
+            var go = new GameObject("Main Camera", typeof(Camera), typeof(AudioListener));
+            go.tag = "MainCamera";
+
+            var camera = go.GetComponent<Camera>();
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color(0.05f, 0.05f, 0.05f, 1f);
+            camera.cullingMask = ~0;
         }
 
         private static void BuildBackground(RectTransform canvasRoot)
