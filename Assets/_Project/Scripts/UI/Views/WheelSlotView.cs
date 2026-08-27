@@ -24,6 +24,7 @@ namespace Vertigo.Wheel.UI.Views
         /// <summary>Bomb slices carry no icon and no amount text; both are hidden rather than left stale.</summary>
         public void SetBomb(Sprite bombIcon)
         {
+            gameObject.SetActive(true);
             _ui_image_slot_icon_value.sprite = bombIcon;
             _ui_image_slot_icon_value.enabled = bombIcon != null;
             _ui_text_slot_amount_value.gameObject.SetActive(false);
@@ -31,6 +32,7 @@ namespace Vertigo.Wheel.UI.Views
 
         public void SetReward(Sprite icon, int amount)
         {
+            gameObject.SetActive(true);
             _ui_image_slot_icon_value.sprite = icon;
             _ui_image_slot_icon_value.enabled = icon != null;
             _ui_text_slot_amount_value.gameObject.SetActive(true);

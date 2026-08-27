@@ -42,7 +42,12 @@ namespace Vertigo.Wheel.Editor
                 { "ui_card_frame_12px_neutral",  new Vector4(12, 12, 12, 12) },
                 { "ui_card_frame_4px_zone",      new Vector4(4, 4, 4, 4) },
                 { "ui_card_frame_gardient",      new Vector4(12, 12, 12, 12) },
-                { "ui_card_zone_map_frame",      new Vector4(8, 8, 8, 8) },
+                // Not a continuous rectangular outline — the art is four independent L-shaped corner
+                // brackets whose arms reach to about pixel 28 of 64. An 8px border sliced straight through
+                // those arms, so the "stretched middle" strip pulled in part of the bracket itself and
+                // smeared it across the whole panel width. 29 clears the arms entirely, leaving a genuinely
+                // transparent 6px band as the only thing that ever gets stretched.
+                { "ui_card_zone_map_frame",      new Vector4(29, 29, 29, 29) },
                 { "ui_card_panel_zone_bg",            new Vector4(4, 0, 4, 0) },
                 { "ui_card_panel_zone_current",       new Vector4(4, 0, 4, 0) },
                 { "ui_card_panel_zone_current_white", new Vector4(4, 0, 4, 0) },

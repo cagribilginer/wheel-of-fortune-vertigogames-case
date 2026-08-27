@@ -36,6 +36,12 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _catalog = catalog;
             _bombIcon = bombIcon;
 
+            // The editor's [ContextMenu] WheelSlotLayout tool is design-time-only convenience; nothing
+            // guarantees a human ever ran it. Doing the same placement here means a fresh Play session is
+            // correct regardless — otherwise every slot starts stacked at the rotor's centre instead of
+            // over its painted hole in the base art, which is indistinguishable from "no icon at all".
+            LayoutSlots();
+
             // Built once and restarted per tick rather than fired fresh each time: ~45 ticks happen over one
             // spin, and a prebuilt, paused, non-autokilled tween is the zero-alloc way to replay that.
             _tickTween = _view.Indicator
@@ -48,10 +54,32 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void SetTheme(WheelModel wheel, WheelThemeConfig theme)
         {
-            _slotAngle = 360f / wheel.SliceCount;
-
             if (theme != null)
                 _view.SetTheme(theme.BaseSprite, theme.IndicatorSprite, theme.AccentColor, theme.GlowColor);
+
+            PopulateSlots(wheel);
+        }
+
+        private void LayoutSlots()
+        {
+            if (_view.Rotor == null || _view.Slots.Count == 0) return;
+
+            float wheelSize = _view.Rotor.rect.width;
+            float radius = 0.315f * wheelSize;
+            float slotAngle = 360f / _view.Slots.Count;
+
+            for (int i = 0; i < _view.Slots.Count; i++)
+            {
+                float angleRad = i * slotAngle * Mathf.Deg2Rad;
+                float x = radius * Mathf.Sin(angleRad);
+                float y = radius * Mathf.Cos(angleRad);
+                _view.Slots[i].Rect.anchoredPosition = new Vector2(x, y);
+            }
+        }
+
+        private void PopulateSlots(WheelModel wheel)
+        {
+            _slotAngle = 360f / wheel.SliceCount;
 
             for (int i = 0; i < wheel.SliceCount && i < _view.Slots.Count; i++)
             {
