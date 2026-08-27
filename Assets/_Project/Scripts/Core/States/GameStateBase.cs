@@ -24,6 +24,7 @@ namespace Vertigo.Wheel.Core.States
         public virtual void OnSpinRequested() { }
         public virtual void OnLeaveRequested() { }
         public virtual void OnGiveUpRequested() { }
+        public virtual void OnExitRequested() { }
         public virtual void OnConfirmed() { }
         public virtual void OnCancelled() { }
         public virtual void OnRestartRequested() { }

@@ -66,6 +66,7 @@ namespace Vertigo.Wheel.Core.States
         public void RequestSpin() => Current?.OnSpinRequested();
         public void RequestLeave() => Current?.OnLeaveRequested();
         public void RequestGiveUp() => Current?.OnGiveUpRequested();
+        public void RequestExit() => Current?.OnExitRequested();
         public void Confirm() => Current?.OnConfirmed();
         public void Cancel() => Current?.OnCancelled();
         public void RequestRestart() => Current?.OnRestartRequested();

@@ -43,5 +43,17 @@ namespace Vertigo.Wheel.Core.States.Flow
             if (!Context.Run.CanGiveUp) return;
             Machine.Change<GiveUpConfirmState>();
         }
+
+        /// <summary>
+        /// The single EXIT button's action: walk away with the haul when that is legal, otherwise fall back
+        /// to the (bank-forfeiting) give-up confirm — the same two rules <see cref="OnLeaveRequested"/> and
+        /// <see cref="OnGiveUpRequested"/> already enforce, just resolved in one place instead of needing two
+        /// separate buttons to expose them.
+        /// </summary>
+        public override void OnExitRequested()
+        {
+            if (Context.Run.CanLeave) { Machine.Change<CashOutState>(); return; }
+            if (Context.Run.CanGiveUp) Machine.Change<GiveUpConfirmState>();
+        }
     }
 }
