@@ -31,7 +31,7 @@ namespace Vertigo.Wheel.Editor
     public static class GameConfigGenerator
     {
         private const string ConfigRoot = "Assets/Resources/Configs";
-        private const string SpriteRoot = "Assets/_Project/Art/Sprites";
+        private const string SpriteRoot = EditorSpriteUtility.SpriteRoot;
 
         private const string RewardsFolder = ConfigRoot + "/Rewards";
         private const string ThemesFolder = ConfigRoot + "/Themes";
@@ -202,7 +202,7 @@ namespace Vertigo.Wheel.Editor
                 RewardDefinition asset = LoadOrCreate<RewardDefinition>(
                     $"{RewardsFolder}/{spec.AssetName}.asset", ref created, ref updated);
 
-                Sprite icon = FindSprite(spec.SpriteName);
+                Sprite icon = EditorSpriteUtility.FindSprite(spec.SpriteName);
                 if (icon == null) missingSprites.Add(spec.SpriteName);
 
                 var so = new SerializedObject(asset);
@@ -249,8 +249,8 @@ namespace Vertigo.Wheel.Editor
                 $"{ThemesFolder}/{assetName}.asset", ref created, ref updated);
 
             var so = new SerializedObject(asset);
-            so.FindProperty("_baseSprite").objectReferenceValue = FindSprite(baseSprite);
-            so.FindProperty("_indicatorSprite").objectReferenceValue = FindSprite(indicatorSprite);
+            so.FindProperty("_baseSprite").objectReferenceValue = EditorSpriteUtility.FindSprite(baseSprite);
+            so.FindProperty("_indicatorSprite").objectReferenceValue = EditorSpriteUtility.FindSprite(indicatorSprite);
             so.FindProperty("_accentColor").colorValue = accent;
             so.FindProperty("_glowColor").colorValue = new Color(accent.r, accent.g, accent.b, 0.65f);
             so.ApplyModifiedPropertiesWithoutUndo();
@@ -457,28 +457,6 @@ namespace Vertigo.Wheel.Editor
 
         private static T Load<T>(string path) where T : ScriptableObject =>
             AssetDatabase.LoadAssetAtPath<T>(path);
-
-        private static Sprite FindSprite(string spriteName)
-        {
-            if (string.IsNullOrEmpty(spriteName)) return null;
-
-            string[] guids = AssetDatabase.FindAssets($"{spriteName} t:Sprite", new[] { SpriteRoot });
-
-            foreach (string guid in guids)
-            {
-                string path = AssetDatabase.GUIDToAssetPath(guid);
-
-                // FindAssets matches substrings, so "UI_icon_cash" would also return "UI_icon_cash_big".
-                // Compare the filename exactly.
-                if (!string.Equals(Path.GetFileNameWithoutExtension(path), spriteName, StringComparison.Ordinal))
-                    continue;
-
-                Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
-                if (sprite != null) return sprite;
-            }
-
-            return null;
-        }
 
         /// <summary>
         /// Reads the generated data back through the same code path the game uses and reports what it found.
