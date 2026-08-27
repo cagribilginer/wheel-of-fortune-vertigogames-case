@@ -41,8 +41,10 @@ namespace Vertigo.Wheel.UI.Views.Popups
 
         public void Show(int rewardsAtStake)
         {
-            _ui_text_popup_confirm_giveup_body_value.SetText("You will lose {0} reward{1}.",
-                rewardsAtStake, rewardsAtStake == 1 ? string.Empty : "s");
+            // SetText's zero-alloc overloads only take float args; the plural suffix is a string, so this
+            // one substitution has to go through the regular text setter instead.
+            _ui_text_popup_confirm_giveup_body_value.text =
+                $"You will lose {rewardsAtStake} reward{(rewardsAtStake == 1 ? string.Empty : "s")}.";
 
             gameObject.SetActive(true);
         }
