@@ -134,7 +134,11 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         {
             _lastTickIndex = int.MinValue;
 
-            float targetLocal = -slotIndex * _slotAngle;
+            // Unity's positive Z rotation is counter-clockwise on screen, but slot index increases
+            // clockwise (LayoutSlots' x = R*sin, y = R*cos). Rotating the rotor CCW by a slot's own
+            // clockwise angle is exactly what cancels that angle out and brings it to the top — the
+            // negated form previously here rotated the wrong way and landed the mirror-image slot instead.
+            float targetLocal = slotIndex * _slotAngle;
             float current = _view.Rotor.localEulerAngles.z;
             float delta = Mathf.Repeat(targetLocal - current, 360f);
             int turns = UnityEngine.Random.Range(_spinConfig.MinTurns, _spinConfig.MaxTurns + 1);
@@ -166,7 +170,9 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         private void EmitTicks()
         {
-            int idx = (int)(-_view.Rotor.localEulerAngles.z / _slotAngle);
+            // Same sign as targetLocal above, for the same reason: the rotor's rotation directly equals
+            // the clockwise angle of whichever slot currently sits at the top.
+            int idx = (int)(_view.Rotor.localEulerAngles.z / _slotAngle);
             if (idx == _lastTickIndex) return;
 
             _lastTickIndex = idx;
