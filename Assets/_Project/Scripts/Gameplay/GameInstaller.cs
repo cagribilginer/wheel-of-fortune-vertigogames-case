@@ -92,7 +92,7 @@ namespace Vertigo.Wheel.Gameplay
             Sprite safeBadge = catalog.Find("Reward_ChestSilver")?.Icon;
             var zoneMapPresenter = new ZoneMapPresenter(
                 _zoneMap, _zoneMapTilePrefab, classifier,
-                _zoneTileBgSprite, _zoneTileCurrentSprite, _zoneTileSuperSprite, safeBadge);
+                _zoneTileBgSprite, _zoneTileCurrentSprite, _zoneTileSuperSprite, safeBadge, progression);
             var bankPresenter = new BankPresenter(_bank, _bankEntryPrefab, catalog, runModel.Bank, _flightLayer);
             var actionBarPresenter = new ActionBarPresenter(_actionBar);
             var popupPresenter = new PopupPresenter(_bombPopup, _collectPopup, _giveUpPopup, _bankEntryPrefab, catalog);

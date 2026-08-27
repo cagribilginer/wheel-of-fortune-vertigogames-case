@@ -86,10 +86,19 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
             for (int i = 0; i < _view.Slots.Count; i++)
             {
-                float angleRad = i * slotAngle * Mathf.Deg2Rad;
+                float angleDeg = i * slotAngle;
+                float angleRad = angleDeg * Mathf.Deg2Rad;
                 float x = radius * Mathf.Sin(angleRad);
                 float y = radius * Mathf.Cos(angleRad);
-                _view.Slots[i].Rect.anchoredPosition = new Vector2(x, y);
+
+                RectTransform slot = _view.Slots[i].Rect;
+                slot.anchoredPosition = new Vector2(x, y);
+
+                // Cancels the slot's own position angle so its local "up" always points radially outward —
+                // i.e. the bottom of the icon/text faces the hub. This holds throughout any later rotor
+                // spin too: rotating the rotor is a rigid transform, so a slot correct at rest stays
+                // correct at every intermediate angle, not just when the wheel is standing still.
+                slot.localEulerAngles = new Vector3(0f, 0f, -angleDeg);
             }
         }
 

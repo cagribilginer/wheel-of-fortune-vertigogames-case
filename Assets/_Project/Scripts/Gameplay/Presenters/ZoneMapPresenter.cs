@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UI;
 using Vertigo.Wheel.Core.Zones;
+using Vertigo.Wheel.Data.Configs;
 using Vertigo.Wheel.UI.Views;
 
 namespace Vertigo.Wheel.Gameplay.Presenters
@@ -43,7 +44,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public ZoneMapPresenter(
             ZoneMapView view, ZoneMapTileView tilePrefab, IZoneClassifier classifier,
-            Sprite bgSprite, Sprite currentSprite, Sprite superSprite, Sprite safeBadge)
+            Sprite bgSprite, Sprite currentSprite, Sprite superSprite, Sprite safeBadge,
+            ZoneProgressionConfig progression)
         {
             _view = view;
             _classifier = classifier;
@@ -51,6 +53,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _currentSprite = currentSprite;
             _superSprite = superSprite;
             _safeBadge = safeBadge;
+
+            _view.SetMilestoneLabels(progression.SafeZoneInterval, progression.SuperZoneInterval);
 
             _pool = new ObjectPool<ZoneMapTileView>(
                 () => Object.Instantiate(tilePrefab, _view.Content),
