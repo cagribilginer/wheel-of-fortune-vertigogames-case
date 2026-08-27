@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c26daf7265a4b46508368f650d873457, type: 3}
+  m_Name: Wheel_Golden_Super
+  m_EditorClassIdentifier: 
+  _tier: 2
+  _theme: {fileID: 11400000, guid: 08441d3a0ccbb4f3dbce19e27c6a93ab, type: 2}
+  _slices:
+  - _kind: 0
+    _reward: {fileID: 11400000, guid: 7bda1ff4d45b74bcd9dc514446047bf9, type: 2}
+    _baseAmountOverride: 0
+    _weight: 1
+  - _kind: 0
+    _reward: {fileID: 11400000, guid: 5809c90abed3d420bb69ae8295a74460, type: 2}
+    _baseAmountOverride: 0
+    _weight: 1
+  - _kind: 0
+    _reward: {fileID: 11400000, guid: b64666bff3933452cb187c376a695774, type: 2}
+    _baseAmountOverride: 0
+    _weight: 1
+  - _kind: 0
+    _reward: {fileID: 11400000, guid: 5e17f4e1270bf42c58fb2a36f1a6f044, type: 2}
+    _baseAmountOverride: 0
+    _weight: 1
+  - _kind: 0
+    _reward: {fileID: 11400000, guid: 27d5a6f2884744e279464b62359090fb, type: 2}
+    _baseAmountOverride: 0
+    _weight: 1
+  - _kind: 0
+    _reward: {fileID: 11400000, guid: f90cc04eb3c2e451da0497192cdacb8c, type: 2}
+    _baseAmountOverride: 0
+    _weight: 1
+  - _kind: 0
+    _reward: {fileID: 11400000, guid: 1555425d89225445a9a1c88d919c56b2, type: 2}
+    _baseAmountOverride: 0
+    _weight: 1
+  - _kind: 0
+    _reward: {fileID: 11400000, guid: d5a00aead753f4a20ad172887ed327e2, type: 2}
+    _baseAmountOverride: 0
+    _weight: 1
+  _shuffleSliceOrder: 0

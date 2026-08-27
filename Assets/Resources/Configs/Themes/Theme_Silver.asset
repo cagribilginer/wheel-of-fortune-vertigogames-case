@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdffe311292204f7892f4af03e992236, type: 3}
+  m_Name: Theme_Silver
+  m_EditorClassIdentifier: 
+  _baseSprite: {fileID: 21300000, guid: 3b41202619bde4c41835f0d9b2a1e8f0, type: 3}
+  _indicatorSprite: {fileID: 21300000, guid: d1b192551e32c4be7bfd9a606135d005, type: 3}
+  _accentColor: {r: 0.78, g: 0.82, b: 0.86, a: 1}
+  _glowColor: {r: 0.78, g: 0.82, b: 0.86, a: 0.65}
+  _spinLoop: {fileID: 0}
+  _tick: {fileID: 0}

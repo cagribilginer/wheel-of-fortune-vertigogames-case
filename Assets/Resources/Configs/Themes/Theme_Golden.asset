@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdffe311292204f7892f4af03e992236, type: 3}
+  m_Name: Theme_Golden
+  m_EditorClassIdentifier: 
+  _baseSprite: {fileID: 21300000, guid: fee1a6cf323e543f38fd3c76208927c6, type: 3}
+  _indicatorSprite: {fileID: 21300000, guid: 7b34709b915904c2ebb9e546730512ba, type: 3}
+  _accentColor: {r: 0.95, g: 0.76, b: 0.2, a: 1}
+  _glowColor: {r: 0.95, g: 0.76, b: 0.2, a: 0.65}
+  _spinLoop: {fileID: 0}
+  _tick: {fileID: 0}

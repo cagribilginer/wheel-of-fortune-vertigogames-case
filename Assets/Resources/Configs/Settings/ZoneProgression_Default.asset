@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a46e89993f0bc4281ae0d2d069723c21, type: 3}
+  m_Name: ZoneProgression_Default
+  m_EditorClassIdentifier: 
+  _safeZoneInterval: 5
+  _superZoneInterval: 30
+  _defaultNormalWheel: {fileID: 11400000, guid: 72239d3e9d5fd4bd0a6a8ed93218f8e9, type: 2}
+  _safeWheel: {fileID: 11400000, guid: 7a4df9c1dc1f54186af2950d578cdaaa, type: 2}
+  _superWheel: {fileID: 11400000, guid: c9fc77327cf3c4e6ba53e45f5bd71197, type: 2}
+  _bandOverrides:
+  - _fromZone: 10
+    _wheel: {fileID: 11400000, guid: cdc9e84b26a9d437ba4c513697b8bfb9, type: 2}
+  - _fromZone: 20
+    _wheel: {fileID: 11400000, guid: ea9b2bfa288504527b4f8d7de4fed049, type: 2}
+  _scaling: {fileID: 11400000, guid: cc971a9bf55d44fbd9dedaa32df0b543, type: 2}
+  _demoMaxZone: 0
