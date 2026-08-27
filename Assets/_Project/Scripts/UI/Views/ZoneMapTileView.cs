@@ -34,5 +34,7 @@ namespace Vertigo.Wheel.UI.Views
             _ui_image_zonemap_tile_badge_value.sprite = badge;
             _ui_image_zonemap_tile_badge_value.enabled = badge != null;
         }
+
+        public void SetNumberColor(Color color) => _ui_text_zonemap_tile_number_value.color = color;
     }
 }

@@ -3,6 +3,7 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UI;
+using Vertigo.Wheel.Core.Zones;
 using Vertigo.Wheel.UI.Views;
 
 namespace Vertigo.Wheel.Gameplay.Presenters
@@ -16,19 +17,41 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     /// A zone's number and type never change between runs, so tiles are never released on a reset either:
     /// the strip only ever grows, and a reset just moves the highlight back to zone 1.
     /// </para>
+    /// <para>
+    /// Zone 1 can never sit dead-centre in the viewport — there is nothing to its left to justify a shift,
+    /// and clamping to show blank space instead would look broken. <see cref="Scroll"/> already clamps to
+    /// the start; what actually reads as "wrong tile highlighted" without a strong per-type visual is
+    /// solved by <see cref="ApplyStyle"/> instead, not by fighting the clamp.
+    /// </para>
     /// </summary>
     public sealed class ZoneMapPresenter
     {
         private const int LookaheadZones = 15;
         private const int MinimumWindow = 30;
 
+        private static readonly Color SafeTextColor = new Color(0.55f, 0.95f, 0.6f);
+        private static readonly Color SuperTextColor = new Color(1f, 0.85f, 0.35f);
+
         private readonly ZoneMapView _view;
+        private readonly IZoneClassifier _classifier;
+        private readonly Sprite _bgSprite;
+        private readonly Sprite _currentSprite;
+        private readonly Sprite _superSprite;
+        private readonly Sprite _safeBadge;
         private readonly ObjectPool<ZoneMapTileView> _pool;
         private readonly List<ZoneMapTileView> _active = new List<ZoneMapTileView>();
 
-        public ZoneMapPresenter(ZoneMapView view, ZoneMapTileView tilePrefab)
+        public ZoneMapPresenter(
+            ZoneMapView view, ZoneMapTileView tilePrefab, IZoneClassifier classifier,
+            Sprite bgSprite, Sprite currentSprite, Sprite superSprite, Sprite safeBadge)
         {
             _view = view;
+            _classifier = classifier;
+            _bgSprite = bgSprite;
+            _currentSprite = currentSprite;
+            _superSprite = superSprite;
+            _safeBadge = safeBadge;
+
             _pool = new ObjectPool<ZoneMapTileView>(
                 () => Object.Instantiate(tilePrefab, _view.Content),
                 tile => tile.gameObject.SetActive(true),
@@ -42,7 +65,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             while (_active.Count < horizon) BuildTile(_active.Count + 1);
 
             for (int i = 0; i < _active.Count; i++)
-                _active[i].Rect.localScale = (i + 1 == zone) ? Vector3.one * 1.12f : Vector3.one;
+                ApplyStyle(_active[i], i + 1, isCurrent: i + 1 == zone);
 
             Scroll(zone, onComplete);
         }
@@ -53,6 +76,39 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             tile.SetZoneNumber(zoneNumber);
             tile.transform.SetSiblingIndex(_active.Count);
             _active.Add(tile);
+        }
+
+        private void ApplyStyle(ZoneMapTileView tile, int zoneNumber, bool isCurrent)
+        {
+            if (isCurrent)
+            {
+                tile.SetBackground(_currentSprite != null ? _currentSprite : _bgSprite);
+                tile.SetBadge(null);
+                tile.SetNumberColor(Color.white);
+                tile.Rect.localScale = Vector3.one * 1.1f;
+                return;
+            }
+
+            tile.Rect.localScale = Vector3.one;
+
+            switch (_classifier.Classify(zoneNumber))
+            {
+                case ZoneType.Super:
+                    tile.SetBackground(_superSprite != null ? _superSprite : _bgSprite);
+                    tile.SetBadge(null);
+                    tile.SetNumberColor(SuperTextColor);
+                    break;
+                case ZoneType.Safe:
+                    tile.SetBackground(_bgSprite);
+                    tile.SetBadge(_safeBadge);
+                    tile.SetNumberColor(SafeTextColor);
+                    break;
+                default:
+                    tile.SetBackground(_bgSprite);
+                    tile.SetBadge(null);
+                    tile.SetNumberColor(Color.white);
+                    break;
+            }
         }
 
         private void Scroll(int zone, System.Action onComplete)

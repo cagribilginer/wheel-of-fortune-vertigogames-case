@@ -27,6 +27,8 @@ namespace Vertigo.Wheel.UI.Views
             gameObject.SetActive(true);
             _ui_image_slot_icon_value.sprite = bombIcon;
             _ui_image_slot_icon_value.enabled = bombIcon != null;
+            _ui_image_slot_icon_value.preserveAspect = true;
+            _ui_image_slot_icon_value.maskable = false; // never inside a mask — the wheel itself isn't clipped
             _ui_text_slot_amount_value.gameObject.SetActive(false);
         }
 
@@ -35,6 +37,8 @@ namespace Vertigo.Wheel.UI.Views
             gameObject.SetActive(true);
             _ui_image_slot_icon_value.sprite = icon;
             _ui_image_slot_icon_value.enabled = icon != null;
+            _ui_image_slot_icon_value.preserveAspect = true;
+            _ui_image_slot_icon_value.maskable = false;
             _ui_text_slot_amount_value.gameObject.SetActive(true);
             _ui_text_slot_amount_value.SetText("x{0}", amount);
         }

@@ -34,6 +34,10 @@ namespace Vertigo.Wheel.Editor
 
         private static readonly Vector2 ReferenceResolution = new Vector2(1920f, 1080f);
 
+        // 9 tiles (76px) + 8 gaps (12px) + layout padding (20px), plus a little breathing room so a
+        // fractional 10th tile peeks in at each edge — reads as "scrolling", not "cut off".
+        private const float ZoneMapViewportWidth = 860f;
+
         [MenuItem("Tools/Vertigo/Build Main Scene UI")]
         public static void Build()
         {
@@ -90,9 +94,12 @@ namespace Vertigo.Wheel.Editor
         {
             var installer = new GameObject("GameInstaller").AddComponent<GameInstaller>();
             Sprite bombIcon = EditorSpriteUtility.FindSprite("ui_card_icon_death");
+            Sprite zoneBg = EditorSpriteUtility.FindSprite("ui_card_panel_zone_bg");
+            Sprite zoneCurrent = EditorSpriteUtility.FindSprite("ui_card_panel_zone_current");
+            Sprite zoneSuper = EditorSpriteUtility.FindSprite("ui_card_panel_zone_super");
 
             installer.Configure(header, wheel, zoneMap, bank, actionBar, bombPopup, collectPopup, giveUpPopup,
-                tilePrefab, bankEntryPrefab, canvasRoot, bombIcon);
+                tilePrefab, bankEntryPrefab, canvasRoot, bombIcon, zoneBg, zoneCurrent, zoneSuper);
         }
 
         // ------------------------------------------------------------------ pooled prefabs
@@ -248,7 +255,9 @@ namespace Vertigo.Wheel.Editor
 
             Image goldIcon = AddImage(NewNode("ui_image_header_gold_icon", header), "UI_icon_gold");
             goldIcon.preserveAspect = true;
-            RightMiddle((RectTransform)goldIcon.transform, -180f, new Vector2(56, 56));
+            // -180 left only ~112px of clearance before the icon's box collides with a right-aligned value
+            // — comfortable for "1,250" but not for a run's gold climbing into five or six digits.
+            RightMiddle((RectTransform)goldIcon.transform, -220f, new Vector2(56, 56));
 
             TextMeshProUGUI gold = AddText(NewNode("ui_text_header_gold_value", header), "1,250", 40f);
             gold.alignment = TextAlignmentOptions.MidlineRight;
@@ -274,8 +283,15 @@ namespace Vertigo.Wheel.Editor
             frame.type = Image.Type.Sliced;
             Stretch((RectTransform)frame.transform, 0, 0, 0, 0);
 
+            // Fixed width, centred, vertically stretched: the backdrop bar behind it spans the full strip,
+            // but the scrollable window itself is capped so ~9 tiles are visible at once instead of the
+            // ~20+ a full-width viewport would show, which made "centre the current zone" imperceptible.
             RectTransform scrollRect = NewNode("ui_scroll_zonemap", zoneMap);
-            Stretch(scrollRect, 0, 0, 0, 0);
+            scrollRect.anchorMin = new Vector2(0.5f, 0f);
+            scrollRect.anchorMax = new Vector2(0.5f, 1f);
+            scrollRect.pivot = new Vector2(0.5f, 0.5f);
+            scrollRect.sizeDelta = new Vector2(ZoneMapViewportWidth, 0f);
+            scrollRect.anchoredPosition = Vector2.zero;
             var scroll = scrollRect.gameObject.AddComponent<ScrollRect>();
             scroll.horizontal = true;
             scroll.vertical = false;
@@ -297,7 +313,7 @@ namespace Vertigo.Wheel.Editor
             content.sizeDelta = Vector2.zero;
 
             var layout = content.gameObject.AddComponent<HorizontalLayoutGroup>();
-            layout.spacing = 10f;
+            layout.spacing = 12f;
             layout.childForceExpandWidth = false;
             layout.childForceExpandHeight = false;
             layout.childAlignment = TextAnchor.MiddleLeft;
@@ -387,6 +403,9 @@ namespace Vertigo.Wheel.Editor
 
             Image bg = AddImage(NewNode("ui_image_bank_bg", bank), "ui_card_frame_12px_neutral");
             bg.type = Image.Type.Sliced;
+            // The source art is neutral (pure white), meant to be tinted per context — left untinted it
+            // reads as a blown-out white panel rather than as part of the dark theme.
+            bg.color = new Color(0.06f, 0.07f, 0.1f, 0.85f);
             Stretch((RectTransform)bg.transform, 0, 0, 0, 0);
 
             TextMeshProUGUI title = AddText(NewNode("ui_text_bank_title", bank), "COLLECTED", 26f);
