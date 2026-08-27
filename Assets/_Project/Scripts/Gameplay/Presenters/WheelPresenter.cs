@@ -25,6 +25,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly RewardCatalog _catalog;
         private readonly Sprite _bombIcon;
         private readonly Tween _tickTween;
+        private readonly Tween _breatheTween;
 
         private float _slotAngle = 45f;
         private int _lastTickIndex = int.MinValue;
@@ -46,6 +47,17 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             // spin, and a prebuilt, paused, non-autokilled tween is the zero-alloc way to replay that.
             _tickTween = _view.Indicator
                 .DOPunchRotation(new Vector3(0f, 0f, -_spinConfig.TickPunchDegrees), 0.09f, 1, 0f)
+                .SetAutoKill(false)
+                .Pause();
+
+            // Targets the spin button's own rect, not its "_anim" child — that child is UIButtonPunch's
+            // target, so the idle-breathe loop and a click's punch tween never fight over one transform's
+            // localScale. Same prebuilt/restarted shape as the tick tween above, for the same reason: this
+            // plays continuously while idle rather than firing once.
+            _breatheTween = _view.SpinButtonRect
+                .DOScale(1.04f, 1.1f)
+                .SetLoops(-1, LoopType.Yoyo)
+                .SetEase(Ease.InOutSine)
                 .SetAutoKill(false)
                 .Pause();
         }
@@ -126,7 +138,20 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             }
         }
 
-        public void SetInteractable(bool interactable) => _view.SetSpinInteractable(interactable);
+        public void SetInteractable(bool interactable)
+        {
+            _view.SetSpinInteractable(interactable);
+
+            if (interactable)
+            {
+                _breatheTween.Restart();
+            }
+            else
+            {
+                _breatheTween.Pause();
+                _view.SpinButtonRect.localScale = Vector3.one;
+            }
+        }
 
         public Vector3 SlotWorldPosition(int slotIndex) => _view.Slots[slotIndex].Rect.position;
 

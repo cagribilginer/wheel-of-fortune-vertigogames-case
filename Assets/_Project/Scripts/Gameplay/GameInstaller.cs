@@ -33,6 +33,7 @@ namespace Vertigo.Wheel.Gameplay
         [SerializeField] private BombPopupView _bombPopup;
         [SerializeField] private CollectPopupView _collectPopup;
         [SerializeField] private GiveUpConfirmPopupView _giveUpPopup;
+        [SerializeField] private VfxView _vfx;
         [SerializeField] private ZoneMapTileView _zoneMapTilePrefab;
         [SerializeField] private BankEntryView _bankEntryPrefab;
         [SerializeField] private Transform _flightLayer;
@@ -45,8 +46,8 @@ namespace Vertigo.Wheel.Gameplay
         public void Configure(
             HeaderView header, WheelView wheel, ZoneMapView zoneMap, BankView bank, ActionBarView actionBar,
             BombPopupView bombPopup, CollectPopupView collectPopup, GiveUpConfirmPopupView giveUpPopup,
-            ZoneMapTileView zoneMapTilePrefab, BankEntryView bankEntryPrefab, Transform flightLayer, Sprite bombSlotIcon,
-            Sprite zoneTileBgSprite, Sprite zoneTileCurrentSprite, Sprite zoneTileSuperSprite)
+            VfxView vfx, ZoneMapTileView zoneMapTilePrefab, BankEntryView bankEntryPrefab, Transform flightLayer,
+            Sprite bombSlotIcon, Sprite zoneTileBgSprite, Sprite zoneTileCurrentSprite, Sprite zoneTileSuperSprite)
         {
             _header = header;
             _wheel = wheel;
@@ -56,6 +57,7 @@ namespace Vertigo.Wheel.Gameplay
             _bombPopup = bombPopup;
             _collectPopup = collectPopup;
             _giveUpPopup = giveUpPopup;
+            _vfx = vfx;
             _zoneMapTilePrefab = zoneMapTilePrefab;
             _bankEntryPrefab = bankEntryPrefab;
             _flightLayer = flightLayer;
@@ -96,10 +98,11 @@ namespace Vertigo.Wheel.Gameplay
             var bankPresenter = new BankPresenter(_bank, _bankEntryPrefab, catalog, runModel.Bank, _flightLayer);
             var actionBarPresenter = new ActionBarPresenter(_actionBar);
             var popupPresenter = new PopupPresenter(_bombPopup, _collectPopup, _giveUpPopup, _bankEntryPrefab, catalog);
+            var vfxPresenter = new VfxPresenter(_vfx);
 
             var presentation = new ScreenPresentation(
                 headerPresenter, wheelPresenter, zoneMapPresenter, bankPresenter, actionBarPresenter, popupPresenter,
-                bronzeTheme, silverTheme, goldenTheme);
+                vfxPresenter, bronzeTheme, silverTheme, goldenTheme);
 
             var context = new GameContext(runModel, wheelFactory, spinService, continueService, presentation);
             GameStateMachine machine = GameFlow.Build(context);

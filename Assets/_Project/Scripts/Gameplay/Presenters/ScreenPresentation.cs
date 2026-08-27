@@ -21,13 +21,19 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly BankPresenter _bank;
         private readonly ActionBarPresenter _actionBar;
         private readonly PopupPresenter _popups;
+        private readonly VfxPresenter _vfx;
         private readonly WheelThemeConfig _bronzeTheme;
         private readonly WheelThemeConfig _silverTheme;
         private readonly WheelThemeConfig _goldenTheme;
 
+        // Fixed, zone-independent per-unit worth (RewardDefinition.EstimatedValue) — the same scale
+        // PopupPresenter's chest tiers use — at or above which a landed reward earns the glow burst on top
+        // of any safe/super zone clear it might also be.
+        private const int BigRewardUnitValue = 60;
+
         public ScreenPresentation(
             HeaderPresenter header, WheelPresenter wheel, ZoneMapPresenter zoneMap, BankPresenter bank,
-            ActionBarPresenter actionBar, PopupPresenter popups,
+            ActionBarPresenter actionBar, PopupPresenter popups, VfxPresenter vfx,
             WheelThemeConfig bronzeTheme, WheelThemeConfig silverTheme, WheelThemeConfig goldenTheme)
         {
             _header = header;
@@ -36,6 +42,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _bank = bank;
             _actionBar = actionBar;
             _popups = popups;
+            _vfx = vfx;
             _bronzeTheme = bronzeTheme;
             _silverTheme = silverTheme;
             _goldenTheme = goldenTheme;
@@ -57,14 +64,22 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void PlaySpin(int slotIndex, Action onComplete) => _wheel.PlaySpin(slotIndex, onComplete);
 
-        public void PlayReveal(SpinOutcome outcome, Action onComplete) =>
+        public void PlayReveal(SpinOutcome outcome, ZoneType zoneType, Action onComplete)
+        {
+            // Fire-and-forget: the burst plays alongside the highlight tween, not gating onComplete, since
+            // nothing downstream needs to wait on a purely cosmetic flourish.
+            if (!outcome.IsBomb && (zoneType != ZoneType.Normal || outcome.UnitValue >= BigRewardUnitValue))
+                _vfx.PlayRewardBurst();
+
             _wheel.HighlightSlot(outcome.SlotIndex, onComplete);
+        }
 
         public void PlayRewardGranted(SpinOutcome outcome, Action onComplete) =>
             _bank.FlyIn(outcome, _wheel.SlotWorldPosition(outcome.SlotIndex), onComplete);
 
         public void PlayBomb(Action onComplete)
         {
+            _vfx.PlayBombImpact();
             _bank.Refresh();
             DOVirtual.DelayedCall(0.4f, () => onComplete());
         }

@@ -11,7 +11,7 @@ namespace Vertigo.Wheel.Core.States.Flow
         {
             Context.Run.Phase = RunPhase.Resolving;
 
-            Context.Presentation.PlayReveal(Context.PendingOutcome, () =>
+            Context.Presentation.PlayReveal(Context.PendingOutcome, Context.Run.CurrentZoneType, () =>
             {
                 if (Context.PendingOutcome.IsBomb) Machine.Change<BombHitState>();
                 else Machine.Change<RewardGrantedState>();

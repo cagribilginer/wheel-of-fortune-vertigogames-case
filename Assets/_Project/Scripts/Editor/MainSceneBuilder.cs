@@ -74,10 +74,10 @@ namespace Vertigo.Wheel.Editor
 
             (BombPopupView bombView, CollectPopupView collectView, GiveUpConfirmPopupView giveUpView) =
                 BuildPopupLayer(canvasRoot, bankEntryPrefab);
-            BuildVfxLayer(canvasRoot);
+            VfxView vfxView = BuildVfxLayer(canvasRoot);
 
             BuildGameInstaller(canvasRoot, headerView, wheelView, zoneMapView, bankView, actionBarView,
-                bombView, collectView, giveUpView, tilePrefab, bankEntryPrefab);
+                bombView, collectView, giveUpView, vfxView, tilePrefab, bankEntryPrefab);
 
             EnsureFolder(Path.GetDirectoryName(ScenePath).Replace('\\', '/'));
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -93,7 +93,7 @@ namespace Vertigo.Wheel.Editor
         private static void BuildGameInstaller(
             RectTransform canvasRoot, HeaderView header, WheelView wheel, ZoneMapView zoneMap, BankView bank,
             ActionBarView actionBar, BombPopupView bombPopup, CollectPopupView collectPopup,
-            GiveUpConfirmPopupView giveUpPopup, ZoneMapTileView tilePrefab, BankEntryView bankEntryPrefab)
+            GiveUpConfirmPopupView giveUpPopup, VfxView vfx, ZoneMapTileView tilePrefab, BankEntryView bankEntryPrefab)
         {
             var installer = new GameObject("GameInstaller").AddComponent<GameInstaller>();
             Sprite bombIcon = EditorSpriteUtility.FindSprite("ui_card_icon_death");
@@ -102,7 +102,7 @@ namespace Vertigo.Wheel.Editor
             Sprite zoneSuper = EditorSpriteUtility.FindSprite("ui_card_panel_zone_super");
 
             installer.Configure(header, wheel, zoneMap, bank, actionBar, bombPopup, collectPopup, giveUpPopup,
-                tilePrefab, bankEntryPrefab, canvasRoot, bombIcon, zoneBg, zoneCurrent, zoneSuper);
+                vfx, tilePrefab, bankEntryPrefab, canvasRoot, bombIcon, zoneBg, zoneCurrent, zoneSuper);
         }
 
         // ------------------------------------------------------------------ pooled prefabs
@@ -459,6 +459,8 @@ namespace Vertigo.Wheel.Editor
             RectTransform spinAnim = NewNode("ui_transform_wheel_spin_anim", spinButtonRect);
             Stretch(spinAnim, 0, 0, 0, 0);
 
+            spinButtonRect.gameObject.AddComponent<UIButtonPunch>();
+
             var view = wheelPanel.gameObject.AddComponent<WheelView>();
             view.RebindReferences();
             return view;
@@ -555,6 +557,8 @@ namespace Vertigo.Wheel.Editor
 
             RectTransform anim = NewNode("ui_transform_action_exit_anim", buttonRect);
             Stretch(anim, 0, 0, 0, 0);
+
+            buttonRect.gameObject.AddComponent<UIButtonPunch>();
 
             TextMeshProUGUI text = AddText(NewNode("ui_text_action_exit_value", anim), "EXIT", 26f);
             text.alignment = TextAlignmentOptions.Center;
@@ -789,11 +793,13 @@ namespace Vertigo.Wheel.Editor
 
             animOut = NewNode(animName, buttonRect);
             Stretch(animOut, 0, 0, 0, 0);
+
+            buttonRect.gameObject.AddComponent<UIButtonPunch>();
         }
 
         // ------------------------------------------------------------------ vfx layer
 
-        private static void BuildVfxLayer(RectTransform canvasRoot)
+        private static VfxView BuildVfxLayer(RectTransform canvasRoot)
         {
             RectTransform layer = NewNode("ui_panel_vfx_layer", canvasRoot);
             Stretch(layer, 0, 0, 0, 0);
@@ -812,6 +818,10 @@ namespace Vertigo.Wheel.Editor
             Image burst = AddImage(NewNode("ui_image_vfx_reward_burst", shake), "star_glow_alpha");
             burst.color = new Color(1f, 1f, 1f, 0f);
             Stretch((RectTransform)burst.transform, 0, 0, 0, 0);
+
+            var view = layer.gameObject.AddComponent<VfxView>();
+            view.RebindReferences();
+            return view;
         }
 
         // ------------------------------------------------------------------ node/anchor helpers

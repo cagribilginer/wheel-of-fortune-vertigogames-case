@@ -66,7 +66,7 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             onComplete?.Invoke();
         }
 
-        public virtual void PlayReveal(SpinOutcome outcome, Action onComplete) => onComplete?.Invoke();
+        public virtual void PlayReveal(SpinOutcome outcome, ZoneType zoneType, Action onComplete) => onComplete?.Invoke();
 
         public virtual void PlayRewardGranted(SpinOutcome outcome, Action onComplete)
         {

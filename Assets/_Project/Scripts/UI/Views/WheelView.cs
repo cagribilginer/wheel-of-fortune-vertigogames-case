@@ -26,6 +26,7 @@ namespace Vertigo.Wheel.UI.Views
 
         public RectTransform Rotor => _ui_transform_wheel_rotor;
         public RectTransform Indicator => _ui_transform_wheel_indicator;
+        public RectTransform SpinButtonRect => (RectTransform)_ui_button_wheel_spin.transform;
         public IReadOnlyList<WheelSlotView> Slots => _slots;
 
         public event Action SpinClicked;

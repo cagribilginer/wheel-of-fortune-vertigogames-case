@@ -25,7 +25,11 @@ namespace Vertigo.Wheel.Core.States
         /// <summary>Rotates the wheel to a slot the logic has already committed to.</summary>
         void PlaySpin(int slotIndex, Action onComplete);
 
-        void PlayReveal(SpinOutcome outcome, Action onComplete);
+        /// <summary>
+        /// The landing beat. <paramref name="zoneType"/> is passed alongside the outcome so the screen can
+        /// flag a safe/super zone clear the moment the slot lands, not only once the reward reaches the bank.
+        /// </summary>
+        void PlayReveal(SpinOutcome outcome, ZoneType zoneType, Action onComplete);
 
         void PlayRewardGranted(SpinOutcome outcome, Action onComplete);
 

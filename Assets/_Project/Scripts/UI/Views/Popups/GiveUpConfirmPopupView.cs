@@ -6,9 +6,10 @@ using UnityEngine.UI;
 namespace Vertigo.Wheel.UI.Views.Popups
 {
     /// <summary>Confirms abandoning a run before the haul is actually forfeited.</summary>
-    public sealed class GiveUpConfirmPopupView : UIViewBase
+    public sealed class GiveUpConfirmPopupView : PopupViewBase
     {
         [SerializeField] private Image _ui_image_popup_confirm_giveup_backdrop;
+        [SerializeField] private RectTransform _ui_transform_popup_confirm_giveup_anim;
         [SerializeField] private TextMeshProUGUI _ui_text_popup_confirm_giveup_body_value;
         [SerializeField] private Button _ui_button_popup_confirm_giveup_yes;
         [SerializeField] private Button _ui_button_popup_confirm_giveup_no;
@@ -19,6 +20,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
         protected override void CacheReferences()
         {
             Bind(ref _ui_image_popup_confirm_giveup_backdrop, "ui_image_popup_confirm_giveup_backdrop");
+            Bind(ref _ui_transform_popup_confirm_giveup_anim, "ui_transform_popup_confirm_giveup_anim");
             Bind(ref _ui_text_popup_confirm_giveup_body_value, "ui_text_popup_confirm_giveup_body_value");
             Bind(ref _ui_button_popup_confirm_giveup_yes, "ui_button_popup_confirm_giveup_yes");
             Bind(ref _ui_button_popup_confirm_giveup_no, "ui_button_popup_confirm_giveup_no");
@@ -46,9 +48,9 @@ namespace Vertigo.Wheel.UI.Views.Popups
             _ui_text_popup_confirm_giveup_body_value.text =
                 $"You will lose {rewardsAtStake} reward{(rewardsAtStake == 1 ? string.Empty : "s")}.";
 
-            gameObject.SetActive(true);
+            PlayOpen(_ui_image_popup_confirm_giveup_backdrop, _ui_transform_popup_confirm_giveup_anim);
         }
 
-        public void Hide() => gameObject.SetActive(false);
+        public void Hide() => PlayClose(_ui_image_popup_confirm_giveup_backdrop, _ui_transform_popup_confirm_giveup_anim);
     }
 }

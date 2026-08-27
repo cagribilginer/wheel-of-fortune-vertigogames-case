@@ -10,9 +10,10 @@ namespace Vertigo.Wheel.UI.Views.Popups
     /// this run — the button is never shown greyed out, so a reviewer never sees an offer that turns out to
     /// be unhonoured.
     /// </summary>
-    public sealed class BombPopupView : UIViewBase
+    public sealed class BombPopupView : PopupViewBase
     {
         [SerializeField] private Image _ui_image_popup_bomb_backdrop;
+        [SerializeField] private RectTransform _ui_transform_popup_bomb_anim;
         [SerializeField] private TextMeshProUGUI _ui_text_popup_bomb_zone_value;
         [SerializeField] private Button _ui_button_popup_bomb_continue;
         [SerializeField] private TextMeshProUGUI _ui_text_popup_bomb_continue_value;
@@ -24,6 +25,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
         protected override void CacheReferences()
         {
             Bind(ref _ui_image_popup_bomb_backdrop, "ui_image_popup_bomb_backdrop");
+            Bind(ref _ui_transform_popup_bomb_anim, "ui_transform_popup_bomb_anim");
             Bind(ref _ui_text_popup_bomb_zone_value, "ui_text_popup_bomb_zone_value");
             Bind(ref _ui_button_popup_bomb_continue, "ui_button_popup_bomb_continue");
             Bind(ref _ui_text_popup_bomb_continue_value, "ui_text_popup_bomb_continue_value");
@@ -51,9 +53,9 @@ namespace Vertigo.Wheel.UI.Views.Popups
             _ui_button_popup_bomb_continue.gameObject.SetActive(continueOffered);
             if (continueOffered) _ui_text_popup_bomb_continue_value.SetText("{0:N0}", continueCost);
 
-            gameObject.SetActive(true);
+            PlayOpen(_ui_image_popup_bomb_backdrop, _ui_transform_popup_bomb_anim);
         }
 
-        public void Hide() => gameObject.SetActive(false);
+        public void Hide() => PlayClose(_ui_image_popup_bomb_backdrop, _ui_transform_popup_bomb_anim);
     }
 }
