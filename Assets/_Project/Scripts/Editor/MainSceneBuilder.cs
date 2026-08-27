@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Vertigo.Wheel.Gameplay;
 using Vertigo.Wheel.UI.Views;
 using Vertigo.Wheel.UI.Views.Popups;
 
@@ -51,28 +52,46 @@ namespace Vertigo.Wheel.Editor
             Stretch(safeArea, 0, 0, 0, 0);
             safeArea.gameObject.AddComponent<SafeAreaFitter>();
 
-            BuildHeader(safeArea);
-            BuildZoneMap(safeArea, tilePrefab);
+            HeaderView headerView = BuildHeader(safeArea);
+            ZoneMapView zoneMapView = BuildZoneMap(safeArea, tilePrefab);
 
             RectTransform playArea = NewNode("ui_panel_play", safeArea);
             Stretch(playArea, 0f, 0f, 0f, 220f);
 
-            BuildWheel(playArea, slotPrefab);
+            WheelView wheelView = BuildWheel(playArea, slotPrefab);
             RectTransform sidePanel = NewNode("ui_panel_side", playArea);
             Stretch(sidePanel, 820f, 20f, 40f, 20f);
-            BuildBank(sidePanel, bankEntryPrefab);
-            BuildActions(sidePanel);
+            BankView bankView = BuildBank(sidePanel, bankEntryPrefab);
+            ActionBarView actionBarView = BuildActions(sidePanel);
 
-            BuildPopupLayer(canvasRoot, bankEntryPrefab);
+            (BombPopupView bombView, CollectPopupView collectView, GiveUpConfirmPopupView giveUpView) =
+                BuildPopupLayer(canvasRoot, bankEntryPrefab);
             BuildVfxLayer(canvasRoot);
+
+            BuildGameInstaller(canvasRoot, headerView, wheelView, zoneMapView, bankView, actionBarView,
+                bombView, collectView, giveUpView, tilePrefab, bankEntryPrefab);
 
             EnsureFolder(Path.GetDirectoryName(ScenePath).Replace('\\', '/'));
             EditorSceneManager.SaveScene(scene, ScenePath);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log($"[Vertigo] Built {ScenePath}. Nothing is clickable yet — GameInstaller wires the flow on Day 4. " +
+            Debug.Log($"[Vertigo] Built {ScenePath} with GameInstaller wired and the flow live. " +
                        "Run Tools/Vertigo/Validate UI Hygiene next, then check the three landscape Game view presets.");
+        }
+
+        // ------------------------------------------------------------------ composition root
+
+        private static void BuildGameInstaller(
+            RectTransform canvasRoot, HeaderView header, WheelView wheel, ZoneMapView zoneMap, BankView bank,
+            ActionBarView actionBar, BombPopupView bombPopup, CollectPopupView collectPopup,
+            GiveUpConfirmPopupView giveUpPopup, ZoneMapTileView tilePrefab, BankEntryView bankEntryPrefab)
+        {
+            var installer = new GameObject("GameInstaller").AddComponent<GameInstaller>();
+            Sprite bombIcon = EditorSpriteUtility.FindSprite("ui_card_icon_death");
+
+            installer.Configure(header, wheel, zoneMap, bank, actionBar, bombPopup, collectPopup, giveUpPopup,
+                tilePrefab, bankEntryPrefab, canvasRoot, bombIcon);
         }
 
         // ------------------------------------------------------------------ pooled prefabs
@@ -197,7 +216,7 @@ namespace Vertigo.Wheel.Editor
 
         // ------------------------------------------------------------------ header
 
-        private static void BuildHeader(RectTransform safeArea)
+        private static HeaderView BuildHeader(RectTransform safeArea)
         {
             RectTransform header = NewNode("ui_panel_header", safeArea);
             TopStrip(header, 100f, 0f);
@@ -220,11 +239,12 @@ namespace Vertigo.Wheel.Editor
 
             var headerView = header.gameObject.AddComponent<HeaderView>();
             headerView.RebindReferences();
+            return headerView;
         }
 
         // ------------------------------------------------------------------ zone map
 
-        private static RectTransform BuildZoneMap(RectTransform safeArea, ZoneMapTileView tilePrefab)
+        private static ZoneMapView BuildZoneMap(RectTransform safeArea, ZoneMapTileView tilePrefab)
         {
             RectTransform zoneMap = NewNode("ui_panel_zonemap", safeArea);
             TopStrip(zoneMap, 120f, 100f);
@@ -274,12 +294,12 @@ namespace Vertigo.Wheel.Editor
 
             var view = zoneMap.gameObject.AddComponent<ZoneMapView>();
             view.RebindReferences();
-            return zoneMap;
+            return view;
         }
 
         // ------------------------------------------------------------------ wheel
 
-        private static void BuildWheel(RectTransform playArea, WheelSlotView slotPrefab)
+        private static WheelView BuildWheel(RectTransform playArea, WheelSlotView slotPrefab)
         {
             RectTransform wheelPanel = NewNode("ui_panel_wheel", playArea);
             wheelPanel.anchorMin = new Vector2(0f, 0.5f);
@@ -338,11 +358,12 @@ namespace Vertigo.Wheel.Editor
 
             var view = wheelPanel.gameObject.AddComponent<WheelView>();
             view.RebindReferences();
+            return view;
         }
 
         // ------------------------------------------------------------------ bank + actions
 
-        private static void BuildBank(RectTransform sidePanel, BankEntryView bankEntryPrefab)
+        private static BankView BuildBank(RectTransform sidePanel, BankEntryView bankEntryPrefab)
         {
             RectTransform bank = NewNode("ui_panel_bank", sidePanel);
             Stretch(bank, 0, 150f, 0, 0);
@@ -396,9 +417,10 @@ namespace Vertigo.Wheel.Editor
 
             var view = bank.gameObject.AddComponent<BankView>();
             view.RebindReferences();
+            return view;
         }
 
-        private static void BuildActions(RectTransform sidePanel)
+        private static ActionBarView BuildActions(RectTransform sidePanel)
         {
             RectTransform actions = NewNode("ui_panel_actions", sidePanel);
             BottomStrip(actions, 130f);
@@ -413,6 +435,7 @@ namespace Vertigo.Wheel.Editor
 
             var view = actions.gameObject.AddComponent<ActionBarView>();
             view.RebindReferences();
+            return view;
         }
 
         private static void BuildActionButton(
@@ -444,7 +467,8 @@ namespace Vertigo.Wheel.Editor
 
         // ------------------------------------------------------------------ popups
 
-        private static void BuildPopupLayer(RectTransform canvasRoot, BankEntryView bankEntryPrefab)
+        private static (BombPopupView, CollectPopupView, GiveUpConfirmPopupView) BuildPopupLayer(
+            RectTransform canvasRoot, BankEntryView bankEntryPrefab)
         {
             RectTransform layer = NewNode("ui_panel_popup_layer", canvasRoot);
             Stretch(layer, 0, 0, 0, 0);
@@ -453,12 +477,14 @@ namespace Vertigo.Wheel.Editor
             canvas.sortingOrder = 10;
             layer.gameObject.AddComponent<GraphicRaycaster>();
 
-            BuildBombPopup(layer);
-            BuildCollectPopup(layer, bankEntryPrefab);
-            BuildGiveUpConfirmPopup(layer);
+            BombPopupView bombView = BuildBombPopup(layer);
+            CollectPopupView collectView = BuildCollectPopup(layer, bankEntryPrefab);
+            GiveUpConfirmPopupView giveUpView = BuildGiveUpConfirmPopup(layer);
+
+            return (bombView, collectView, giveUpView);
         }
 
-        private static void BuildBombPopup(RectTransform layer)
+        private static BombPopupView BuildBombPopup(RectTransform layer)
         {
             RectTransform root = NewNode("ui_popup_bomb", layer);
             Stretch(root, 0, 0, 0, 0);
@@ -508,9 +534,10 @@ namespace Vertigo.Wheel.Editor
             var bombView = root.gameObject.AddComponent<BombPopupView>();
             bombView.RebindReferences();
             root.gameObject.SetActive(false);
+            return bombView;
         }
 
-        private static void BuildCollectPopup(RectTransform layer, BankEntryView bankEntryPrefab)
+        private static CollectPopupView BuildCollectPopup(RectTransform layer, BankEntryView bankEntryPrefab)
         {
             RectTransform root = NewNode("ui_popup_collect", layer);
             Stretch(root, 0, 0, 0, 0);
@@ -591,9 +618,10 @@ namespace Vertigo.Wheel.Editor
             var collectView = root.gameObject.AddComponent<CollectPopupView>();
             collectView.RebindReferences();
             root.gameObject.SetActive(false);
+            return collectView;
         }
 
-        private static void BuildGiveUpConfirmPopup(RectTransform layer)
+        private static GiveUpConfirmPopupView BuildGiveUpConfirmPopup(RectTransform layer)
         {
             RectTransform root = NewNode("ui_popup_confirm_giveup", layer);
             Stretch(root, 0, 0, 0, 0);
@@ -635,6 +663,7 @@ namespace Vertigo.Wheel.Editor
             var giveUpView = root.gameObject.AddComponent<GiveUpConfirmPopupView>();
             giveUpView.RebindReferences();
             root.gameObject.SetActive(false);
+            return giveUpView;
         }
 
         /// <summary>Shared skeleton for a popup action button: sliced image, Button, and an _anim child.</summary>
