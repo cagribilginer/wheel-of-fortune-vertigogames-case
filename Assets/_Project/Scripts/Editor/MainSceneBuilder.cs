@@ -185,10 +185,16 @@ namespace Vertigo.Wheel.Editor
             EnsureFolder(PrefabFolder);
             string path = $"{PrefabFolder}/{root.name}.prefab";
 
-            GameObject saved = PrefabUtility.SaveAsPrefabAsset(root, path);
+            PrefabUtility.SaveAsPrefabAsset(root, path);
             Object.DestroyImmediate(root);
 
-            return saved.GetComponent<T>();
+            // The reference SaveAsPrefabAsset hands back doesn't survive the NewScene(...) teardown a few
+            // lines later in Build() — it reads as valid here but comes back destroyed by the time BuildWheel
+            // tries to instantiate from it. Forcing a full import + a fresh AssetDatabase load gives every
+            // caller a genuinely disk-backed reference instead.
+            AssetDatabase.SaveAssets();
+            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+            return AssetDatabase.LoadAssetAtPath<GameObject>(path).GetComponent<T>();
         }
 
         // ------------------------------------------------------------------ canvas root
