@@ -112,7 +112,7 @@ namespace Vertigo.Wheel.Editor
             foreach (Graphic graphic in root.GetComponentsInChildren<Graphic>(true))
             {
                 CheckRaycastTarget(graphic);
-                if (checkMaskAncestor) CheckMaskable(graphic);
+                if (checkMaskAncestor && graphic is MaskableGraphic maskable) CheckMaskable(maskable);
 
                 if (graphic is Image image) CheckSlicedBorder(image);
             }
@@ -130,7 +130,7 @@ namespace Vertigo.Wheel.Editor
                 graphic));
         }
 
-        private void CheckMaskable(Graphic graphic)
+        private void CheckMaskable(MaskableGraphic graphic)
         {
             bool hasMaskAncestor = HasMaskAncestor(graphic.transform);
 
@@ -206,13 +206,13 @@ namespace Vertigo.Wheel.Editor
                     fixedCount++;
                 }
 
-                if (checkMaskAncestor)
+                if (checkMaskAncestor && graphic is MaskableGraphic maskable)
                 {
                     bool hasMaskAncestor = HasMaskAncestor(graphic.transform);
-                    if (graphic.maskable != hasMaskAncestor)
+                    if (maskable.maskable != hasMaskAncestor)
                     {
-                        Undo.RecordObject(graphic, "UI Hygiene: Maskable");
-                        graphic.maskable = hasMaskAncestor;
+                        Undo.RecordObject(maskable, "UI Hygiene: Maskable");
+                        maskable.maskable = hasMaskAncestor;
                         fixedCount++;
                     }
                 }
