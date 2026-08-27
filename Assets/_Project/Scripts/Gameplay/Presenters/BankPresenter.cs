@@ -38,10 +38,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _flightLayer = flightLayer;
 
             _pool = new ObjectPool<BankEntryView>(
-                () => Object.Instantiate(entryPrefab, _view.Content),
+                () => UnityEngine.Object.Instantiate(entryPrefab, _view.Content),
                 e => e.gameObject.SetActive(true),
                 e => e.gameObject.SetActive(false),
-                e => Object.Destroy(e.gameObject));
+                e => UnityEngine.Object.Destroy(e.gameObject));
         }
 
         public void Refresh()
@@ -84,7 +84,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
             ghostRect.DOMove(target.position, 0.5f).SetEase(Ease.InBack).OnComplete(() =>
             {
-                Object.Destroy(ghostGo);
+                UnityEngine.Object.Destroy(ghostGo);
                 target.DOKill();
                 target.DOPunchScale(Vector3.one * 0.25f, 0.2f);
                 onComplete();

@@ -62,7 +62,7 @@ namespace Vertigo.Wheel.Gameplay
         {
             // Sized against the busiest moment (a spin's tick punches plus a bomb's shake) so the first
             // real spin never pays for a capacity resize on the frame the player is watching.
-            DOTween.Init(recycleAllTweens: true, useSafeMode: true, logBehaviour: LogBehaviour.ErrorsOnly)
+            DOTween.Init(recycleAllByDefault: true, useSafeMode: true, logBehaviour: LogBehaviour.ErrorsOnly)
                    .SetCapacity(tweenersCapacity: 120, sequencesCapacity: 40);
 
             var catalog = Resources.Load<RewardCatalog>("Configs/Settings/RewardCatalog");
