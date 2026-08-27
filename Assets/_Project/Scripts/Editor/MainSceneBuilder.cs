@@ -176,6 +176,13 @@ namespace Vertigo.Wheel.Editor
 
             TextMeshProUGUI amount = AddText(NewNode("ui_text_bank_entry_amount_value", rt), "x42", 24f);
             amount.maskable = true; // pooled into a masked scroll view (bank grid or collect popup list)
+            // TMP's default overflow mode renders past the text box instead of clipping to it — invisible at
+            // "x42" but a stacked reward on an endless, ever-scaling economy can reach 4+ digits, and that
+            // would spill past the card's edge. Auto-sizing shrinks the font to fit instead.
+            amount.enableAutoSizing = true;
+            amount.fontSizeMin = 14f;
+            amount.fontSizeMax = 24f;
+            amount.overflowMode = TextOverflowModes.Truncate;
             FixedCentered((RectTransform)amount.transform, new Vector2(0, -54), new Vector2(120, 32));
 
             var view = root.AddComponent<BankEntryView>();
@@ -288,29 +295,29 @@ namespace Vertigo.Wheel.Editor
             bg.type = Image.Type.Sliced;
             Stretch((RectTransform)bg.transform, 0, 0, 0, 0);
 
-            // Fixed width, left-aligned, vertically stretched: the backdrop bar behind it spans the full
-            // strip, but the scrollable window itself is capped so ~9 tiles are visible at once instead of
-            // the ~20+ a full-width viewport would show, which made "centre the current zone" imperceptible.
-            // Left-aligned (rather than centred) so the frame hugs only the actual track instead of its own
-            // decorative corner brackets sitting in dead space on both sides, and so the freed width on the
-            // right has somewhere to go: the milestone badges.
-            const float trackLeftPadding = 20f;
-
+            // Fixed width, centred, vertically stretched: the backdrop bar behind it spans the full strip,
+            // but the scrollable window itself is capped so ~9 tiles are visible at once instead of the
+            // ~20+ a full-width viewport would show, which made "centre the current zone" imperceptible.
+            // The frame is matched to this same width/position — not the full panel — so its decorative
+            // corner brackets hug the actual track instead of sitting in dead space past its ends. Centring
+            // never collides with the milestone badges: the panel's logical width is never narrower than the
+            // 1920 reference (CanvasScaler Expand only ever grows it), and at 1920 there is a clear ~320px
+            // gap between the centred track's right edge and the badges' left edge.
             Image frame = AddImage(NewNode("ui_image_zonemap_frame", zoneMap), "ui_card_zone_map_frame");
             frame.type = Image.Type.Sliced;
             RectTransform frameRect = (RectTransform)frame.transform;
-            frameRect.anchorMin = new Vector2(0f, 0f);
-            frameRect.anchorMax = new Vector2(0f, 1f);
-            frameRect.pivot = new Vector2(0f, 0.5f);
+            frameRect.anchorMin = new Vector2(0.5f, 0f);
+            frameRect.anchorMax = new Vector2(0.5f, 1f);
+            frameRect.pivot = new Vector2(0.5f, 0.5f);
             frameRect.sizeDelta = new Vector2(ZoneMapViewportWidth, 0f);
-            frameRect.anchoredPosition = new Vector2(trackLeftPadding, 0f);
+            frameRect.anchoredPosition = Vector2.zero;
 
             RectTransform scrollRect = NewNode("ui_scroll_zonemap", zoneMap);
-            scrollRect.anchorMin = new Vector2(0f, 0f);
-            scrollRect.anchorMax = new Vector2(0f, 1f);
-            scrollRect.pivot = new Vector2(0f, 0.5f);
+            scrollRect.anchorMin = new Vector2(0.5f, 0f);
+            scrollRect.anchorMax = new Vector2(0.5f, 1f);
+            scrollRect.pivot = new Vector2(0.5f, 0.5f);
             scrollRect.sizeDelta = new Vector2(ZoneMapViewportWidth, 0f);
-            scrollRect.anchoredPosition = new Vector2(trackLeftPadding, 0f);
+            scrollRect.anchoredPosition = Vector2.zero;
             var scroll = scrollRect.gameObject.AddComponent<ScrollRect>();
             scroll.horizontal = true;
             scroll.vertical = false;
@@ -462,7 +469,7 @@ namespace Vertigo.Wheel.Editor
         private static BankView BuildBank(RectTransform sidePanel, BankEntryView bankEntryPrefab)
         {
             RectTransform bank = NewNode("ui_panel_bank", sidePanel);
-            Stretch(bank, 0, 0f, 0, 74f);
+            Stretch(bank, 0, 74f, 0, 0);
 
             Image bg = AddImage(NewNode("ui_image_bank_bg", bank), "ui_card_frame_12px_neutral");
             bg.type = Image.Type.Sliced;
@@ -527,12 +534,14 @@ namespace Vertigo.Wheel.Editor
         private static ActionBarView BuildActions(RectTransform sidePanel)
         {
             RectTransform actions = NewNode("ui_panel_actions", sidePanel);
-            TopStrip(actions, 64f, 0f);
+            BottomStrip(actions, 64f);
 
+            // Centred in a strip that shares the bank panel's own left/right bounds — centred here is
+            // centred relative to the COLLECTED box above it, without needing to reference that box directly.
             RectTransform buttonRect = NewNode("ui_button_action_exit", actions);
-            buttonRect.anchorMin = new Vector2(0f, 0.5f);
-            buttonRect.anchorMax = new Vector2(0f, 0.5f);
-            buttonRect.pivot = new Vector2(0f, 0.5f);
+            buttonRect.anchorMin = new Vector2(0.5f, 0.5f);
+            buttonRect.anchorMax = new Vector2(0.5f, 0.5f);
+            buttonRect.pivot = new Vector2(0.5f, 0.5f);
             buttonRect.sizeDelta = new Vector2(180f, 52f);
             buttonRect.anchoredPosition = Vector2.zero;
 
