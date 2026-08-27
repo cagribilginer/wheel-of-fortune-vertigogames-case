@@ -36,9 +36,9 @@ namespace Vertigo.Wheel.Editor
         {
             public readonly int Rule;
             public readonly string Message;
-            public readonly Object Target;
+            public readonly UnityEngine.Object Target;
 
-            public Finding(int rule, string message, Object target)
+            public Finding(int rule, string message, UnityEngine.Object target)
             {
                 Rule = rule;
                 Message = message;
