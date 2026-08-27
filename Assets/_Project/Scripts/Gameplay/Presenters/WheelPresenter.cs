@@ -60,11 +60,27 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             PopulateSlots(wheel);
         }
 
+        // The wheel panel's authored, fixed design size (see MainSceneBuilder.BuildWheel) — the fallback
+        // LayoutSlots reaches for if the rotor's rect ever reads back degenerate.
+        private const float DesignWheelSize = 720f;
+
         private void LayoutSlots()
         {
             if (_view.Rotor == null || _view.Slots.Count == 0) return;
 
             float wheelSize = _view.Rotor.rect.width;
+            if (wheelSize < 50f)
+            {
+                // A degenerate rect here collapses every slot's radius to ~0, stacking all eight on the
+                // rotor's centre — indistinguishable from "no icon at all" and easy to mistake for a
+                // population bug. Falling back to the design size keeps the wheel correct either way; the
+                // warning makes it visible if this path is ever actually taken instead of silently masking it.
+                Debug.LogWarning(
+                    $"[Vertigo] WheelPresenter: rotor rect width was {wheelSize:F1}px when laying out slots; " +
+                    $"falling back to the {DesignWheelSize:F0}px design size.");
+                wheelSize = DesignWheelSize;
+            }
+
             float radius = 0.315f * wheelSize;
             float slotAngle = 360f / _view.Slots.Count;
 
