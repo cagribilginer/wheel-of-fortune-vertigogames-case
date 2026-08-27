@@ -1,7 +1,7 @@
 {
     "name": "Vertigo.Wheel.UI",
     "rootNamespace": "Vertigo.Wheel.UI",
-    "references": [ "Vertigo.Wheel.Core", "Vertigo.Wheel.Data", "Vertigo.Wheel.Gameplay", "Unity.TextMeshPro" ],
+    "references": [ "Vertigo.Wheel.Core", "Vertigo.Wheel.Data", "Unity.TextMeshPro" ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
