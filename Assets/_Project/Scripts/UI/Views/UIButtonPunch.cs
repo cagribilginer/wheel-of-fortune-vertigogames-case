@@ -2,14 +2,15 @@ using System;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
+using Vertigo.Wheel.Data.Services;
 
 namespace Vertigo.Wheel.UI.Views
 {
     /// <summary>
-    /// Shared click feedback for every interactable button: a quick scale punch on its dedicated
-    /// <c>_anim</c> child, never on the button's own root — the root carries the raycastable Image and, on
-    /// the spin button, an independent idle-breathe tween (see <c>WheelPresenter</c>); two tweens sharing
-    /// one transform's localScale would fight each other.
+    /// Shared click feedback for every interactable button: a click SFX plus a quick scale punch on its
+    /// dedicated <c>_anim</c> child, never on the button's own root — the root carries the raycastable Image
+    /// and, on the spin button, an independent idle-breathe tween (see <c>WheelPresenter</c>); two tweens
+    /// sharing one transform's localScale would fight each other.
     /// <para>
     /// Wired with <c>AddListener</c> in <see cref="OnEnable"/>, never an Inspector OnClick binding, for the
     /// same reason every other view in this project does it that way.
@@ -38,6 +39,8 @@ namespace Vertigo.Wheel.UI.Views
 
         private void Punch()
         {
+            AudioHub.PlayButtonClick();
+
             if (_animTarget == null) return;
 
             _animTarget.DOKill();

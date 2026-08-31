@@ -22,6 +22,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly ActionBarPresenter _actionBar;
         private readonly PopupPresenter _popups;
         private readonly VfxPresenter _vfx;
+        private readonly AudioPresenter _audio;
         private readonly WheelThemeConfig _bronzeTheme;
         private readonly WheelThemeConfig _silverTheme;
         private readonly WheelThemeConfig _goldenTheme;
@@ -33,7 +34,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public ScreenPresentation(
             HeaderPresenter header, WheelPresenter wheel, ZoneMapPresenter zoneMap, BankPresenter bank,
-            ActionBarPresenter actionBar, PopupPresenter popups, VfxPresenter vfx,
+            ActionBarPresenter actionBar, PopupPresenter popups, VfxPresenter vfx, AudioPresenter audio,
             WheelThemeConfig bronzeTheme, WheelThemeConfig silverTheme, WheelThemeConfig goldenTheme)
         {
             _header = header;
@@ -43,6 +44,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _actionBar = actionBar;
             _popups = popups;
             _vfx = vfx;
+            _audio = audio;
             _bronzeTheme = bronzeTheme;
             _silverTheme = silverTheme;
             _goldenTheme = goldenTheme;
@@ -66,10 +68,15 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void PlayReveal(SpinOutcome outcome, ZoneType zoneType, Action onComplete)
         {
-            // Fire-and-forget: the burst plays alongside the highlight tween, not gating onComplete, since
-            // nothing downstream needs to wait on a purely cosmetic flourish.
-            if (!outcome.IsBomb && (zoneType != ZoneType.Normal || outcome.UnitValue >= BigRewardUnitValue))
-                _vfx.PlayRewardBurst();
+            // Fire-and-forget: both play alongside the highlight tween, not gating onComplete, since
+            // nothing downstream needs to wait on a purely cosmetic flourish. The chime plays on every
+            // reward landing; the glow burst is reserved for the ones worth calling out visually.
+            if (!outcome.IsBomb)
+            {
+                _audio.PlayReward();
+                if (zoneType != ZoneType.Normal || outcome.UnitValue >= BigRewardUnitValue)
+                    _vfx.PlayRewardBurst();
+            }
 
             _wheel.HighlightSlot(outcome.SlotIndex, onComplete);
         }
@@ -80,6 +87,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         public void PlayBomb(Action onComplete)
         {
             _vfx.PlayBombImpact();
+            _audio.PlayBombImpact();
             _bank.Refresh();
             DOVirtual.DelayedCall(0.4f, () => onComplete());
         }

@@ -4,6 +4,7 @@ using UnityEngine;
 using Vertigo.Wheel.Core.Spin;
 using Vertigo.Wheel.Core.States;
 using Vertigo.Wheel.Data.Configs;
+using Vertigo.Wheel.Data.Services;
 using Vertigo.Wheel.UI.Views;
 
 namespace Vertigo.Wheel.Gameplay.Presenters
@@ -24,18 +25,22 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly WheelSpinConfig _spinConfig;
         private readonly RewardCatalog _catalog;
         private readonly Sprite _bombIcon;
+        private readonly IAudioService _audio;
         private readonly Tween _tickTween;
         private readonly Tween _breatheTween;
 
         private float _slotAngle = 45f;
         private int _lastTickIndex = int.MinValue;
+        private AudioClip _tickClip;
 
-        public WheelPresenter(WheelView view, WheelSpinConfig spinConfig, RewardCatalog catalog, Sprite bombIcon)
+        public WheelPresenter(
+            WheelView view, WheelSpinConfig spinConfig, RewardCatalog catalog, Sprite bombIcon, IAudioService audio)
         {
             _view = view;
             _spinConfig = spinConfig;
             _catalog = catalog;
             _bombIcon = bombIcon;
+            _audio = audio;
 
             // The editor's [ContextMenu] WheelSlotLayout tool is design-time-only convenience; nothing
             // guarantees a human ever ran it. Doing the same placement here means a fresh Play session is
@@ -67,7 +72,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         public void SetTheme(WheelModel wheel, WheelThemeConfig theme)
         {
             if (theme != null)
+            {
                 _view.SetTheme(theme.BaseSprite, theme.IndicatorSprite, theme.AccentColor, theme.GlowColor);
+                _tickClip = theme.Tick;
+            }
 
             PopulateSlots(wheel);
         }
@@ -202,6 +210,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
             _lastTickIndex = idx;
             _tickTween.Restart();
+            _audio.PlayOneShot(_tickClip, 0.5f);
         }
     }
 }

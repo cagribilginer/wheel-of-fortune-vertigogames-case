@@ -174,6 +174,7 @@ namespace Vertigo.Wheel.Editor
                 GenerateSpinConfig(ref created, ref updated);
                 GenerateContinueConfig(ref created, ref updated);
                 GenerateCatalog(rewards, ref created, ref updated);
+                GenerateAudioLibrary(ref created, ref updated);
             }
             finally
             {
@@ -409,6 +410,14 @@ namespace Vertigo.Wheel.Editor
 
             so.ApplyModifiedPropertiesWithoutUndo();
         }
+
+        /// <summary>
+        /// Just the drop target — no <c>demo_content</c> clips exist to assign, so this only ensures the
+        /// asset <c>GameInstaller</c>'s <c>Resources.Load</c> expects actually exists. Whoever sources SFX
+        /// later drags clips onto this same asset; nothing about the loading path changes.
+        /// </summary>
+        private static void GenerateAudioLibrary(ref int created, ref int updated) =>
+            LoadOrCreate<AudioLibrary>($"{SettingsFolder}/AudioLibrary.asset", ref created, ref updated);
 
         // ------------------------------------------------------------------ helpers
 

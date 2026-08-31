@@ -89,20 +89,26 @@ namespace Vertigo.Wheel.Gameplay
             var continueService = new ContinueService(wallet, continueConfig.ToSettings());
             var runModel = new RunModel(classifier, wallet, new RewardId("Reward_Gold"));
 
+            var audioLibrary = Resources.Load<AudioLibrary>("Configs/Settings/AudioLibrary");
+            IAudioService audioService = new AudioService(new PlayerPrefsSaveService(), transform);
+            AudioHub.Initialize(audioService, audioLibrary);
+            var audioPresenter = new AudioPresenter(audioService, audioLibrary);
+
             var headerPresenter = new HeaderPresenter(_header, wallet);
-            var wheelPresenter = new WheelPresenter(_wheel, spinConfig, catalog, _bombSlotIcon);
+            var wheelPresenter = new WheelPresenter(_wheel, spinConfig, catalog, _bombSlotIcon, audioService);
             Sprite safeBadge = catalog.Find("Reward_ChestSilver")?.Icon;
             var zoneMapPresenter = new ZoneMapPresenter(
                 _zoneMap, _zoneMapTilePrefab, classifier,
                 _zoneTileBgSprite, _zoneTileCurrentSprite, _zoneTileSuperSprite, safeBadge, progression);
             var bankPresenter = new BankPresenter(_bank, _bankEntryPrefab, catalog, runModel.Bank, _flightLayer);
             var actionBarPresenter = new ActionBarPresenter(_actionBar);
-            var popupPresenter = new PopupPresenter(_bombPopup, _collectPopup, _giveUpPopup, _bankEntryPrefab, catalog);
+            var popupPresenter = new PopupPresenter(
+                _bombPopup, _collectPopup, _giveUpPopup, _bankEntryPrefab, catalog, audioPresenter);
             var vfxPresenter = new VfxPresenter(_vfx);
 
             var presentation = new ScreenPresentation(
                 headerPresenter, wheelPresenter, zoneMapPresenter, bankPresenter, actionBarPresenter, popupPresenter,
-                vfxPresenter, bronzeTheme, silverTheme, goldenTheme);
+                vfxPresenter, audioPresenter, bronzeTheme, silverTheme, goldenTheme);
 
             var context = new GameContext(runModel, wheelFactory, spinService, continueService, presentation);
             GameStateMachine machine = GameFlow.Build(context);

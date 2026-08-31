@@ -27,17 +27,19 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly CollectPopupView _collect;
         private readonly GiveUpConfirmPopupView _giveUp;
         private readonly RewardCatalog _catalog;
+        private readonly AudioPresenter _audio;
         private readonly ObjectPool<BankEntryView> _listPool;
         private readonly List<BankEntryView> _activeList = new List<BankEntryView>();
 
         public PopupPresenter(
             BombPopupView bomb, CollectPopupView collect, GiveUpConfirmPopupView giveUp,
-            BankEntryView entryPrefab, RewardCatalog catalog)
+            BankEntryView entryPrefab, RewardCatalog catalog, AudioPresenter audio)
         {
             _bomb = bomb;
             _collect = collect;
             _giveUp = giveUp;
             _catalog = catalog;
+            _audio = audio;
 
             _listPool = new ObjectPool<BankEntryView>(
                 () => Object.Instantiate(entryPrefab, _collect.Content),
@@ -55,10 +57,17 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _giveUp.CancelClicked += machine.Cancel;
         }
 
-        public void ShowGameOver(int zoneReached, bool continueOffered, int continueCost) =>
+        public void ShowGameOver(int zoneReached, bool continueOffered, int continueCost)
+        {
+            _audio.PlayPopupOpen();
             _bomb.Show(zoneReached, continueOffered, continueCost);
+        }
 
-        public void HideGameOver() => _bomb.Hide();
+        public void HideGameOver()
+        {
+            _audio.PlayPopupClose();
+            _bomb.Hide();
+        }
 
         public void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared)
         {
@@ -77,14 +86,27 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             }
 
             _collect.SetChest(ChestFor(total));
+            _audio.PlayPopupOpen();
             _collect.Show(zonesCleared);
         }
 
-        public void HideCashOut() => _collect.Hide();
+        public void HideCashOut()
+        {
+            _audio.PlayPopupClose();
+            _collect.Hide();
+        }
 
-        public void ShowGiveUpConfirm(int rewardsAtStake) => _giveUp.Show(rewardsAtStake);
+        public void ShowGiveUpConfirm(int rewardsAtStake)
+        {
+            _audio.PlayPopupOpen();
+            _giveUp.Show(rewardsAtStake);
+        }
 
-        public void HideGiveUpConfirm() => _giveUp.Hide();
+        public void HideGiveUpConfirm()
+        {
+            _audio.PlayPopupClose();
+            _giveUp.Hide();
+        }
 
         private Sprite ChestFor(long totalValue)
         {
