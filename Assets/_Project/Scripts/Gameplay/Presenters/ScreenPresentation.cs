@@ -15,7 +15,6 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     /// </summary>
     public sealed class ScreenPresentation : IWheelPresentation
     {
-        private readonly HeaderPresenter _header;
         private readonly WheelPresenter _wheel;
         private readonly ZoneMapPresenter _zoneMap;
         private readonly BankPresenter _bank;
@@ -33,11 +32,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private const int BigRewardUnitValue = 60;
 
         public ScreenPresentation(
-            HeaderPresenter header, WheelPresenter wheel, ZoneMapPresenter zoneMap, BankPresenter bank,
+            WheelPresenter wheel, ZoneMapPresenter zoneMap, BankPresenter bank,
             ActionBarPresenter actionBar, PopupPresenter popups, VfxPresenter vfx, AudioPresenter audio,
             WheelThemeConfig bronzeTheme, WheelThemeConfig silverTheme, WheelThemeConfig goldenTheme)
         {
-            _header = header;
             _wheel = wheel;
             _zoneMap = zoneMap;
             _bank = bank;
@@ -52,7 +50,6 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void ShowZone(int zone, ZoneType zoneType, WheelModel wheel, Action onComplete)
         {
-            _header.SetZone(zone);
             _wheel.SetTheme(wheel, ThemeFor(wheel.Tier));
             _bank.Refresh();
             _zoneMap.ShowZone(zone, onComplete);

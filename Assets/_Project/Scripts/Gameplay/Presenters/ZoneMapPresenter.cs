@@ -11,18 +11,18 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 {
     /// <summary>
     /// The horizontal zone strip: one pooled tile per zone in the visible window, scrolled so the current
-    /// zone stays centred.
+    /// zone stays centred, over a single solid dark bar.
     /// <para>
     /// The window is built <em>ahead</em> of the player rather than growing tile-by-tile as each zone is
-    /// reached — a designer wants to be able to see zone 30's golden marker while still standing on zone 1.
-    /// A zone's number and type never change between runs, so tiles are never released on a reset either:
-    /// the strip only ever grows, and a reset just moves the highlight back to zone 1.
+    /// reached — a designer wants to be able to see zone 30's marker while still standing on zone 1. A
+    /// zone's number and type never change between runs, so tiles are never released on a reset either: the
+    /// strip only ever grows, and a reset just moves the highlight back to zone 1.
     /// </para>
     /// <para>
-    /// Zone 1 can never sit dead-centre in the viewport — there is nothing to its left to justify a shift,
-    /// and clamping to show blank space instead would look broken. <see cref="Scroll"/> already clamps to
-    /// the start; what actually reads as "wrong tile highlighted" without a strong per-type visual is
-    /// solved by <see cref="ApplyStyle"/> instead, not by fighting the clamp.
+    /// A tile has no card of its own — the reference strip is a plain dark bar of numbers. Which tile is
+    /// "current" is carried entirely by the raised white marker + a dark bold number (<see cref="ApplyStyle"/>).
+    /// Number colour depends only on zone type, not on passed/upcoming: green for safe zones, gold for
+    /// super zones, muted grey for the rest.
     /// </para>
     /// </summary>
     public sealed class ZoneMapPresenter
@@ -30,31 +30,29 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private const int LookaheadZones = 15;
         private const int MinimumWindow = 30;
 
-        private static readonly Color SafeTextColor = new Color(0.55f, 0.95f, 0.6f);
-        private static readonly Color SuperTextColor = new Color(1f, 0.85f, 0.35f);
+        // Colour is driven by zone type only, never by whether a zone is passed or upcoming: green is
+        // reserved strictly for safe zones (5, 10, 15…), gold for super zones, muted grey for everything
+        // else. A passed normal zone therefore looks exactly like an upcoming one.
+        private static readonly Color CurrentTextColor = new Color(0.12f, 0.13f, 0.16f);
+        private static readonly Color SafeTextColor = new Color(0.40f, 0.95f, 0.45f);
+        private static readonly Color SuperTextColor = new Color(1f, 0.82f, 0.30f);
+        private static readonly Color NormalTextColor = new Color(0.62f, 0.64f, 0.70f);
 
         private readonly ZoneMapView _view;
         private readonly IZoneClassifier _classifier;
-        private readonly Sprite _bgSprite;
-        private readonly Sprite _currentSprite;
-        private readonly Sprite _superSprite;
-        private readonly Sprite _safeBadge;
+        private readonly int _safeInterval;
+        private readonly int _superInterval;
         private readonly ObjectPool<ZoneMapTileView> _pool;
         private readonly List<ZoneMapTileView> _active = new List<ZoneMapTileView>();
 
         public ZoneMapPresenter(
             ZoneMapView view, ZoneMapTileView tilePrefab, IZoneClassifier classifier,
-            Sprite bgSprite, Sprite currentSprite, Sprite superSprite, Sprite safeBadge,
             ZoneProgressionConfig progression)
         {
             _view = view;
             _classifier = classifier;
-            _bgSprite = bgSprite;
-            _currentSprite = currentSprite;
-            _superSprite = superSprite;
-            _safeBadge = safeBadge;
-
-            _view.SetMilestoneLabels(progression.SafeZoneInterval, progression.SuperZoneInterval);
+            _safeInterval = Mathf.Max(1, progression.SafeZoneInterval);
+            _superInterval = Mathf.Max(1, progression.SuperZoneInterval);
 
             _pool = new ObjectPool<ZoneMapTileView>(
                 () => Object.Instantiate(tilePrefab, _view.Content),
@@ -65,14 +63,19 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void ShowZone(int zone, System.Action onComplete)
         {
+            _view.SetMilestoneTargets(NextMilestone(zone, _safeInterval), NextMilestone(zone, _superInterval));
+
             int horizon = Mathf.Max(MinimumWindow, zone + LookaheadZones);
             while (_active.Count < horizon) BuildTile(_active.Count + 1);
 
             for (int i = 0; i < _active.Count; i++)
-                ApplyStyle(_active[i], i + 1, isCurrent: i + 1 == zone);
+                ApplyStyle(_active[i], i + 1, zone);
 
             Scroll(zone, onComplete);
         }
+
+        /// <summary>The next multiple of <paramref name="interval"/> strictly greater than <paramref name="zone"/>.</summary>
+        private static int NextMilestone(int zone, int interval) => (zone / interval + 1) * interval;
 
         private void BuildTile(int zoneNumber)
         {
@@ -82,14 +85,12 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _active.Add(tile);
         }
 
-        private void ApplyStyle(ZoneMapTileView tile, int zoneNumber, bool isCurrent)
+        private void ApplyStyle(ZoneMapTileView tile, int zoneNumber, int currentZone)
         {
-            if (isCurrent)
+            if (zoneNumber == currentZone)
             {
-                tile.SetBackground(_currentSprite != null ? _currentSprite : _bgSprite);
-                tile.SetBadge(null);
-                tile.SetNumberColor(Color.white);
-                tile.Rect.localScale = Vector3.one * 1.1f;
+                tile.SetCurrent(CurrentTextColor);
+                tile.Rect.localScale = Vector3.one * 1.12f;
                 return;
             }
 
@@ -98,19 +99,13 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             switch (_classifier.Classify(zoneNumber))
             {
                 case ZoneType.Super:
-                    tile.SetBackground(_superSprite != null ? _superSprite : _bgSprite);
-                    tile.SetBadge(null);
-                    tile.SetNumberColor(SuperTextColor);
+                    tile.SetPlain(SuperTextColor, bold: true);
                     break;
                 case ZoneType.Safe:
-                    tile.SetBackground(_bgSprite);
-                    tile.SetBadge(_safeBadge);
-                    tile.SetNumberColor(SafeTextColor);
+                    tile.SetPlain(SafeTextColor, bold: true);
                     break;
                 default:
-                    tile.SetBackground(_bgSprite);
-                    tile.SetBadge(null);
-                    tile.SetNumberColor(Color.white);
+                    tile.SetPlain(NormalTextColor, bold: false);
                     break;
             }
         }

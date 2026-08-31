@@ -78,7 +78,8 @@ namespace Vertigo.Wheel.UI.Views
             }
 
             float wheelSize = _ui_transform_wheel_rotor.rect.width;
-            float radius = 0.315f * wheelSize;
+            // Keep in sync with WheelPresenter.LayoutSlots: 0.303 centres the slots in the bronze holes.
+            float radius = 0.303f * wheelSize;
             float slotAngle = 360f / _slots.Length;
 
             for (int i = 0; i < _slots.Length; i++)

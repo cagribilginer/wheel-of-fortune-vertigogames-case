@@ -101,7 +101,9 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 wheelSize = DesignWheelSize;
             }
 
-            float radius = 0.315f * wheelSize;
+            // 0.303 puts a slot's centre (icons are centred in the slot, no local offset) dead in the middle
+            // of the bronze cylinder holes on the 720px base art — 0.315 sat them a touch proud of the rim.
+            float radius = 0.303f * wheelSize;
             float slotAngle = 360f / _view.Slots.Count;
 
             for (int i = 0; i < _view.Slots.Count; i++)

@@ -97,12 +97,9 @@ namespace Vertigo.Wheel.Editor
         {
             var installer = new GameObject("GameInstaller").AddComponent<GameInstaller>();
             Sprite bombIcon = EditorSpriteUtility.FindSprite("ui_card_icon_death");
-            Sprite zoneBg = EditorSpriteUtility.FindSprite("ui_card_panel_zone_bg");
-            Sprite zoneCurrent = EditorSpriteUtility.FindSprite("ui_card_panel_zone_current");
-            Sprite zoneSuper = EditorSpriteUtility.FindSprite("ui_card_panel_zone_super");
 
             installer.Configure(header, wheel, zoneMap, bank, actionBar, bombPopup, collectPopup, giveUpPopup,
-                vfx, tilePrefab, bankEntryPrefab, canvasRoot, bombIcon, zoneBg, zoneCurrent, zoneSuper);
+                vfx, tilePrefab, bankEntryPrefab, canvasRoot, bombIcon);
         }
 
         // ------------------------------------------------------------------ pooled prefabs
@@ -111,29 +108,26 @@ namespace Vertigo.Wheel.Editor
         {
             var root = new GameObject("ui_item_zonemap_tile", typeof(RectTransform));
             var rt = (RectTransform)root.transform;
-            rt.sizeDelta = new Vector2(76f, 104f);
-            root.AddComponent<LayoutElement>().preferredWidth = 76f;
-            root.GetComponent<LayoutElement>().preferredHeight = 104f;
+            rt.sizeDelta = new Vector2(60f, 76f);
+            var layoutElement = root.AddComponent<LayoutElement>();
+            layoutElement.preferredWidth = 60f;
+            layoutElement.preferredHeight = 76f;
 
-            Image bg = AddImage(NewNode("ui_image_zonemap_tile_bg_value", rt), "ui_card_panel_zone_bg");
-            bg.type = Image.Type.Sliced;
-            bg.maskable = true;
-            Stretch((RectTransform)bg.transform, 0, 0, 0, 0);
+            // The reference strip has no per-tile card: tiles are bare numbers on the shared dark bar. The
+            // only decoration a tile ever carries is this raised white marker, shown on exactly one tile —
+            // the current zone. The sprite is 9-sliced horizontally only (border 4/0/4/0), so its top notch
+            // keeps its shape at any width; the rect height is pinned to the art's native 64px for the same
+            // reason. The presenter toggles Image.enabled, never the GameObject, so a pooled tile that was
+            // once "current" cleanly goes back to plain.
+            Image marker = AddImage(NewNode("ui_image_zonemap_tile_marker_value", rt), "ui_card_panel_zone_current_white");
+            marker.type = Image.Type.Sliced;
+            marker.maskable = true;
+            marker.enabled = false;
+            FixedCentered((RectTransform)marker.transform, new Vector2(0f, 2f), new Vector2(56f, 64f));
 
-            Image frame = AddImage(NewNode("ui_image_zonemap_tile_frame", rt), "ui_card_frame_4px_zone");
-            frame.type = Image.Type.Sliced;
-            frame.maskable = true;
-            Stretch((RectTransform)frame.transform, 0, 0, 0, 0);
-
-            TextMeshProUGUI number = AddText(NewNode("ui_text_zonemap_tile_number_value", rt), "7", 28f);
+            TextMeshProUGUI number = AddText(NewNode("ui_text_zonemap_tile_number_value", rt), "7", 30f);
             number.maskable = true; // pooled into ui_content_zonemap, which sits inside a RectMask2D
-            FixedCentered((RectTransform)number.transform, Vector2.zero, new Vector2(70, 40));
-
-            Image badge = AddImage(NewNode("ui_image_zonemap_tile_badge_value", rt), null);
-            badge.preserveAspect = true;
-            badge.maskable = true;
-            badge.enabled = false;
-            FixedTop((RectTransform)badge.transform, new Vector2(32, 32), 6f);
+            FixedCentered((RectTransform)number.transform, Vector2.zero, new Vector2(56, 48));
 
             var view = root.AddComponent<ZoneMapTileView>();
             view.RebindReferences();
@@ -144,14 +138,22 @@ namespace Vertigo.Wheel.Editor
         {
             var root = new GameObject("ui_item_wheel_slot", typeof(RectTransform));
             var rt = (RectTransform)root.transform;
-            rt.sizeDelta = new Vector2(140f, 140f);
+            // Anchored dead-centre so WheelPresenter.LayoutSlots' anchoredPosition places the slot's centre
+            // exactly on the polar ring. 90x90 with a 55x55 icon sits strictly inside one bronze cylinder
+            // hole: it clears the outer rim and the neighbouring numbers, where the old 140x140 slot's
+            // rectangular grey-backed reward icons bled over the rim. preserveAspect stops the non-square
+            // icons distorting inside that box.
+            rt.anchorMin = new Vector2(0.5f, 0.5f);
+            rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = new Vector2(90f, 90f);
 
             Image icon = AddImage(NewNode("ui_image_slot_icon_value", rt), null);
             icon.preserveAspect = true;
-            FixedCentered((RectTransform)icon.transform, new Vector2(0, 14), new Vector2(84, 84));
+            FixedCentered((RectTransform)icon.transform, Vector2.zero, new Vector2(55f, 55f));
 
-            TextMeshProUGUI amount = AddText(NewNode("ui_text_slot_amount_value", rt), "x25", 22f);
-            FixedCentered((RectTransform)amount.transform, new Vector2(0, -42), new Vector2(120, 32));
+            TextMeshProUGUI amount = AddText(NewNode("ui_text_slot_amount_value", rt), "x25", 17f);
+            FixedCentered((RectTransform)amount.transform, new Vector2(0f, -30f), new Vector2(84f, 24f));
 
             var view = root.AddComponent<WheelSlotView>();
             view.RebindReferences();
@@ -265,10 +267,6 @@ namespace Vertigo.Wheel.Editor
             bg.type = Image.Type.Sliced;
             Stretch((RectTransform)bg.transform, 0, 0, 0, 0);
 
-            TextMeshProUGUI zone = AddText(NewNode("ui_text_header_zone_value", header), "ZONE 7", 44f);
-            zone.alignment = TextAlignmentOptions.MidlineLeft;
-            LeftMiddle((RectTransform)zone.transform, 40f, new Vector2(400, 80));
-
             Image goldIcon = AddImage(NewNode("ui_image_header_gold_icon", header), "UI_icon_gold");
             goldIcon.preserveAspect = true;
             // -180 left only ~112px of clearance before the icon's box collides with a right-aligned value
@@ -291,26 +289,36 @@ namespace Vertigo.Wheel.Editor
             RectTransform zoneMap = NewNode("ui_panel_zonemap", safeArea);
             TopStrip(zoneMap, 120f, 100f);
 
-            Image bg = AddImage(NewNode("ui_image_zonemap_bg", zoneMap), "ui_card_panel_zone_bg");
-            bg.type = Image.Type.Sliced;
-            Stretch((RectTransform)bg.transform, 0, 0, 0, 0);
+            // One solid, rounded, dark container strip — no gradient backdrop bars, no outer corner
+            // brackets. Fixed width, centred, vertically inset a little inside the 120px panel so the raised
+            // current-zone marker still reads as a badge sitting on the bar rather than filling it. The bar
+            // is matched to the scroll window's width (not the full panel) so it hugs the actual track and
+            // never reaches into the milestone badges: at the 1920 reference width (CanvasScaler Expand only
+            // grows it) there is a clear ~320px gap between the centred bar and the badges.
+            RectTransform barRect = NewNode("ui_image_zonemap_bg", zoneMap);
+            barRect.anchorMin = new Vector2(0.5f, 0f);
+            barRect.anchorMax = new Vector2(0.5f, 1f);
+            barRect.pivot = new Vector2(0.5f, 0.5f);
+            barRect.sizeDelta = new Vector2(ZoneMapViewportWidth, -16f);
+            barRect.anchoredPosition = Vector2.zero;
+            Image bar = barRect.gameObject.AddComponent<Image>();
+            // Opaque panel sprite for the fill (ui_card_frame_12px_neutral has a transparent centre and only
+            // ever draws its edge — see the bank panel note), tinted almost to black.
+            bar.sprite = EditorSpriteUtility.FindSprite("ui_card_panel_zone_bg");
+            bar.type = Image.Type.Sliced;
+            bar.color = new Color(0.07f, 0.075f, 0.09f, 1f);
+            bar.raycastTarget = false;
+            bar.maskable = false;
 
-            // Fixed width, centred, vertically stretched: the backdrop bar behind it spans the full strip,
-            // but the scrollable window itself is capped so ~9 tiles are visible at once instead of the
-            // ~20+ a full-width viewport would show, which made "centre the current zone" imperceptible.
-            // The frame is matched to this same width/position — not the full panel — so its decorative
-            // corner brackets hug the actual track instead of sitting in dead space past its ends. Centring
-            // never collides with the milestone badges: the panel's logical width is never narrower than the
-            // 1920 reference (CanvasScaler Expand only ever grows it), and at 1920 there is a clear ~320px
-            // gap between the centred track's right edge and the badges' left edge.
-            Image frame = AddImage(NewNode("ui_image_zonemap_frame", zoneMap), "ui_card_zone_map_frame");
-            frame.type = Image.Type.Sliced;
-            RectTransform frameRect = (RectTransform)frame.transform;
-            frameRect.anchorMin = new Vector2(0.5f, 0f);
-            frameRect.anchorMax = new Vector2(0.5f, 1f);
-            frameRect.pivot = new Vector2(0.5f, 0.5f);
-            frameRect.sizeDelta = new Vector2(ZoneMapViewportWidth, 0f);
-            frameRect.anchoredPosition = Vector2.zero;
+            Image barStroke = AddImage(NewNode("ui_image_zonemap_stroke", zoneMap), "ui_card_frame_12px_neutral");
+            barStroke.type = Image.Type.Sliced;
+            barStroke.color = new Color(0.34f, 0.37f, 0.43f, 0.85f);
+            RectTransform barStrokeRect = (RectTransform)barStroke.transform;
+            barStrokeRect.anchorMin = new Vector2(0.5f, 0f);
+            barStrokeRect.anchorMax = new Vector2(0.5f, 1f);
+            barStrokeRect.pivot = new Vector2(0.5f, 0.5f);
+            barStrokeRect.sizeDelta = new Vector2(ZoneMapViewportWidth, -16f);
+            barStrokeRect.anchoredPosition = Vector2.zero;
 
             RectTransform scrollRect = NewNode("ui_scroll_zonemap", zoneMap);
             scrollRect.anchorMin = new Vector2(0.5f, 0f);
@@ -351,50 +359,72 @@ namespace Vertigo.Wheel.Editor
 
             scroll.content = content;
 
+            // Fills are tinted bright to survive multiplying against the mid-grey panel art; the sprite's
+            // darker corner pixels still give each card a subtle bevel.
             BuildMilestoneBadge(zoneMap, "ui_card_zonemap_milestone_super", "ui_text_zonemap_milestone_super_value",
-                "UI_icon_chest_gold_nolight", new Color(0.32f, 0.22f, 0.08f, 0.92f), new Color(1f, 0.85f, 0.35f),
-                new Vector2(-20f, 30f));
+                "UI_icon_chest_gold_nolight", "SUPER ZONE 30",
+                new Color(1f, 0.66f, 0.16f, 1f), new Color(1f, 0.82f, 0.34f, 1f),
+                new Vector2(-16f, 33f));
 
             BuildMilestoneBadge(zoneMap, "ui_card_zonemap_milestone_safe", "ui_text_zonemap_milestone_safe_value",
-                "UI_icon_chest_silver_nolight", new Color(0.08f, 0.22f, 0.1f, 0.92f), new Color(0.55f, 0.95f, 0.6f),
-                new Vector2(-20f, -30f));
+                "UI_icon_chest_silver_nolight", "SAFE ZONE 10",
+                new Color(0.30f, 0.88f, 0.34f, 1f), new Color(0.48f, 0.96f, 0.52f, 1f),
+                new Vector2(-16f, -33f));
 
             var view = zoneMap.gameObject.AddComponent<ZoneMapView>();
             view.RebindReferences();
             return view;
         }
 
+        // Every SUPER/SAFE milestone card shares these exactly so the two badges are typographically
+        // identical — same box, same fixed font size (auto-sizing was letting the longer "SUPER ZONE 60"
+        // shrink relative to "SAFE ZONE 10"), same padding, same icon slot.
+        private static readonly Vector2 MilestoneCardSize = new Vector2(258f, 60f);
+        private const float MilestoneFontSize = 19f;
+        private const float MilestoneIconSize = 44f;
+
         /// <summary>
-        /// One top-right milestone card ("SAFE ZONE 5", "SUPER ZONE 30"). The interval number baked into the
-        /// placeholder text here is cosmetic only — <c>ZoneMapPresenter</c> overwrites it once, from
-        /// <c>ZoneProgressionConfig</c>, the same "static placeholder now, live value at Awake" pattern the
-        /// header's zone/gold text already uses.
+        /// One top-right milestone card ("SAFE ZONE 10", "SUPER ZONE 30"): an opaque, high-contrast pill
+        /// with a bright stroke and its chest icon on the right. The number in <paramref name="placeholder"/>
+        /// is cosmetic — <c>ZoneMapPresenter.ShowZone</c> rewrites both cards on every zone change with the
+        /// next safe/super zone strictly ahead of the player, so the targets count up as the run does.
         /// </summary>
         private static void BuildMilestoneBadge(
-            RectTransform parent, string cardName, string textName, string iconSpriteName,
-            Color cardTint, Color textColor, Vector2 anchoredPosition)
+            RectTransform parent, string cardName, string textName, string iconSpriteName, string placeholder,
+            Color fillColor, Color strokeColor, Vector2 anchoredPosition)
         {
             RectTransform card = NewNode(cardName, parent);
             card.anchorMin = new Vector2(1f, 0.5f);
             card.anchorMax = new Vector2(1f, 0.5f);
             card.pivot = new Vector2(1f, 0.5f);
-            card.sizeDelta = new Vector2(190f, 50f);
+            card.sizeDelta = MilestoneCardSize;
             card.anchoredPosition = anchoredPosition;
 
-            Image bg = AddImage(NewNode(cardName + "_bg", card), "ui_card_frame_4px_zone");
+            // Opaque panel sprite for the fill; ui_card_frame_12px_neutral is an outline only (transparent
+            // centre), so tinting it never produced the solid colour these cards need — it just drew a thin
+            // edge blown up to card size. The stroke layer on top is that outline sprite, used as intended.
+            Image bg = AddImage(NewNode(cardName + "_bg", card), "ui_card_panel_zone_bg");
             bg.type = Image.Type.Sliced;
-            bg.color = cardTint;
+            bg.color = fillColor;
             Stretch((RectTransform)bg.transform, 0, 0, 0, 0);
+
+            Image stroke = AddImage(NewNode(cardName + "_stroke", card), "ui_card_frame_12px_neutral");
+            stroke.type = Image.Type.Sliced;
+            stroke.color = strokeColor;
+            Stretch((RectTransform)stroke.transform, 0, 0, 0, 0);
 
             Image icon = AddImage(NewNode(cardName + "_icon", card), iconSpriteName);
             icon.preserveAspect = true;
-            LeftMiddle((RectTransform)icon.transform, 8f, new Vector2(36f, 36f));
+            RightMiddle((RectTransform)icon.transform, -8f, new Vector2(MilestoneIconSize, MilestoneIconSize));
 
-            TextMeshProUGUI text = AddText(NewNode(textName, card), "ZONE", 16f);
+            TextMeshProUGUI text = AddText(NewNode(textName, card), placeholder, MilestoneFontSize);
             text.alignment = TextAlignmentOptions.MidlineLeft;
-            text.color = textColor;
-            text.lineSpacing = -15f;
-            Stretch((RectTransform)text.transform, 50f, 2f, 8f, 2f);
+            text.color = Color.white;
+            text.fontStyle = FontStyles.Bold;
+            text.enableAutoSizing = false;
+            text.enableWordWrapping = false;
+            text.overflowMode = TextOverflowModes.Overflow;
+            Stretch((RectTransform)text.transform, 14f, 2f, 14f + MilestoneIconSize + 8f, 2f);
         }
 
         // ------------------------------------------------------------------ wheel
@@ -473,12 +503,22 @@ namespace Vertigo.Wheel.Editor
             RectTransform bank = NewNode("ui_panel_bank", sidePanel);
             Stretch(bank, 0, 74f, 0, 0);
 
-            Image bg = AddImage(NewNode("ui_image_bank_bg", bank), "ui_card_frame_12px_neutral");
+            // Two layers, each doing one job so neither has to be stretched past what it can render cleanly:
+            //   - the fill is ui_card_panel_zone_bg, a fully opaque panel sprite (no transparent centre), so
+            //     the COLLECTED box reads as a solid dark card against the near-black scene;
+            //   - the border is ui_card_frame_12px_neutral, an outline-only sprite (transparent centre) whose
+            //     12px 9-slice corners stay crisp at any panel size, tinted silver for a defined edge.
+            // The earlier single ui_card_frame_12px_neutral fill looked "stretched / low-res" precisely
+            // because it has no centre to fill with — only its thin edge was ever drawn, blown up huge.
+            Image bg = AddImage(NewNode("ui_image_bank_bg", bank), "ui_card_panel_zone_bg");
             bg.type = Image.Type.Sliced;
-            // The source art is neutral (pure white), meant to be tinted per context — left untinted it
-            // reads as a blown-out white panel rather than as part of the dark theme.
-            bg.color = new Color(0.06f, 0.07f, 0.1f, 0.85f);
+            bg.color = new Color(0.42f, 0.44f, 0.50f, 1f); // multiplies the mid-grey panel art down to a dark slate
             Stretch((RectTransform)bg.transform, 0, 0, 0, 0);
+
+            Image frame = AddImage(NewNode("ui_image_bank_frame", bank), "ui_card_frame_12px_neutral");
+            frame.type = Image.Type.Sliced;
+            frame.color = new Color(0.64f, 0.68f, 0.76f, 1f);
+            Stretch((RectTransform)frame.transform, 0, 0, 0, 0);
 
             TextMeshProUGUI title = AddText(NewNode("ui_text_bank_title", bank), "COLLECTED", 26f);
             title.alignment = TextAlignmentOptions.TopLeft;

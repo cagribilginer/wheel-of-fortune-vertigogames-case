@@ -3,19 +3,19 @@ using UnityEngine;
 
 namespace Vertigo.Wheel.UI.Views
 {
-    /// <summary>Top strip: current zone and the persistent gold balance. Purely passive.</summary>
+    /// <summary>
+    /// Top strip: the persistent gold balance only. The old left-aligned "ZONE X" label was removed — the
+    /// zone strip directly below already names the current zone with its raised marker, so repeating it in
+    /// the header was redundant chrome.
+    /// </summary>
     public sealed class HeaderView : UIViewBase
     {
-        [SerializeField] private TextMeshProUGUI _ui_text_header_zone_value;
         [SerializeField] private TextMeshProUGUI _ui_text_header_gold_value;
 
         protected override void CacheReferences()
         {
-            Bind(ref _ui_text_header_zone_value, "ui_text_header_zone_value");
             Bind(ref _ui_text_header_gold_value, "ui_text_header_gold_value");
         }
-
-        public void SetZone(int zone) => _ui_text_header_zone_value.SetText("ZONE {0}", zone);
 
         // TMP_Text.SetText's zero-alloc formatter only understands bare {0}..{4} tokens, not .NET format
         // specifiers — "{0:N0}" was printing the literal characters "N0" instead of a thousands separator.

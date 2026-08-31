@@ -38,9 +38,6 @@ namespace Vertigo.Wheel.Gameplay
         [SerializeField] private BankEntryView _bankEntryPrefab;
         [SerializeField] private Transform _flightLayer;
         [SerializeField] private Sprite _bombSlotIcon;
-        [SerializeField] private Sprite _zoneTileBgSprite;
-        [SerializeField] private Sprite _zoneTileCurrentSprite;
-        [SerializeField] private Sprite _zoneTileSuperSprite;
 
         /// <summary>
         /// Exposed for the one Play Mode smoke test that proves this composition root actually reaches
@@ -49,12 +46,17 @@ namespace Vertigo.Wheel.Gameplay
         /// </summary>
         public GameStateMachine Machine { get; private set; }
 
+        // The header presenter has no per-zone collaborator now that the zone number moved to the zone
+        // strip — it only mirrors the wallet onto the header. The composition root holds it so its
+        // subscription lives exactly as long as the scene does.
+        private HeaderPresenter _headerPresenter;
+
         /// <summary>Called once by the editor scene-build step; never touched by hand.</summary>
         public void Configure(
             HeaderView header, WheelView wheel, ZoneMapView zoneMap, BankView bank, ActionBarView actionBar,
             BombPopupView bombPopup, CollectPopupView collectPopup, GiveUpConfirmPopupView giveUpPopup,
             VfxView vfx, ZoneMapTileView zoneMapTilePrefab, BankEntryView bankEntryPrefab, Transform flightLayer,
-            Sprite bombSlotIcon, Sprite zoneTileBgSprite, Sprite zoneTileCurrentSprite, Sprite zoneTileSuperSprite)
+            Sprite bombSlotIcon)
         {
             _header = header;
             _wheel = wheel;
@@ -69,9 +71,6 @@ namespace Vertigo.Wheel.Gameplay
             _bankEntryPrefab = bankEntryPrefab;
             _flightLayer = flightLayer;
             _bombSlotIcon = bombSlotIcon;
-            _zoneTileBgSprite = zoneTileBgSprite;
-            _zoneTileCurrentSprite = zoneTileCurrentSprite;
-            _zoneTileSuperSprite = zoneTileSuperSprite;
         }
 
         private void Awake()
@@ -101,12 +100,9 @@ namespace Vertigo.Wheel.Gameplay
             AudioHub.Initialize(audioService, audioLibrary);
             var audioPresenter = new AudioPresenter(audioService, audioLibrary);
 
-            var headerPresenter = new HeaderPresenter(_header, wallet);
+            _headerPresenter = new HeaderPresenter(_header, wallet);
             var wheelPresenter = new WheelPresenter(_wheel, spinConfig, catalog, _bombSlotIcon, audioService);
-            Sprite safeBadge = catalog.Find("Reward_ChestSilver")?.Icon;
-            var zoneMapPresenter = new ZoneMapPresenter(
-                _zoneMap, _zoneMapTilePrefab, classifier,
-                _zoneTileBgSprite, _zoneTileCurrentSprite, _zoneTileSuperSprite, safeBadge, progression);
+            var zoneMapPresenter = new ZoneMapPresenter(_zoneMap, _zoneMapTilePrefab, classifier, progression);
             var bankPresenter = new BankPresenter(_bank, _bankEntryPrefab, catalog, runModel.Bank, _flightLayer);
             var actionBarPresenter = new ActionBarPresenter(_actionBar);
             var popupPresenter = new PopupPresenter(
@@ -114,7 +110,7 @@ namespace Vertigo.Wheel.Gameplay
             var vfxPresenter = new VfxPresenter(_vfx);
 
             var presentation = new ScreenPresentation(
-                headerPresenter, wheelPresenter, zoneMapPresenter, bankPresenter, actionBarPresenter, popupPresenter,
+                wheelPresenter, zoneMapPresenter, bankPresenter, actionBarPresenter, popupPresenter,
                 vfxPresenter, audioPresenter, bronzeTheme, silverTheme, goldenTheme);
 
             var context = new GameContext(runModel, wheelFactory, spinService, continueService, presentation);
