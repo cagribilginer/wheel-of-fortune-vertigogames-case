@@ -42,8 +42,11 @@ namespace Vertigo.Wheel.UI.Views
 
             _animTarget.DOKill();
             _animTarget.localScale = Vector3.one;
-            _animTarget.DOScale(0.94f, 0.06f)
-                .SetLoops(2, LoopType.Yoyo)
+            // A plain 2-loop DOScale over 0.06s is only a handful of frames each way and reads as
+            // nothing next to the spin button's own idle-breathe tween running on the sibling root
+            // transform. DOPunchScale's spring-back over more frames is what actually registers as
+            // "the button just reacted to my click."
+            _animTarget.DOPunchScale(Vector3.one * -0.18f, 0.28f, vibrato: 8, elasticity: 0.75f)
                 .SetLink(gameObject, LinkBehaviour.KillOnDestroy);
         }
 
