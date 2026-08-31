@@ -42,6 +42,13 @@ namespace Vertigo.Wheel.Gameplay
         [SerializeField] private Sprite _zoneTileCurrentSprite;
         [SerializeField] private Sprite _zoneTileSuperSprite;
 
+        /// <summary>
+        /// Exposed for the one Play Mode smoke test that proves this composition root actually reaches
+        /// <c>IdleState</c> in a real scene — nothing at runtime reads it. Everything else about the state
+        /// machine's construction stays a local in <see cref="Awake"/>, same as before.
+        /// </summary>
+        public GameStateMachine Machine { get; private set; }
+
         /// <summary>Called once by the editor scene-build step; never touched by hand.</summary>
         public void Configure(
             HeaderView header, WheelView wheel, ZoneMapView zoneMap, BankView bank, ActionBarView actionBar,
@@ -112,6 +119,7 @@ namespace Vertigo.Wheel.Gameplay
 
             var context = new GameContext(runModel, wheelFactory, spinService, continueService, presentation);
             GameStateMachine machine = GameFlow.Build(context);
+            Machine = machine;
 
             wheelPresenter.WireInput(machine);
             actionBarPresenter.WireInput(machine);
