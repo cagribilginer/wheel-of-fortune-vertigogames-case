@@ -243,6 +243,11 @@ namespace Vertigo.Wheel.Editor
             // freeze even though they work in the plain Game view.
             var module = go.AddComponent<StandaloneInputModule>();
             module.forceModuleActive = true;
+
+            // A touch on a phone jitters a few pixels between finger-down and finger-up; keep the
+            // click-vs-drag threshold low enough that a swipe on a ScrollRect registers as a drag
+            // straight away instead of being eaten as a dead tap. (Unity's default is 10.)
+            go.GetComponent<EventSystem>().pixelDragThreshold = 8;
         }
 
         /// <summary>
@@ -548,7 +553,7 @@ namespace Vertigo.Wheel.Editor
             Stretch(viewport, 0, 0, 0, 0);
             viewport.gameObject.AddComponent<RectMask2D>();
             Image viewportImage = viewport.gameObject.AddComponent<Image>();
-            viewportImage.color = new Color(0, 0, 0, 0f);
+            viewportImage.color = new Color(0f, 0f, 0f, 0.001f); // faint, not hard-zero: see ui_viewport_popup_bomb_list
             viewportImage.raycastTarget = true; // draggable ScrollRect viewport: RaycastTarget stays ON
             viewportImage.maskable = false; // its own RectMask2D is not an ancestor mask for itself
             scroll.viewport = viewport;
@@ -719,7 +724,10 @@ namespace Vertigo.Wheel.Editor
             Stretch(listViewport, 0, 0, 0, 0);
             listViewport.gameObject.AddComponent<RectMask2D>();
             Image listViewportImage = listViewport.gameObject.AddComponent<Image>();
-            listViewportImage.color = new Color(0f, 0f, 0f, 0f);
+            // Very faint rather than a hard zero: raycastTarget is what actually makes the hit test fire,
+            // but a non-zero alpha keeps the graphic unambiguously "present" for every pointer/touch path
+            // (Device Simulator touch simulation included). Imperceptible over the content behind it.
+            listViewportImage.color = new Color(0f, 0f, 0f, 0.001f);
             listViewportImage.raycastTarget = true; // draggable ScrollRect viewport: RaycastTarget stays ON
             listViewportImage.maskable = false; // its own RectMask2D is not an ancestor mask for itself
             listScroll.viewport = listViewport;
@@ -1086,7 +1094,7 @@ namespace Vertigo.Wheel.Editor
             Stretch(viewport, 0, 0, 0, 0);
             viewport.gameObject.AddComponent<RectMask2D>();
             Image viewportImage = viewport.gameObject.AddComponent<Image>();
-            viewportImage.color = new Color(0, 0, 0, 0f);
+            viewportImage.color = new Color(0f, 0f, 0f, 0.001f); // faint, not hard-zero: see ui_viewport_popup_bomb_list
             viewportImage.raycastTarget = true;
             viewportImage.maskable = false; // its own RectMask2D is not an ancestor mask for itself
             scroll.viewport = viewport;
