@@ -75,7 +75,9 @@ namespace Vertigo.Wheel.Editor
             (BombPopupView bombView, CollectPopupView collectView, GiveUpConfirmPopupView giveUpView,
                 MilestonePreviewPopupView milestoneView) = BuildPopupLayer(canvasRoot, bankEntryPrefab);
             VfxView vfxView = BuildVfxLayer(canvasRoot);
-            DebugOverlayView debugView = BuildDebugOverlay(canvasRoot);
+            // Inside the safe-area node, not the raw canvas, so the cheat bar clears rounded corners, the
+            // home indicator and landscape notches on a real device / the Device Simulator.
+            DebugOverlayView debugView = BuildDebugOverlay(safeArea);
 
             BuildGameInstaller(canvasRoot, headerView, wheelView, zoneMapView, bankView, actionBarView,
                 bombView, collectView, giveUpView, milestoneView, vfxView, debugView, tilePrefab, bankEntryPrefab);
@@ -232,7 +234,15 @@ namespace Vertigo.Wheel.Editor
 
         private static void BuildEventSystem()
         {
-            var go = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+            var go = new GameObject("EventSystem", typeof(EventSystem));
+
+            // Project runs the classic Input Manager (Player Settings > Active Input Handling = Input
+            // Manager), so StandaloneInputModule is the right module. Force it active: under the Device
+            // Simulator's touch simulation Input.mousePresent goes false, and without this the module
+            // deactivates itself mid-session — pointer drags stop reaching the EventSystem and ScrollRects
+            // freeze even though they work in the plain Game view.
+            var module = go.AddComponent<StandaloneInputModule>();
+            module.forceModuleActive = true;
         }
 
         /// <summary>
@@ -622,6 +632,10 @@ namespace Vertigo.Wheel.Editor
             canvas.overrideSorting = true;
             canvas.sortingOrder = 10;
             layer.gameObject.AddComponent<GraphicRaycaster>();
+            // Keep popup content (the bomb corner HUD, close buttons, cards) clear of the notch / dynamic
+            // island in landscape. Each backdrop bleeds back out past this inset so the dim still covers the
+            // full screen — see the negative Stretch on every "*_backdrop" below.
+            layer.gameObject.AddComponent<SafeAreaFitter>();
 
             BombPopupView bombView = BuildBombPopup(layer);
             CollectPopupView collectView = BuildCollectPopup(layer, bankEntryPrefab);
@@ -642,7 +656,8 @@ namespace Vertigo.Wheel.Editor
             Image backdrop = AddImage(NewNode("ui_image_popup_bomb_backdrop", root), null);
             backdrop.color = new Color(0.02f, 0f, 0f, 0.86f);
             backdrop.raycastTarget = true;
-            Stretch((RectTransform)backdrop.transform, 0, 0, 0, 0);
+            // Bleeds past the popup layer's safe-area inset so the dim always covers the full screen edge.
+            Stretch((RectTransform)backdrop.transform, -140, -140, -140, -140);
 
             // Breathing red alert wash over the backdrop. star_glow_alpha is a soft radial, oversized past
             // the canvas so its falloff never shows an edge; the view yoyos its alpha 0.5..0.9.
@@ -688,25 +703,28 @@ namespace Vertigo.Wheel.Editor
 
             // The lost haul: pooled BankEntryView tiles in one horizontal row, centred below the skull.
             // A deep run can bank more tiles than fit across the screen, so the row is a real horizontal
-            // ScrollRect (RectMask2D clip + HorizontalLayoutGroup) — the player can swipe through the full
-            // haul instead of it clipping at the edges.
+            // ScrollRect — same three-node shape as the bank and cash-out lists: a ScrollRect node, a
+            // viewport child that owns the RectMask2D clip and the drag raycast target, and the content row
+            // inside it. Keeping the raycast Image on the viewport (a child of the ScrollRect) is what stops
+            // the UI-hygiene "raycast target on a non-interactive Image" rule from flagging it.
             RectTransform listFrame = NewNode("ui_scroll_popup_bomb_list", anim);
             FixedCentered(listFrame, new Vector2(0f, -155f), new Vector2(1160f, 176f));
-            listFrame.gameObject.AddComponent<RectMask2D>();
             var listScroll = listFrame.gameObject.AddComponent<ScrollRect>();
             listScroll.horizontal = true;
             listScroll.vertical = false;
             listScroll.movementType = ScrollRect.MovementType.Elastic;
             listScroll.scrollSensitivity = 24f;
 
-            // Transparent fill so the ScrollRect (which is its own viewport here) has a raycast target and
-            // actually receives swipe/drag events across the strip.
-            Image listRaycast = listFrame.gameObject.AddComponent<Image>();
-            listRaycast.color = new Color(0f, 0f, 0f, 0f);
-            listRaycast.raycastTarget = true;
-            listRaycast.maskable = false; // its own RectMask2D is not an ancestor mask for itself
+            RectTransform listViewport = NewNode("ui_viewport_popup_bomb_list", listFrame);
+            Stretch(listViewport, 0, 0, 0, 0);
+            listViewport.gameObject.AddComponent<RectMask2D>();
+            Image listViewportImage = listViewport.gameObject.AddComponent<Image>();
+            listViewportImage.color = new Color(0f, 0f, 0f, 0f);
+            listViewportImage.raycastTarget = true; // draggable ScrollRect viewport: RaycastTarget stays ON
+            listViewportImage.maskable = false; // its own RectMask2D is not an ancestor mask for itself
+            listScroll.viewport = listViewport;
 
-            RectTransform content = NewNode("ui_content_popup_bomb_list", listFrame);
+            RectTransform content = NewNode("ui_content_popup_bomb_list", listViewport);
             content.anchorMin = new Vector2(0f, 0f);
             content.anchorMax = new Vector2(0f, 1f);
             content.pivot = new Vector2(0f, 0.5f);
@@ -726,7 +744,6 @@ namespace Vertigo.Wheel.Editor
             listFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
             listFitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
 
-            listScroll.viewport = listFrame;
             listScroll.content = content;
 
             TextMeshProUGUI empty = AddText(NewNode("ui_text_popup_bomb_empty_value", anim), "Nothing was banked yet", 22f);
@@ -991,7 +1008,8 @@ namespace Vertigo.Wheel.Editor
             Image backdrop = AddImage(NewNode("ui_image_popup_collect_backdrop", root), null);
             backdrop.color = new Color(0f, 0f, 0f, 0.82f);
             backdrop.raycastTarget = true;
-            Stretch((RectTransform)backdrop.transform, 0, 0, 0, 0);
+            // Bleeds past the popup layer's safe-area inset so the dim always covers the full screen edge.
+            Stretch((RectTransform)backdrop.transform, -140, -140, -140, -140);
 
             RectTransform anim = NewNode("ui_transform_popup_collect_anim", root);
             FixedCentered(anim, Vector2.zero, new Vector2(1280f, 720f));
@@ -1121,7 +1139,8 @@ namespace Vertigo.Wheel.Editor
             Image backdrop = AddImage(NewNode("ui_image_popup_confirm_giveup_backdrop", root), null);
             backdrop.color = new Color(0f, 0f, 0f, 0.82f);
             backdrop.raycastTarget = true;
-            Stretch((RectTransform)backdrop.transform, 0, 0, 0, 0);
+            // Bleeds past the popup layer's safe-area inset so the dim always covers the full screen edge.
+            Stretch((RectTransform)backdrop.transform, -140, -140, -140, -140);
 
             RectTransform anim = NewNode("ui_transform_popup_confirm_giveup_anim", root);
             FixedCentered(anim, Vector2.zero, new Vector2(820f, 420f));
@@ -1171,7 +1190,8 @@ namespace Vertigo.Wheel.Editor
             Image backdrop = AddImage(NewNode("ui_image_popup_milestone_backdrop", root), null);
             backdrop.color = new Color(0.02f, 0.03f, 0.02f, 0.88f);
             backdrop.raycastTarget = true;
-            Stretch((RectTransform)backdrop.transform, 0, 0, 0, 0);
+            // Bleeds past the popup layer's safe-area inset so the dim always covers the full screen edge.
+            Stretch((RectTransform)backdrop.transform, -140, -140, -140, -140);
             var backdropButton = backdrop.gameObject.AddComponent<Button>();
             backdropButton.transition = Selectable.Transition.None;
             backdropButton.targetGraphic = backdrop;
@@ -1337,17 +1357,19 @@ namespace Vertigo.Wheel.Editor
         // ------------------------------------------------------------------ debug overlay
 
         /// <summary>
-        /// The cheat bar, bottom-left on its own top-most canvas. Built into every scene but
-        /// <see cref="DebugOverlayView"/> switches itself off outside the editor / development builds.
+        /// The cheat bar, bottom-left on its own top-most canvas. Parented under the safe-area node and
+        /// held off the edge by an extra inset so it never clips into rounded corners or the home
+        /// indicator. Built into every scene but <see cref="DebugOverlayView"/> switches itself off
+        /// outside the editor / development builds.
         /// </summary>
-        private static DebugOverlayView BuildDebugOverlay(RectTransform canvasRoot)
+        private static DebugOverlayView BuildDebugOverlay(RectTransform safeArea)
         {
-            RectTransform root = NewNode("ui_panel_debug", canvasRoot);
+            RectTransform root = NewNode("ui_panel_debug", safeArea);
             root.anchorMin = Vector2.zero;
             root.anchorMax = Vector2.zero;
             root.pivot = Vector2.zero;
             root.sizeDelta = new Vector2(230f, 48f);
-            root.anchoredPosition = new Vector2(16f, 16f);
+            root.anchoredPosition = new Vector2(28f, 28f);
 
             var canvas = root.gameObject.AddComponent<Canvas>();
             canvas.overrideSorting = true;
