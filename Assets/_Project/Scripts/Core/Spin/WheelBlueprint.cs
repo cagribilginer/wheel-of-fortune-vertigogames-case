@@ -11,7 +11,7 @@ namespace Vertigo.Wheel.Core.Spin
     {
         private readonly SliceBlueprint[] _slices;
 
-        public WheelBlueprint(WheelTier tier, IReadOnlyList<SliceBlueprint> slices)
+        public WheelBlueprint(WheelTier tier, IReadOnlyList<SliceBlueprint> slices, bool shuffleSlices = false)
         {
             if (slices == null) throw new ArgumentNullException(nameof(slices));
             if (slices.Count == 0) throw new ArgumentException("A wheel needs at least one slice.", nameof(slices));
@@ -27,6 +27,7 @@ namespace Vertigo.Wheel.Core.Spin
 
             Tier = tier;
             BombCount = bombCount;
+            ShuffleSlices = shuffleSlices;
         }
 
         public WheelTier Tier { get; }
@@ -34,5 +35,12 @@ namespace Vertigo.Wheel.Core.Spin
         public IReadOnlyList<SliceBlueprint> Slices => _slices;
 
         public int BombCount { get; }
+
+        /// <summary>
+        /// When set, the factory reorders this wheel's slices each time it builds a zone, so the same reward
+        /// pool does not sit on the same wedges every zone. Bomb <em>count</em> is unaffected — only its
+        /// position moves — so the safe/super risk-free rule still holds.
+        /// </summary>
+        public bool ShuffleSlices { get; }
     }
 }

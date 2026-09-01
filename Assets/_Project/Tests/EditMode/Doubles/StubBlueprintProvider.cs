@@ -12,8 +12,13 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
     public sealed class StubBlueprintProvider : IWheelBlueprintProvider
     {
         private readonly int _bombIndex;
+        private readonly bool _shuffle;
 
-        public StubBlueprintProvider(int bombIndex = 0) => _bombIndex = bombIndex;
+        public StubBlueprintProvider(int bombIndex = 0, bool shuffle = false)
+        {
+            _bombIndex = bombIndex;
+            _shuffle = shuffle;
+        }
 
         /// <summary>Set to 0 to make normal zones survivable, for long-run and overflow tests.</summary>
         public int BombWeight { get; set; } = 1;
@@ -31,7 +36,7 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
                     : SliceBlueprint.CreateReward(RewardFor(zoneType), BaseAmountFor(zoneType), weight: 1, unitValue: 2));
             }
 
-            return new WheelBlueprint(TierFor(zoneType), slices);
+            return new WheelBlueprint(TierFor(zoneType), slices, _shuffle);
         }
 
         private static RewardId RewardFor(ZoneType zoneType) =>

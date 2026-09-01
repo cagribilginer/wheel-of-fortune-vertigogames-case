@@ -290,7 +290,9 @@ namespace Vertigo.Wheel.Editor
             var so = new SerializedObject(asset);
             so.FindProperty("_tier").enumValueIndex = (int)tier;
             so.FindProperty("_theme").objectReferenceValue = theme;
-            so.FindProperty("_shuffleSliceOrder").boolValue = false;
+            // On: the slice list stays a readable picture of the pool, but the factory deals it onto
+            // different wedges each zone so rewards aren't visually pinned to the same wedge every time.
+            so.FindProperty("_shuffleSliceOrder").boolValue = true;
 
             SerializedProperty slices = so.FindProperty("_slices");
             slices.arraySize = WheelModel.StandardSliceCount;

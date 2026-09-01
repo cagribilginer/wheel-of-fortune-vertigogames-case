@@ -41,7 +41,7 @@ namespace Vertigo.Wheel.Data.Configs
                 blueprints.Add(entry.ToBlueprint());
             }
 
-            return new WheelBlueprint(_tier, blueprints);
+            return new WheelBlueprint(_tier, blueprints, _shuffleSliceOrder);
         }
 
 #if UNITY_EDITOR

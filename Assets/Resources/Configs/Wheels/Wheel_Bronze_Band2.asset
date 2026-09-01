@@ -47,4 +47,4 @@ MonoBehaviour:
     _reward: {fileID: 11400000, guid: 383bfb5cf1e01434fb78357810b71ce8, type: 2}
     _baseAmountOverride: 0
     _weight: 1
-  _shuffleSliceOrder: 0
+  _shuffleSliceOrder: 1

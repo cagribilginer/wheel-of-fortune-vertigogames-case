@@ -98,7 +98,10 @@ namespace Vertigo.Wheel.Gameplay
             var goldenTheme = Resources.Load<WheelThemeConfig>("Configs/Themes/Theme_Golden");
 
             IZoneClassifier classifier = progression.CreateClassifier();
-            var wheelFactory = new ZoneWheelFactory(classifier, progression, progression.Scaling);
+            // The wheel factory gets its own RNG so a zone's slices are dealt onto different wedges each
+            // time; the resolver's RNG stays separate so the two concerns can't perturb each other.
+            var wheelFactory = new ZoneWheelFactory(
+                classifier, progression, progression.Scaling, new UnityRandomProvider());
             var spinService = new SpinService(new WeightedSliceResolver(new UnityRandomProvider()));
             var wallet = new GoldWallet(new PlayerPrefsSaveService());
             var continueService = new ContinueService(wallet, continueConfig.ToSettings());

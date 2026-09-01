@@ -92,6 +92,60 @@ namespace Vertigo.Wheel.Tests.EditMode
                     Assert.That(deep[i].Amount, Is.Zero);
         }
 
+        [Test]
+        public void AShufflingBlueprint_DoesNothingWithoutARandomProvider()
+        {
+            // _blueprints puts the bomb at index 0; a shuffling blueprint with no RNG stays in order.
+            var shufflingButNoRng = new ZoneWheelFactory(
+                new ZoneClassifier(), new StubBlueprintProvider(bombIndex: 0, shuffle: true),
+                new LinearRewardScaling());
+
+            Assert.That(shufflingButNoRng.Build(2)[0].IsBomb, Is.True);
+        }
+
+        [Test]
+        public void AShufflingWheel_MovesTheBombBetweenWedgesWithoutChangingTheCount()
+        {
+            var factory = new ZoneWheelFactory(
+                new ZoneClassifier(), new StubBlueprintProvider(bombIndex: 0, shuffle: true),
+                new LinearRewardScaling(), new SystemRandomProvider(12345));
+
+            var bombWedges = new System.Collections.Generic.HashSet<int>();
+            for (int build = 0; build < 40; build++)
+            {
+                WheelModel wheel = factory.Build(2);
+                Assert.That(wheel.BombCount, Is.EqualTo(1), "the bomb is moved, never removed or duplicated");
+
+                for (int s = 0; s < wheel.SliceCount; s++)
+                    if (wheel[s].IsBomb) bombWedges.Add(s);
+            }
+
+            Assert.That(bombWedges.Count, Is.GreaterThan(1),
+                "the bomb should land on different wedges across zone builds");
+        }
+
+        [Test]
+        public void AShufflingWheel_KeepsTheSameSlicePool()
+        {
+            WheelModel plain = _factory.Build(3);
+            var shuffling = new ZoneWheelFactory(
+                new ZoneClassifier(), new StubBlueprintProvider(shuffle: true), new LinearRewardScaling(),
+                new SystemRandomProvider(7));
+
+            CollectionAssert.AreEquivalent(plain.Slices, shuffling.Build(3).Slices);
+        }
+
+        [Test]
+        public void AShufflingSafeZone_StaysRiskFree()
+        {
+            var factory = new ZoneWheelFactory(
+                new ZoneClassifier(), new StubBlueprintProvider(shuffle: true), new LinearRewardScaling(),
+                new SystemRandomProvider(2));
+
+            for (int build = 0; build < 10; build++)
+                Assert.That(factory.Build(5).BombCount, Is.Zero);
+        }
+
         /// <summary>
         /// A safe or super zone carrying a bomb would break the mode's headline promise, so it fails loudly
         /// at build time rather than surfacing as a bad play-through.

@@ -18,15 +18,21 @@ namespace Vertigo.Wheel.Core.Spin
         private readonly IZoneClassifier _classifier;
         private readonly IWheelBlueprintProvider _blueprints;
         private readonly IRewardScaling _scaling;
+        private readonly IRandomProvider _random;
 
         public ZoneWheelFactory(
             IZoneClassifier classifier,
             IWheelBlueprintProvider blueprints,
-            IRewardScaling scaling)
+            IRewardScaling scaling,
+            IRandomProvider random = null)
         {
             _classifier = classifier ?? throw new ArgumentNullException(nameof(classifier));
             _blueprints = blueprints ?? throw new ArgumentNullException(nameof(blueprints));
             _scaling = scaling ?? throw new ArgumentNullException(nameof(scaling));
+
+            // Optional: a blueprint that opts into shuffling only actually shuffles when the factory was
+            // given a randomness source. Tests leave it null, so their wheels stay in blueprint order.
+            _random = random;
         }
 
         public WheelModel Build(int zone)
@@ -55,7 +61,22 @@ namespace Vertigo.Wheel.Core.Spin
             for (int i = 0; i < authored.Count; i++)
                 slices.Add(authored[i].ToSlice(zone, _scaling));
 
+            if (blueprint.ShuffleSlices && _random != null)
+                Shuffle(slices);
+
             return new WheelModel(blueprint.Tier, slices);
+        }
+
+        // Fisher-Yates over the materialised slices: same pool, new wedge order for this zone. Weight
+        // travels with each slice, so weighted resolution is unaffected; bomb count is unchanged, so the
+        // safe/super rule checked above still holds.
+        private void Shuffle(List<WheelSlice> slices)
+        {
+            for (int i = slices.Count - 1; i > 0; i--)
+            {
+                int j = _random.Next(i + 1);
+                (slices[i], slices[j]) = (slices[j], slices[i]);
+            }
         }
     }
 }
