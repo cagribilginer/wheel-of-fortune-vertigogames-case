@@ -532,7 +532,7 @@ namespace Vertigo.Wheel.Editor
             var scroll = scrollRect.gameObject.AddComponent<ScrollRect>();
             scroll.horizontal = false;
             scroll.vertical = true;
-            scroll.movementType = ScrollRect.MovementType.Clamped;
+            scroll.movementType = ScrollRect.MovementType.Elastic;
 
             RectTransform viewport = NewNode("ui_viewport_bank", scrollRect);
             Stretch(viewport, 0, 0, 0, 0);
@@ -554,9 +554,10 @@ namespace Vertigo.Wheel.Editor
             grid.cellSize = new Vector2(140f, 160f);
             grid.spacing = new Vector2(12f, 12f);
             grid.constraint = GridLayoutGroup.Constraint.Flexible;
-            // Fill left-to-right and wrap: items land in acquisition order reading like a list, not
-            // re-centred each time a row's count changes.
-            grid.childAlignment = TextAnchor.UpperLeft;
+            // UpperCenter, not UpperLeft: the column count is decided at layout time from the panel's real
+            // width, so any leftover space is split evenly to both sides instead of all piling up on the
+            // right. Left/right padding is equal, so the margins are mirrored by construction.
+            grid.childAlignment = TextAnchor.UpperCenter;
             grid.padding = new RectOffset(16, 16, 12, 12);
 
             var contentFitter = content.gameObject.AddComponent<ContentSizeFitter>();
@@ -810,6 +811,82 @@ namespace Vertigo.Wheel.Editor
             element.minHeight = height;
         }
 
+        private const string VideoIconPath = "Assets/_Project/Art/Sprites/Icons/UI/ui_icon_video.png";
+
+        /// <summary>
+        /// Generates a crisp "watch video" glyph once into the art folder: a white rounded card with a play
+        /// triangle knocked out of it, so on the blue ad-revive button the triangle reads as the button
+        /// colour showing through. The demo art pack ships no video/play sprite, and the previous
+        /// text-glyph-in-a-box stand-in never read cleanly.
+        /// </summary>
+        private static Sprite EnsureVideoIconSprite()
+        {
+            Sprite existing = EditorSpriteUtility.FindSprite("ui_icon_video");
+            if (existing != null) return existing;
+
+            EnsureFolder(Path.GetDirectoryName(VideoIconPath).Replace('\\', '/'));
+
+            const int size = 144;
+            const int ss = 4; // supersamples per axis, for anti-aliased edges when scaled down to 40px
+
+            float inset = size * 0.06f;
+            float radius = size * 0.20f;
+            float minX = inset, minY = inset, maxX = size - inset, maxY = size - inset;
+            var t0 = new Vector2(size * 0.40f, size * 0.28f);
+            var t1 = new Vector2(size * 0.40f, size * 0.72f);
+            var t2 = new Vector2(size * 0.70f, size * 0.50f);
+
+            var pixels = new Color[size * size];
+            for (int py = 0; py < size; py++)
+            for (int px = 0; px < size; px++)
+            {
+                int covered = 0;
+                for (int sy = 0; sy < ss; sy++)
+                for (int sx = 0; sx < ss; sx++)
+                {
+                    var p = new Vector2(px + (sx + 0.5f) / ss, py + (sy + 0.5f) / ss);
+                    if (InRoundedRect(p, minX, minY, maxX, maxY, radius) && !InTriangle(p, t0, t1, t2))
+                        covered++;
+                }
+                pixels[py * size + px] = new Color(1f, 1f, 1f, covered / (float)(ss * ss));
+            }
+
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            tex.SetPixels(pixels);
+            tex.Apply();
+            File.WriteAllBytes(VideoIconPath, tex.EncodeToPNG());
+            UnityEngine.Object.DestroyImmediate(tex);
+
+            AssetDatabase.ImportAsset(VideoIconPath, ImportAssetOptions.ForceSynchronousImport);
+            var importer = (TextureImporter)AssetImporter.GetAtPath(VideoIconPath);
+            importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Single;
+            importer.alphaIsTransparency = true;
+            importer.mipmapEnabled = false;
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.SaveAndReimport();
+
+            return EditorSpriteUtility.FindSprite("ui_icon_video");
+        }
+
+        private static bool InRoundedRect(Vector2 p, float minX, float minY, float maxX, float maxY, float r)
+        {
+            if (p.x < minX || p.x > maxX || p.y < minY || p.y > maxY) return false;
+            float dx = Mathf.Max(0f, Mathf.Max(minX + r - p.x, p.x - (maxX - r)));
+            float dy = Mathf.Max(0f, Mathf.Max(minY + r - p.y, p.y - (maxY - r)));
+            return dx * dx + dy * dy <= r * r;
+        }
+
+        private static bool InTriangle(Vector2 p, Vector2 a, Vector2 b, Vector2 c)
+        {
+            float d1 = (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
+            float d2 = (p.x - c.x) * (b.y - c.y) - (b.x - c.x) * (p.y - c.y);
+            float d3 = (p.x - a.x) * (c.y - a.y) - (c.x - a.x) * (p.y - a.y);
+            bool hasNeg = d1 < 0f || d2 < 0f || d3 < 0f;
+            bool hasPos = d1 > 0f || d2 > 0f || d3 > 0f;
+            return !(hasNeg && hasPos);
+        }
+
         /// <summary>
         /// The three defeat-screen buttons, siblings of the scaled content so they hold their row. All are
         /// always present; BombPopupView only toggles <c>interactable</c> on a revive that isn't available.
@@ -817,6 +894,8 @@ namespace Vertigo.Wheel.Editor
         private static void BuildBombButtons(RectTransform root)
         {
             const float y = -350f;
+
+            EnsureVideoIconSprite();
 
             // GIVE UP — sleek grey, skull on the left (no trash-can art ships; the skull reads as "give up").
             BuildPopupButton(root, "ui_button_popup_bomb_giveup", "ui_transform_popup_bomb_giveup_anim",
@@ -877,29 +956,30 @@ namespace Vertigo.Wheel.Editor
                 animOut: out RectTransform advertAnim, tint: new Color(0.20f, 0.46f, 0.86f, 1f));
 
             RectTransform advertRow = NewNode("ui_row_popup_bomb_advert", advertAnim);
-            FixedCentered(advertRow, Vector2.zero, new Vector2(230f, 40f));
+            FixedCentered(advertRow, Vector2.zero, new Vector2(240f, 44f));
             var advertLayout = advertRow.gameObject.AddComponent<HorizontalLayoutGroup>();
-            advertLayout.spacing = 12f;
-            advertLayout.childAlignment = TextAnchor.MiddleCenter;
+            advertLayout.spacing = 9f;
+            advertLayout.childAlignment = TextAnchor.MiddleRight;
             advertLayout.childControlWidth = true;
             advertLayout.childControlHeight = true;
             advertLayout.childForceExpandWidth = false;
             advertLayout.childForceExpandHeight = false;
+            // Hug the text+icon cluster so it stays centred on the button rather than pinned to a corner.
+            var advertFitter = advertRow.gameObject.AddComponent<ContentSizeFitter>();
+            advertFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            advertFitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
 
             TextMeshProUGUI advertText = AddText(NewNode("ui_text_popup_bomb_advert_value", advertRow), "REVIVE", 24f);
             advertText.alignment = TextAlignmentOptions.Midline;
             advertText.fontStyle = FontStyles.Bold;
             advertText.enableWordWrapping = false;
 
-            Image advertScreen = AddImage(NewNode("ui_image_popup_bomb_advert_icon", advertRow), "ui_card_panel_zone_bg");
-            advertScreen.type = Image.Type.Sliced;
-            advertScreen.color = Color.white;
-            AddLayoutSize((RectTransform)advertScreen.transform, 40f, 28f);
-            TextMeshProUGUI advertPlay = AddText(NewNode("ui_text_popup_bomb_advert_play", (RectTransform)advertScreen.transform), "▶", 18f);
-            advertPlay.alignment = TextAlignmentOptions.Center;
-            advertPlay.color = new Color(0.12f, 0.28f, 0.55f, 1f);
-            advertPlay.fontStyle = FontStyles.Bold;
-            Stretch((RectTransform)advertPlay.transform, 2, 0, 0, 0);
+            // Stark-white "watch video" glyph, generated once into the art folder (no such sprite ships with
+            // the demo pack), sized 32x32 to sit level with the 24pt label and placed to the right of it.
+            Image advertIcon = AddImage(NewNode("ui_image_popup_bomb_advert_icon", advertRow), "ui_icon_video");
+            advertIcon.color = Color.white;
+            advertIcon.preserveAspect = true;
+            AddLayoutSize((RectTransform)advertIcon.transform, 32f, 32f);
         }
 
         private static CollectPopupView BuildCollectPopup(RectTransform layer, BankEntryView bankEntryPrefab)
@@ -1003,7 +1083,10 @@ namespace Vertigo.Wheel.Editor
             grid.cellSize = new Vector2(140f, 160f);
             grid.spacing = new Vector2(12f, 12f);
             grid.constraint = GridLayoutGroup.Constraint.Flexible;
-            grid.childAlignment = TextAnchor.UpperLeft;
+            // Same as the gameplay bank: centre the column block with equal left/right padding so the
+            // collected-items grid has mirrored margins rather than a wide gap on the right.
+            grid.childAlignment = TextAnchor.UpperCenter;
+            grid.padding = new RectOffset(16, 16, 12, 12);
 
             var contentFitter = content.gameObject.AddComponent<ContentSizeFitter>();
             contentFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
