@@ -63,6 +63,11 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             }
 
             _view.SetEmpty(entries.Count == 0);
+
+            // Force the grid + ContentSizeFitter to resolve now so the ScrollRect sees the real content
+            // height this frame — otherwise a freshly populated bank does not accept a drag until the next
+            // layout pass.
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_view.Content);
         }
 
         public void FlyIn(SpinOutcome outcome, Vector3 fromWorldPosition, Action onComplete)

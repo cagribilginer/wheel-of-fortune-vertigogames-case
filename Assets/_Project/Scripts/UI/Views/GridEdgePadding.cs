@@ -16,6 +16,13 @@ namespace Vertigo.Wheel.UI.Views
     /// the container its width, and under the landscape <c>Expand</c> canvas scaler that width grows past
     /// the 1920 reference on wider displays.
     /// </para>
+    /// <para>
+    /// The padding is written from <see cref="Update"/>, never from <see cref="OnRectTransformDimensionsChange"/>:
+    /// changing a layout property re-inside a layout pass gets dropped with an "already inside a rebuild
+    /// loop" warning, which left the <see cref="ContentSizeFitter"/> below it with a stale height and stopped
+    /// the parent <see cref="ScrollRect"/> from ever seeing the overflow. Same poll-then-apply shape as
+    /// <see cref="SafeAreaFitter"/>.
+    /// </para>
     /// </summary>
     [RequireComponent(typeof(GridLayoutGroup))]
     public sealed class GridEdgePadding : UIBehaviour
@@ -25,6 +32,7 @@ namespace Vertigo.Wheel.UI.Views
 
         private GridLayoutGroup _grid;
         private RectTransform _rect;
+        private bool _dirty = true;
 
         protected override void Awake()
         {
@@ -32,9 +40,16 @@ namespace Vertigo.Wheel.UI.Views
             _rect = (RectTransform)transform;
         }
 
-        protected override void OnEnable() => Apply();
+        protected override void OnEnable() => _dirty = true;
 
-        protected override void OnRectTransformDimensionsChange() => Apply();
+        protected override void OnRectTransformDimensionsChange() => _dirty = true;
+
+        private void Update()
+        {
+            if (!_dirty) return;
+            _dirty = false;
+            Apply();
+        }
 
         private void Apply()
         {
@@ -43,7 +58,11 @@ namespace Vertigo.Wheel.UI.Views
 
             float width = _rect.rect.width;
             float step = _grid.cellSize.x + _grid.spacing.x;
-            if (width <= 0f || step <= 0f) return;
+            if (width <= 0f || step <= 0f)
+            {
+                _dirty = true; // width not resolved yet; try again next frame
+                return;
+            }
 
             int columns = Mathf.Max(1,
                 Mathf.FloorToInt((width - 2 * _minPadding + _grid.spacing.x) / step));

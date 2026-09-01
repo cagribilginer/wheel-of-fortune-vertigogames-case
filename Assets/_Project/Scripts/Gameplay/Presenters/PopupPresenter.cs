@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
+using UnityEngine.UI;
 using Vertigo.Wheel.Core.Rewards;
 using Vertigo.Wheel.Core.States;
 using Vertigo.Wheel.Data.Configs;
@@ -87,6 +88,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 _activeBombList.Add(entry);
             }
 
+            // Resolve the horizontal row now so the ScrollRect knows its content width before the popup
+            // opens and accepts a swipe on the first frame.
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_bomb.Content);
+
             _audio.PlayPopupOpen();
             _audio.PlayDefeatAmbience();
 
@@ -119,6 +124,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 entry.transform.SetSiblingIndex(i);
                 _activeList.Add(entry);
             }
+
+            // Resolve the grid + ContentSizeFitter now so the ScrollRect sees the real content height on
+            // the frame the cash-out summary opens.
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_collect.Content);
 
             _collect.SetChest(ChestFor(total));
             _audio.PlayPopupOpen();
