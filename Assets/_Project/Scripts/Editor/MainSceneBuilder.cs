@@ -554,11 +554,12 @@ namespace Vertigo.Wheel.Editor
             grid.cellSize = new Vector2(140f, 160f);
             grid.spacing = new Vector2(12f, 12f);
             grid.constraint = GridLayoutGroup.Constraint.Flexible;
-            // UpperCenter, not UpperLeft: the column count is decided at layout time from the panel's real
-            // width, so any leftover space is split evenly to both sides instead of all piling up on the
-            // right. Left/right padding is equal, so the margins are mirrored by construction.
-            grid.childAlignment = TextAnchor.UpperCenter;
+            // Fill left-to-right and wrap, last row left-aligned under the first. GridEdgePadding then keeps
+            // the left/right padding equal and sized so the row block is centred — mirrored margins without
+            // giving up the list-style fill.
+            grid.childAlignment = TextAnchor.UpperLeft;
             grid.padding = new RectOffset(16, 16, 12, 12);
+            content.gameObject.AddComponent<GridEdgePadding>();
 
             var contentFitter = content.gameObject.AddComponent<ContentSizeFitter>();
             contentFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
@@ -1083,10 +1084,10 @@ namespace Vertigo.Wheel.Editor
             grid.cellSize = new Vector2(140f, 160f);
             grid.spacing = new Vector2(12f, 12f);
             grid.constraint = GridLayoutGroup.Constraint.Flexible;
-            // Same as the gameplay bank: centre the column block with equal left/right padding so the
-            // collected-items grid has mirrored margins rather than a wide gap on the right.
-            grid.childAlignment = TextAnchor.UpperCenter;
+            // Same as the gameplay bank: UpperLeft fill, GridEdgePadding balances the side margins.
+            grid.childAlignment = TextAnchor.UpperLeft;
             grid.padding = new RectOffset(16, 16, 12, 12);
+            content.gameObject.AddComponent<GridEdgePadding>();
 
             var contentFitter = content.gameObject.AddComponent<ContentSizeFitter>();
             contentFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
