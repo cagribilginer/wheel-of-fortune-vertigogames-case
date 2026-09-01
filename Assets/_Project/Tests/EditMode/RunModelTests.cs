@@ -144,38 +144,61 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void ApplyContinue_ResumesTheSameZoneAndKeepsTheHaul()
+        public void ApplyGoldRevive_ResumesTheSameZoneAndKeepsTheHaul()
         {
             _run.AdvanceZone();                                   // now on zone 2
             _run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Pistol, 10));
-            _run.Phase = RunPhase.GameOver;
+            _run.Detonate();                                      // bomb clears the bank, snapshots the haul
 
-            _run.ApplyContinue();
+            _run.ApplyGoldRevive();
 
             Assert.That(_run.CurrentZone, Is.EqualTo(2));
-            Assert.That(_run.Bank.AmountOf(TestWheels.Pistol), Is.EqualTo(10));
+            Assert.That(_run.Bank.AmountOf(TestWheels.Pistol), Is.EqualTo(10), "the snapshotted haul is restored");
             Assert.That(_run.Phase, Is.EqualTo(RunPhase.Idle));
-            Assert.That(_run.ContinuesUsedThisRun, Is.EqualTo(1));
-        }
-
-        [TestCase(1, false)]
-        [TestCase(5, true)]
-        [TestCase(30, true)]
-        public void CanLeave_TracksTheCurrentZoneType(int zone, bool expected)
-        {
-            for (int i = 1; i < zone; i++) _run.AdvanceZone();
-
-            Assert.That(_run.CurrentZone, Is.EqualTo(zone));
-            Assert.That(_run.CanLeave, Is.EqualTo(expected));
+            Assert.That(_run.GoldRevivesUsedThisRun, Is.EqualTo(1));
+            Assert.That(_run.AdRevivesUsedThisRun, Is.Zero);
         }
 
         [Test]
-        public void CanLeave_IsFalseWhileSpinningEvenOnASafeZone()
+        public void GoldRevive_CanBeAppliedRepeatedly_EachBumpsTheCount()
         {
-            for (int i = 1; i < 5; i++) _run.AdvanceZone();
+            _run.Detonate();
+            _run.ApplyGoldRevive();
+            _run.Detonate();
+            _run.ApplyGoldRevive();
+
+            Assert.That(_run.GoldRevivesUsedThisRun, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void ApplyAdRevive_BumpsTheAdCountAndRestoresTheHaul()
+        {
+            _run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Pistol, 5));
+            _run.Detonate();
+
+            _run.ApplyAdRevive();
+
+            Assert.That(_run.Bank.AmountOf(TestWheels.Pistol), Is.EqualTo(5));
+            Assert.That(_run.AdRevivesUsedThisRun, Is.EqualTo(1));
+            Assert.That(_run.GoldRevivesUsedThisRun, Is.Zero);
+        }
+
+        [Test]
+        public void CanLeave_TracksWhetherTheBankHasAnything()
+        {
+            Assert.That(_run.CanLeave, Is.False, "empty bank");
+
+            _run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Pistol, 10));
+
+            Assert.That(_run.CanLeave, Is.True, "bank has a reward");
+        }
+
+        [Test]
+        public void CanLeave_IsFalseWhileSpinningEvenWithAHaul()
+        {
+            _run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Pistol, 10));
             _run.Phase = RunPhase.Spinning;
 
-            Assert.That(_run.CurrentZoneType, Is.EqualTo(ZoneType.Safe));
             Assert.That(_run.CanLeave, Is.False);
         }
 

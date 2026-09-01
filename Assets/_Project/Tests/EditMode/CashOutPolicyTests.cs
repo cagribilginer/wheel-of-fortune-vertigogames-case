@@ -1,31 +1,26 @@
 using NUnit.Framework;
 using Vertigo.Wheel.Core.Run;
-using Vertigo.Wheel.Core.Zones;
 
 namespace Vertigo.Wheel.Tests.EditMode
 {
     /// <summary>
-    /// "Player can choose to leave when wheel is not spinning and when the zone is safe or at the super zone."
-    /// Both halves of that sentence are tested here, because the Collect button only mirrors this decision.
+    /// "The player can leave with their haul whenever the wheel is idle and there is something banked."
+    /// Both halves of that sentence are tested here, because the EXIT button only mirrors this decision.
     /// </summary>
     [TestFixture]
     public sealed class CashOutPolicyTests
     {
-        [TestCase(ZoneType.Safe, RunPhase.Idle, true)]
-        [TestCase(ZoneType.Super, RunPhase.Idle, true)]
-        [TestCase(ZoneType.Normal, RunPhase.Idle, false)]
-        public void ZoneType_GatesLeaving(ZoneType zone, RunPhase phase, bool expected) =>
-            Assert.That(CashOutPolicy.CanLeave(zone, phase), Is.EqualTo(expected));
+        [TestCase(RunPhase.Idle, true, true)]
+        [TestCase(RunPhase.Idle, false, false)]
+        public void LeavingNeedsAnIdleWheelWithAHaul(RunPhase phase, bool bankHasRewards, bool expected) =>
+            Assert.That(CashOutPolicy.CanLeave(phase, bankHasRewards), Is.EqualTo(expected));
 
         [TestCase(RunPhase.Spinning)]
         [TestCase(RunPhase.Resolving)]
         [TestCase(RunPhase.GameOver)]
         [TestCase(RunPhase.CashOut)]
-        public void NonIdlePhase_BlocksLeavingEvenOnASafeZone(RunPhase phase)
-        {
-            Assert.That(CashOutPolicy.CanLeave(ZoneType.Safe, phase), Is.False);
-            Assert.That(CashOutPolicy.CanLeave(ZoneType.Super, phase), Is.False);
-        }
+        public void NonIdlePhase_BlocksLeavingEvenWithAHaul(RunPhase phase) =>
+            Assert.That(CashOutPolicy.CanLeave(phase, bankHasRewards: true), Is.False);
 
         [TestCase(RunPhase.Idle, true)]
         [TestCase(RunPhase.Spinning, false)]

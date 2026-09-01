@@ -35,6 +35,9 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
         public bool ContinueOffered { get; private set; }
         public int ContinueCostShown { get; private set; }
         public int GameOverZoneShown { get; private set; }
+        public bool AdReviveOffered { get; private set; }
+        public int PlayerGoldShown { get; private set; }
+        public List<BankEntry> LostHaulShown { get; } = new List<BankEntry>();
 
         public bool CashOutVisible { get; private set; }
         public int CashOutZonesCleared { get; private set; }
@@ -80,12 +83,19 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             onComplete?.Invoke();
         }
 
-        public virtual void ShowGameOver(int zoneReached, bool continueOffered, int continueCost)
+        public virtual void ShowGameOver(
+            int zoneReached, IReadOnlyList<BankEntry> lostHaul, int playerGold,
+            bool goldReviveOffered, int goldReviveCost, bool adReviveOffered)
         {
             GameOverVisible = true;
             GameOverZoneShown = zoneReached;
-            ContinueOffered = continueOffered;
-            ContinueCostShown = continueCost;
+            ContinueOffered = goldReviveOffered;
+            ContinueCostShown = goldReviveCost;
+            AdReviveOffered = adReviveOffered;
+            PlayerGoldShown = playerGold;
+
+            LostHaulShown.Clear();
+            for (int i = 0; i < lostHaul.Count; i++) LostHaulShown.Add(lostHaul[i]);
         }
 
         public virtual void HideGameOver() => GameOverVisible = false;
@@ -99,6 +109,12 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
         }
 
         public virtual void HideCashOut() => CashOutVisible = false;
+
+        public virtual void ClaimCashOut(Action onComplete)
+        {
+            CashOutVisible = false;
+            onComplete?.Invoke();
+        }
 
         public virtual void ShowGiveUpConfirm(int rewardsAtStake)
         {

@@ -61,7 +61,8 @@ namespace Vertigo.Wheel.Tests.EditMode
             _machine.RequestSpin();
 
             Assert.That(_run.CurrentZone, Is.EqualTo(2));
-            Assert.That(_run.Bank.AmountOf(TestWheels.Pistol), Is.EqualTo(10));
+            // Zone 1 is a safe zone: the stub pays Rifle x20 there, unscaled at zone 1.
+            Assert.That(_run.Bank.AmountOf(TestWheels.Rifle), Is.EqualTo(20));
             Assert.That(_machine.IsIn<IdleState>(), Is.True);
             Assert.That(_view.SpinsPlayed, Is.EqualTo(1));
         }
@@ -89,6 +90,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void RestartAfterBomb_ReturnsToZoneOneWithAnEmptyBank()
         {
+            AdvanceToZone(2);                             // zone 1 is safe; the bomb only bites from zone 2
             _resolver.LandOn(BombSlot);
             _machine.RequestSpin();
             _machine.RequestRestart();
@@ -100,8 +102,9 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void LeaveOnANormalZone_IsIgnored()
+        public void LeaveWithAnEmptyBank_IsIgnored()
         {
+            // Fresh on zone 1 with nothing banked: there is nothing to cash out.
             _machine.RequestLeave();
 
             Assert.That(_machine.IsIn<IdleState>(), Is.True);
@@ -109,11 +112,11 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void LeaveOnASafeZone_OpensTheCashOutSummary()
+        public void LeaveOnANormalZoneWithAHaul_OpensTheCashOutSummary()
         {
-            AdvanceToZone(5);
+            _machine.RequestSpin();                        // zone 1 -> 2, banks a reward
 
-            Assert.That(_run.CurrentZoneType, Is.EqualTo(ZoneType.Safe));
+            Assert.That(_run.CurrentZoneType, Is.EqualTo(ZoneType.Normal));
             _machine.RequestLeave();
 
             Assert.That(_machine.IsIn<CashOutState>(), Is.True);
@@ -122,7 +125,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void ConfirmingCashOut_StartsAFreshRun()
+        public void ConfirmingCashOut_ClaimsTheHaulAndStartsAFreshRun()
         {
             AdvanceToZone(5);
             _machine.RequestLeave();
@@ -135,15 +138,32 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void CollectButton_IsOnlyOfferedOnSafeOrSuperZones()
+        public void CancellingCashOut_ReturnsToTheSameZoneWithTheHaulIntact()
         {
-            Assert.That(_view.CanLeave, Is.False, "zone 1");
+            _machine.RequestSpin();                        // zone 1 -> 2, banks a reward
+            int zoneBefore = _run.CurrentZone;
+            long bankedBefore = _run.Bank.TotalValue;
 
-            AdvanceToZone(5);
-            Assert.That(_view.CanLeave, Is.True, "zone 5");
+            _machine.RequestLeave();
+            _machine.Cancel();
 
-            _machine.RequestSpin();
-            Assert.That(_view.CanLeave, Is.False, "zone 6");
+            Assert.That(_machine.IsIn<IdleState>(), Is.True);
+            Assert.That(_view.CashOutVisible, Is.False);
+            Assert.That(_run.CurrentZone, Is.EqualTo(zoneBefore));
+            Assert.That(_run.Bank.TotalValue, Is.EqualTo(bankedBefore));
+            Assert.That(bankedBefore, Is.GreaterThan(0));
+        }
+
+        [Test]
+        public void ExitIsOfferedWheneverTheBankHasSomething()
+        {
+            Assert.That(_view.CanLeave, Is.False, "zone 1, empty bank");
+
+            _machine.RequestSpin();                        // zone 1 -> 2, banks a reward
+            Assert.That(_view.CanLeave, Is.True, "zone 2, has a haul");
+
+            _machine.RequestSpin();                        // zone 2 -> 3
+            Assert.That(_view.CanLeave, Is.True, "zone 3, still has a haul");
         }
 
         [Test]
@@ -170,16 +190,18 @@ namespace Vertigo.Wheel.Tests.EditMode
             _machine.Cancel();
 
             Assert.That(_machine.IsIn<IdleState>(), Is.True);
-            Assert.That(_run.Bank.AmountOf(TestWheels.Pistol), Is.EqualTo(10));
+            Assert.That(_run.Bank.IsEmpty, Is.False, "the haul survives a cancelled give-up");
             Assert.That(_run.CurrentZone, Is.EqualTo(2));
         }
 
         [Test]
         public void ContinueIsNotOfferedWithAnEmptyWallet()
         {
+            AdvanceToZone(2);                             // zone 1 is safe; the bomb only bites from zone 2
             _resolver.LandOn(BombSlot);
             _machine.RequestSpin();
 
+            Assert.That(_machine.IsIn<GameOverState>(), Is.True);
             Assert.That(_view.ContinueOffered, Is.False);
         }
 
@@ -188,9 +210,9 @@ namespace Vertigo.Wheel.Tests.EditMode
         {
             _wallet.Add(10_000);
 
-            _machine.RequestSpin();                       // zone 1 -> 2, banks 10
+            _machine.RequestSpin();                       // zone 1 -> 2, banks a reward
             int zoneBefore = _run.CurrentZone;
-            int bankedBefore = _run.Bank.AmountOf(TestWheels.Pistol);
+            long bankedBefore = _run.Bank.TotalValue;
 
             _resolver.LandOn(BombSlot);
             _machine.RequestSpin();                       // bomb clears the bank
@@ -204,22 +226,50 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.That(_run.CurrentZone, Is.EqualTo(zoneBefore), "Continue must resume the same zone.");
             Assert.That(_wallet.Balance, Is.LessThan(walletBefore), "The continue must have been paid for.");
             Assert.That(_run.ContinuesUsedThisRun, Is.EqualTo(1));
-            Assert.That(bankedBefore, Is.EqualTo(10));
+            Assert.That(bankedBefore, Is.GreaterThan(0));
+            Assert.That(_run.Bank.TotalValue, Is.EqualTo(bankedBefore), "the continue restores the lost haul");
         }
 
         [Test]
-        public void OnlyOneContinueIsAllowedPerRun()
+        public void GoldRevive_CanBeUsedMoreThanOncePerRun_AtADoublingPrice()
         {
-            _wallet.Add(10_000);
+            _wallet.Add(100_000);
+            AdvanceToZone(2);
 
             _resolver.LandOn(BombSlot);
-            _machine.RequestSpin();
-            _machine.RequestContinue();
+            _machine.RequestSpin();                       // bomb -> game over
+            Assert.That(_view.ContinueOffered, Is.True);
+            int firstCost = _view.ContinueCostShown;
 
-            _machine.RequestSpin();                       // bombs again on the same slot
+            _machine.RequestContinue();                   // gold revive #1
+            Assert.That(_machine.IsIn<IdleState>(), Is.True);
 
+            _machine.RequestSpin();                       // bombs again, same zone
             Assert.That(_machine.IsIn<GameOverState>(), Is.True);
-            Assert.That(_view.ContinueOffered, Is.False, "A second continue in one run must not be offered.");
+            Assert.That(_view.ContinueOffered, Is.True, "gold revive has no per-run cap");
+            Assert.That(_view.ContinueCostShown, Is.EqualTo(firstCost * 2), "the second gold revive costs double");
+
+            _machine.RequestContinue();                   // gold revive #2
+            Assert.That(_machine.IsIn<IdleState>(), Is.True);
+            Assert.That(_run.GoldRevivesUsedThisRun, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void AdRevive_IsOfferedOnlyOncePerRun()
+        {
+            AdvanceToZone(2);
+
+            _resolver.LandOn(BombSlot);
+            _machine.RequestSpin();                       // bomb -> game over
+            Assert.That(_view.AdReviveOffered, Is.True);
+
+            _machine.RequestAdContinue();                 // free revive
+            Assert.That(_machine.IsIn<IdleState>(), Is.True);
+            Assert.That(_run.AdRevivesUsedThisRun, Is.EqualTo(1));
+
+            _machine.RequestSpin();                       // bombs again, same zone
+            Assert.That(_machine.IsIn<GameOverState>(), Is.True);
+            Assert.That(_view.AdReviveOffered, Is.False, "the ad revive is one per run");
         }
 
         [Test]

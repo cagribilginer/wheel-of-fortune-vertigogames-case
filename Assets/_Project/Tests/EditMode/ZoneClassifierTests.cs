@@ -12,7 +12,6 @@ namespace Vertigo.Wheel.Tests.EditMode
         [SetUp]
         public void SetUp() => _classifier = new ZoneClassifier();
 
-        [TestCase(1)]
         [TestCase(2)]
         [TestCase(4)]
         [TestCase(6)]
@@ -20,6 +19,11 @@ namespace Vertigo.Wheel.Tests.EditMode
         [TestCase(31)]
         public void RiskyZones_AreNormal(int zone) =>
             Assert.That(_classifier.Classify(zone), Is.EqualTo(ZoneType.Normal));
+
+        /// <summary>The opening zone is always safe, so a run can never end on the very first spin.</summary>
+        [Test]
+        public void FirstZone_IsSafe() =>
+            Assert.That(_classifier.Classify(1), Is.EqualTo(ZoneType.Safe));
 
         [TestCase(5)]
         [TestCase(10)]

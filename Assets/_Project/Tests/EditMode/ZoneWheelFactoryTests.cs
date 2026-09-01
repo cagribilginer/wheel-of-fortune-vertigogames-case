@@ -20,7 +20,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             _factory = new ZoneWheelFactory(new ZoneClassifier(), _blueprints, new LinearRewardScaling());
         }
 
-        [TestCase(1)]
+        [TestCase(2)]
         [TestCase(4)]
         [TestCase(29)]
         public void NormalZone_HasExactlyOneBomb(int zone) =>
@@ -36,7 +36,8 @@ namespace Vertigo.Wheel.Tests.EditMode
         public void SuperZone_HasNoBomb(int zone) =>
             Assert.That(_factory.Build(zone).BombCount, Is.Zero);
 
-        [TestCase(1, WheelTier.Bronze)]
+        [TestCase(1, WheelTier.Silver)]
+        [TestCase(2, WheelTier.Bronze)]
         [TestCase(5, WheelTier.Silver)]
         [TestCase(30, WheelTier.Golden)]
         public void TierFollowsZoneType(int zone, WheelTier expected) =>
@@ -52,24 +53,22 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void SliceAmounts_AreScaledForTheZone()
         {
-            // Base 10 on a normal zone; zone 5 is safe, so use zone 4: 1 + 0.25 * 3 = 1.75x.
-            WheelModel zone1 = _factory.Build(1);
+            // Base 10 on a normal zone (zone 1 is safe now, so start at zone 2):
+            // zone 2 = 1 + 0.25 * 1 = 1.25x, zone 4 = 1 + 0.25 * 3 = 1.75x.
+            WheelModel zone2 = _factory.Build(2);
             WheelModel zone4 = _factory.Build(4);
 
-            int rewardAt1 = FirstRewardAmount(zone1);
-            int rewardAt4 = FirstRewardAmount(zone4);
-
-            Assert.That(rewardAt1, Is.EqualTo(10));
-            Assert.That(rewardAt4, Is.EqualTo((int)Math.Ceiling(10 * 1.75d)));
+            Assert.That(FirstRewardAmount(zone2), Is.EqualTo((int)Math.Ceiling(10 * 1.25d)));
+            Assert.That(FirstRewardAmount(zone4), Is.EqualTo((int)Math.Ceiling(10 * 1.75d)));
         }
 
         [Test]
         public void ScalingIsAppliedToTheBlueprintWithoutMutatingIt()
         {
             _factory.Build(50);
-            WheelModel again = _factory.Build(1);
+            WheelModel again = _factory.Build(2);
 
-            Assert.That(FirstRewardAmount(again), Is.EqualTo(10),
+            Assert.That(FirstRewardAmount(again), Is.EqualTo((int)Math.Ceiling(10 * 1.25d)),
                 "Building a deep zone must not have altered the authored base amount.");
         }
 

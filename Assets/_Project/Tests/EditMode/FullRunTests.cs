@@ -98,7 +98,8 @@ namespace Vertigo.Wheel.Tests.EditMode
             }
 
             CollectionAssert.AreEqual(new[] { 30 }, superZonesSeen);
-            Assert.That(safeZonesSeen, Is.EqualTo(10), "Zones 5..55 step 5, excluding 30 which is super.");
+            Assert.That(safeZonesSeen, Is.EqualTo(11),
+                "Zone 1, then 5..55 step 5, excluding 30 which is super.");
             Assert.That(_run.CurrentZone, Is.EqualTo(60));
             Assert.That(_view.BombsPlayed, Is.Zero);
         }
