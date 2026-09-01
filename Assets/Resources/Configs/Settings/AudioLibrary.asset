@@ -11,9 +11,10 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 97a6b7f455c1b4b528a48636f60b366d, type: 3}
   m_Name: AudioLibrary
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   _buttonClick: {fileID: 8300000, guid: b287f2ce23b0b47a4959f63caade72ca, type: 3}
-  _popupOpen: {fileID: 0}
-  _popupClose: {fileID: 0}
-  _rewardChime: {fileID: 0}
-  _bombExplosion: {fileID: 0}
+  _popupOpen: {fileID: 8300000, guid: 29bde6326b4c34ad8a12da475f79b50a, type: 3}
+  _popupClose: {fileID: 8300000, guid: 5039414d94a6e4e70a5ab9e8833e992a, type: 3}
+  _rewardChime: {fileID: 8300000, guid: 38a17a92b9d9748c6a1e67972041b833, type: 3}
+  _bombExplosion: {fileID: 8300000, guid: a235d590ef2a04d1b85b61ef4c21337c, type: 3}
+  _defeatAmbience: {fileID: 8300000, guid: ff5f85da24bc943d1abdc5760a22bc81, type: 3}

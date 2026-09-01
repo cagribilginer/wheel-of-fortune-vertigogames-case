@@ -21,7 +21,12 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         }
 
         public void PlayReward() => _audio.PlayOneShot(_library != null ? _library.RewardChime : null);
+
+        /// <summary>The cash-out "rewards claimed" flourish. Reuses the reward chime — it is the game's one
+        /// positive sting and there is no dedicated victory clip in the pack.</summary>
+        public void PlayClaim() => _audio.PlayOneShot(_library != null ? _library.RewardChime : null);
         public void PlayBombImpact() => _audio.PlayOneShot(_library != null ? _library.BombExplosion : null);
+        public void PlayDefeatAmbience() => _audio.PlayOneShot(_library != null ? _library.DefeatAmbience : null);
         public void PlayPopupOpen() => _audio.PlayOneShot(_library != null ? _library.PopupOpen : null);
         public void PlayPopupClose() => _audio.PlayOneShot(_library != null ? _library.PopupClose : null);
     }

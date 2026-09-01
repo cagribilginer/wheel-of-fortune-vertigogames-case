@@ -21,11 +21,15 @@ namespace Vertigo.Wheel.Data.Configs
         [SerializeField] private AudioClip _popupClose;
         [SerializeField] private AudioClip _rewardChime;
         [SerializeField] private AudioClip _bombExplosion;
+        [SerializeField] private AudioClip _defeatAmbience;
 
         public AudioClip ButtonClick => _buttonClick;
         public AudioClip PopupOpen => _popupOpen;
         public AudioClip PopupClose => _popupClose;
         public AudioClip RewardChime => _rewardChime;
         public AudioClip BombExplosion => _bombExplosion;
+
+        /// <summary>The tense drone that stings in under the bomb defeat / revive screen.</summary>
+        public AudioClip DefeatAmbience => _defeatAmbience;
     }
 }

@@ -17,4 +17,4 @@ MonoBehaviour:
   _accentColor: {r: 0.78, g: 0.82, b: 0.86, a: 1}
   _glowColor: {r: 0.78, g: 0.82, b: 0.86, a: 0.65}
   _spinLoop: {fileID: 0}
-  _tick: {fileID: 0}
+  _tick: {fileID: 8300000, guid: 0994c12e202f342459a4212e7287f7e8, type: 3}
