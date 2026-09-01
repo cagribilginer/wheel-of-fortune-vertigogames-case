@@ -6,6 +6,7 @@ using Vertigo.Wheel.Core.Spin;
 using Vertigo.Wheel.Core.States;
 using Vertigo.Wheel.Core.Zones;
 using Vertigo.Wheel.Data.Configs;
+using Vertigo.Wheel.UI.Views;
 
 namespace Vertigo.Wheel.Gameplay.Presenters
 {
@@ -15,6 +16,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     /// </summary>
     public sealed class ScreenPresentation : IWheelPresentation
     {
+        private readonly HeaderView _header;
         private readonly WheelPresenter _wheel;
         private readonly ZoneMapPresenter _zoneMap;
         private readonly BankPresenter _bank;
@@ -32,10 +34,11 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private const int BigRewardUnitValue = 60;
 
         public ScreenPresentation(
-            WheelPresenter wheel, ZoneMapPresenter zoneMap, BankPresenter bank,
+            HeaderView header, WheelPresenter wheel, ZoneMapPresenter zoneMap, BankPresenter bank,
             ActionBarPresenter actionBar, PopupPresenter popups, VfxPresenter vfx, AudioPresenter audio,
             WheelThemeConfig bronzeTheme, WheelThemeConfig silverTheme, WheelThemeConfig goldenTheme)
         {
+            _header = header;
             _wheel = wheel;
             _zoneMap = zoneMap;
             _bank = bank;
@@ -50,9 +53,15 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void ShowZone(int zone, ZoneType zoneType, WheelModel wheel, Action onComplete)
         {
-            _wheel.SetTheme(wheel, ThemeFor(wheel.Tier));
             _bank.Refresh();
-            _zoneMap.ShowZone(zone, onComplete);
+
+            // The header only exists for the end-of-run screens; the wheel loop stays uncluttered.
+            _header.SetVisible(false);
+
+            // The wheel exits downward, re-themes and re-populates its slots off-screen, then rides back
+            // up — only then does the zone strip scroll and the flow reach Idle.
+            _wheel.PlayZoneTransition(
+                wheel, ThemeFor(wheel.Tier), () => _zoneMap.ShowZone(zone, onComplete));
         }
 
         public void SetInputState(bool canSpin, bool canLeave, bool canGiveUp)
@@ -85,23 +94,60 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         {
             _vfx.PlayBombImpact();
             _audio.PlayBombImpact();
-            _bank.Refresh();
+            // The bank panel is deliberately NOT refreshed here: the pre-bomb haul stays on screen behind
+            // the defeat vignette so a revive restores it seamlessly. HideGameOver refreshes once the
+            // player has actually chosen (revive keeps it, give-up/restart empties it).
             DOVirtual.DelayedCall(0.4f, () => onComplete());
         }
 
-        public void ShowGameOver(int zoneReached, bool continueOffered, int continueCost) =>
-            _popups.ShowGameOver(zoneReached, continueOffered, continueCost);
+        public void ShowGameOver(
+            int zoneReached, IReadOnlyList<BankEntry> lostHaul, int playerGold,
+            bool goldReviveOffered, int goldReviveCost, bool adReviveOffered)
+        {
+            _header.SetVisible(true);
+            _popups.ShowGameOver(
+                zoneReached, lostHaul, playerGold, goldReviveOffered, goldReviveCost, adReviveOffered);
+        }
 
-        public void HideGameOver() => _popups.HideGameOver();
+        public void HideGameOver()
+        {
+            _header.SetVisible(false);
+            // A revive restored the haul and a give-up wiped it — either way the board the player returns to
+            // needs the current bank, and no ShowZone runs on the revive path to do it.
+            _bank.Refresh();
+            _popups.HideGameOver();
+        }
 
-        public void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared) =>
+        public void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared)
+        {
+            _header.SetVisible(true);
             _popups.ShowCashOut(haul, zonesCleared);
+        }
 
-        public void HideCashOut() => _popups.HideCashOut();
+        public void HideCashOut()
+        {
+            _header.SetVisible(false);
+            _popups.HideCashOut();
+        }
 
-        public void ShowGiveUpConfirm(int rewardsAtStake) => _popups.ShowGiveUpConfirm(rewardsAtStake);
+        public void ClaimCashOut(Action onComplete)
+        {
+            // The header stays visible through the celebration so its gold counter can be seen counting
+            // up; ShowZone hides it again once the fresh run's wheel slides in.
+            _popups.ClaimCashOut(onComplete);
+        }
 
-        public void HideGiveUpConfirm() => _popups.HideGiveUpConfirm();
+        public void ShowGiveUpConfirm(int rewardsAtStake)
+        {
+            _header.SetVisible(true);
+            _popups.ShowGiveUpConfirm(rewardsAtStake);
+        }
+
+        public void HideGiveUpConfirm()
+        {
+            _header.SetVisible(false);
+            _popups.HideGiveUpConfirm();
+        }
 
         private WheelThemeConfig ThemeFor(WheelTier tier)
         {

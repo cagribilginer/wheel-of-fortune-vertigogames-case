@@ -11,7 +11,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
     /// </summary>
     public abstract class PopupViewBase : UIViewBase
     {
-        protected void PlayOpen(Image backdrop, RectTransform card)
+        protected void PlayOpen(Image backdrop, RectTransform card, float backdropAlpha = 0.82f)
         {
             gameObject.SetActive(true);
 
@@ -20,7 +20,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
 
             Color c = backdrop.color;
             backdrop.color = new Color(c.r, c.g, c.b, 0f);
-            backdrop.DOFade(0.82f, 0.2f);
+            backdrop.DOFade(backdropAlpha, 0.2f);
 
             card.localScale = Vector3.one * 0.85f;
             card.DOScale(1f, 0.3f).SetEase(Ease.OutBack);

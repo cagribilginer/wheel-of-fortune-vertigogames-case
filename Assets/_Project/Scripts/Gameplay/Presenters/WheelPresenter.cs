@@ -33,6 +33,12 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private int _lastTickIndex = int.MinValue;
         private AudioClip _tickClip;
 
+        // The panel's resting Y and the fully-off-screen Y the wheel exits to between zones. Captured once
+        // from the authored layout so an art/anchor change carries through without a magic number here.
+        private readonly float _homeY;
+        private readonly float _hiddenY;
+        private bool _hasShownZone;
+
         public WheelPresenter(
             WheelView view, WheelSpinConfig spinConfig, RewardCatalog catalog, Sprite bombIcon, IAudioService audio)
         {
@@ -41,6 +47,9 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _catalog = catalog;
             _bombIcon = bombIcon;
             _audio = audio;
+
+            _homeY = _view.Root.anchoredPosition.y;
+            _hiddenY = _homeY - 900f; // a 720px panel plus margin: clears the bottom of the safe area entirely
 
             // The editor's [ContextMenu] WheelSlotLayout tool is design-time-only convenience; nothing
             // guarantees a human ever ran it. Doing the same placement here means a fresh Play session is
@@ -68,6 +77,35 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         }
 
         public void WireInput(GameStateMachine machine) => _view.SpinClicked += machine.RequestSpin;
+
+        /// <summary>
+        /// The zone-advance cinematic: drop the current wheel off the bottom, swap in the new zone's
+        /// theme and slots while it is out of sight, then spring the fresh wheel back up to centre.
+        /// <para>
+        /// The very first zone has no outgoing wheel, so it only plays the entrance — which also keeps the
+        /// boot-to-Idle chain inside the Play Mode smoke test's two-second budget.
+        /// </para>
+        /// </summary>
+        public void PlayZoneTransition(WheelModel wheel, WheelThemeConfig theme, Action onComplete)
+        {
+            RectTransform root = _view.Root;
+            root.DOKill();
+
+            Sequence seq = DOTween.Sequence().SetLink(root.gameObject, LinkBehaviour.KillOnDestroy);
+
+            if (_hasShownZone)
+                seq.Append(root.DOAnchorPosY(_hiddenY, 0.35f).SetEase(Ease.InBack));
+            else
+                root.anchoredPosition = new Vector2(root.anchoredPosition.x, _hiddenY);
+
+            seq.AppendCallback(() => SetTheme(wheel, theme));
+            seq.Append(root.DOAnchorPosY(_homeY, 0.45f).SetEase(Ease.OutBack));
+            seq.OnComplete(() =>
+            {
+                _hasShownZone = true;
+                onComplete();
+            });
+        }
 
         public void SetTheme(WheelModel wheel, WheelThemeConfig theme)
         {

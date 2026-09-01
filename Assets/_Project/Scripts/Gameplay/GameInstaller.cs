@@ -33,7 +33,9 @@ namespace Vertigo.Wheel.Gameplay
         [SerializeField] private BombPopupView _bombPopup;
         [SerializeField] private CollectPopupView _collectPopup;
         [SerializeField] private GiveUpConfirmPopupView _giveUpPopup;
+        [SerializeField] private MilestonePreviewPopupView _milestonePopup;
         [SerializeField] private VfxView _vfx;
+        [SerializeField] private DebugOverlayView _debugOverlay;
         [SerializeField] private ZoneMapTileView _zoneMapTilePrefab;
         [SerializeField] private BankEntryView _bankEntryPrefab;
         [SerializeField] private Transform _flightLayer;
@@ -51,11 +53,16 @@ namespace Vertigo.Wheel.Gameplay
         // subscription lives exactly as long as the scene does.
         private HeaderPresenter _headerPresenter;
 
+        // Held for the same reason as the header presenter: it owns the milestone badge -> preview-popup
+        // subscription and must outlive this method.
+        private MilestonePreviewPresenter _milestonePreviewPresenter;
+
         /// <summary>Called once by the editor scene-build step; never touched by hand.</summary>
         public void Configure(
             HeaderView header, WheelView wheel, ZoneMapView zoneMap, BankView bank, ActionBarView actionBar,
             BombPopupView bombPopup, CollectPopupView collectPopup, GiveUpConfirmPopupView giveUpPopup,
-            VfxView vfx, ZoneMapTileView zoneMapTilePrefab, BankEntryView bankEntryPrefab, Transform flightLayer,
+            MilestonePreviewPopupView milestonePopup, VfxView vfx, DebugOverlayView debugOverlay,
+            ZoneMapTileView zoneMapTilePrefab, BankEntryView bankEntryPrefab, Transform flightLayer,
             Sprite bombSlotIcon)
         {
             _header = header;
@@ -66,7 +73,9 @@ namespace Vertigo.Wheel.Gameplay
             _bombPopup = bombPopup;
             _collectPopup = collectPopup;
             _giveUpPopup = giveUpPopup;
+            _milestonePopup = milestonePopup;
             _vfx = vfx;
+            _debugOverlay = debugOverlay;
             _zoneMapTilePrefab = zoneMapTilePrefab;
             _bankEntryPrefab = bankEntryPrefab;
             _flightLayer = flightLayer;
@@ -101,16 +110,21 @@ namespace Vertigo.Wheel.Gameplay
             var audioPresenter = new AudioPresenter(audioService, audioLibrary);
 
             _headerPresenter = new HeaderPresenter(_header, wallet);
+
+            // Skipped when the scene predates the milestone popup — a rebuild adds it.
+            if (_milestonePopup != null)
+                _milestonePreviewPresenter = new MilestonePreviewPresenter(_zoneMap, _milestonePopup);
             var wheelPresenter = new WheelPresenter(_wheel, spinConfig, catalog, _bombSlotIcon, audioService);
             var zoneMapPresenter = new ZoneMapPresenter(_zoneMap, _zoneMapTilePrefab, classifier, progression);
-            var bankPresenter = new BankPresenter(_bank, _bankEntryPrefab, catalog, runModel.Bank, _flightLayer);
+            var bankPresenter = new BankPresenter(
+                _bank, _bankEntryPrefab, catalog, runModel.Bank, _flightLayer, audioPresenter);
             var actionBarPresenter = new ActionBarPresenter(_actionBar);
             var popupPresenter = new PopupPresenter(
                 _bombPopup, _collectPopup, _giveUpPopup, _bankEntryPrefab, catalog, audioPresenter);
             var vfxPresenter = new VfxPresenter(_vfx);
 
             var presentation = new ScreenPresentation(
-                wheelPresenter, zoneMapPresenter, bankPresenter, actionBarPresenter, popupPresenter,
+                _header, wheelPresenter, zoneMapPresenter, bankPresenter, actionBarPresenter, popupPresenter,
                 vfxPresenter, audioPresenter, bronzeTheme, silverTheme, goldenTheme);
 
             var context = new GameContext(runModel, wheelFactory, spinService, continueService, presentation);
@@ -120,6 +134,11 @@ namespace Vertigo.Wheel.Gameplay
             wheelPresenter.WireInput(machine);
             actionBarPresenter.WireInput(machine);
             popupPresenter.WireInput(machine);
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (_debugOverlay != null)
+                new DebugPresenter(runModel, machine, wallet, catalog, bankPresenter).WireInput(_debugOverlay);
+#endif
 
             GameFlow.Start(machine);
         }

@@ -30,6 +30,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly AudioPresenter _audio;
         private readonly ObjectPool<BankEntryView> _listPool;
         private readonly List<BankEntryView> _activeList = new List<BankEntryView>();
+        private readonly ObjectPool<BankEntryView> _bombListPool;
+        private readonly List<BankEntryView> _activeBombList = new List<BankEntryView>();
 
         public PopupPresenter(
             BombPopupView bomb, CollectPopupView collect, GiveUpConfirmPopupView giveUp,
@@ -46,21 +48,54 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 e => e.gameObject.SetActive(true),
                 e => e.gameObject.SetActive(false),
                 e => Object.Destroy(e.gameObject));
+
+            _bombListPool = new ObjectPool<BankEntryView>(
+                () => Object.Instantiate(entryPrefab, _bomb.Content),
+                e => e.gameObject.SetActive(true),
+                e => e.gameObject.SetActive(false),
+                e => Object.Destroy(e.gameObject));
         }
 
         public void WireInput(GameStateMachine machine)
         {
+            // "Give up" forfeits the haul and drops back to zone one — the machine already models that as a
+            // restart, so the bomb screen's give-up button raises the same input the old "TRY AGAIN" did.
+            _bomb.GiveUpClicked += machine.RequestRestart;
             _bomb.ContinueClicked += machine.RequestContinue;
-            _bomb.RestartClicked += machine.RequestRestart;
+            _bomb.AdContinueClicked += machine.RequestAdContinue;
             _collect.ConfirmClicked += machine.Confirm;
+            _collect.CancelClicked += machine.Cancel;
             _giveUp.ConfirmClicked += machine.Confirm;
             _giveUp.CancelClicked += machine.Cancel;
         }
 
-        public void ShowGameOver(int zoneReached, bool continueOffered, int continueCost)
+        public void ShowGameOver(
+            int zoneReached, IReadOnlyList<BankEntry> lostHaul, int playerGold,
+            bool goldReviveOffered, int goldReviveCost, bool adReviveOffered)
         {
+            for (int i = 0; i < _activeBombList.Count; i++) _bombListPool.Release(_activeBombList[i]);
+            _activeBombList.Clear();
+
+            long lostValue = 0;
+            for (int i = 0; i < lostHaul.Count; i++)
+            {
+                lostValue += lostHaul[i].TotalValue;
+
+                BankEntryView entry = _bombListPool.Get();
+                entry.SetEntry(_catalog.IconFor(lostHaul[i].Reward), lostHaul[i].Amount);
+                entry.transform.SetSiblingIndex(i);
+                _activeBombList.Add(entry);
+            }
+
             _audio.PlayPopupOpen();
-            _bomb.Show(zoneReached, continueOffered, continueCost);
+            _audio.PlayDefeatAmbience();
+
+            // The corner HUD shows two numbers: "cash" is the worth of the haul now on the line, "gold" is
+            // the persistent wallet a paid revive spends from.
+            int lostCash = lostValue > int.MaxValue ? int.MaxValue : (int)lostValue;
+            _bomb.Show(
+                zoneReached, lostHaul.Count, lostCash, playerGold,
+                goldReviveOffered, goldReviveCost, adReviveOffered);
         }
 
         public void HideGameOver()
@@ -94,6 +129,16 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         {
             _audio.PlayPopupClose();
             _collect.Hide();
+        }
+
+        public void ClaimCashOut(System.Action onComplete)
+        {
+            _audio.PlayClaim();
+            _collect.PlayClaim(() =>
+            {
+                _audio.PlayPopupClose();
+                onComplete();
+            });
         }
 
         public void ShowGiveUpConfirm(int rewardsAtStake)

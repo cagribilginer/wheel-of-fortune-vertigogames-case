@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,9 +24,15 @@ namespace Vertigo.Wheel.UI.Views
         [SerializeField] private RectTransform _ui_content_zonemap;
         [SerializeField] private TextMeshProUGUI _ui_text_zonemap_milestone_super_value;
         [SerializeField] private TextMeshProUGUI _ui_text_zonemap_milestone_safe_value;
+        [SerializeField] private Button _ui_card_zonemap_milestone_super;
+        [SerializeField] private Button _ui_card_zonemap_milestone_safe;
 
         public ScrollRect Scroll => _ui_scroll_zonemap;
         public RectTransform Content => _ui_content_zonemap;
+
+        /// <summary>Raised when the player taps a milestone badge — opens the preview teaser.</summary>
+        public event Action SafeMilestoneClicked;
+        public event Action SuperMilestoneClicked;
 
         protected override void CacheReferences()
         {
@@ -33,7 +40,30 @@ namespace Vertigo.Wheel.UI.Views
             Bind(ref _ui_content_zonemap, "ui_content_zonemap");
             Bind(ref _ui_text_zonemap_milestone_super_value, "ui_text_zonemap_milestone_super_value");
             Bind(ref _ui_text_zonemap_milestone_safe_value, "ui_text_zonemap_milestone_safe_value");
+            Bind(ref _ui_card_zonemap_milestone_super, "ui_card_zonemap_milestone_super");
+            Bind(ref _ui_card_zonemap_milestone_safe, "ui_card_zonemap_milestone_safe");
         }
+
+        private void OnEnable()
+        {
+            // Null-guarded because a scene built before the badges became buttons still deserialises here
+            // with these refs empty; a rebuild wires them.
+            if (_ui_card_zonemap_milestone_safe != null)
+                _ui_card_zonemap_milestone_safe.onClick.AddListener(RaiseSafe);
+            if (_ui_card_zonemap_milestone_super != null)
+                _ui_card_zonemap_milestone_super.onClick.AddListener(RaiseSuper);
+        }
+
+        private void OnDisable()
+        {
+            if (_ui_card_zonemap_milestone_safe != null)
+                _ui_card_zonemap_milestone_safe.onClick.RemoveListener(RaiseSafe);
+            if (_ui_card_zonemap_milestone_super != null)
+                _ui_card_zonemap_milestone_super.onClick.RemoveListener(RaiseSuper);
+        }
+
+        private void RaiseSafe() => SafeMilestoneClicked?.Invoke();
+        private void RaiseSuper() => SuperMilestoneClicked?.Invoke();
 
         /// <summary>
         /// <paramref name="nextSafeZone"/> / <paramref name="nextSuperZone"/> are absolute zone numbers, not

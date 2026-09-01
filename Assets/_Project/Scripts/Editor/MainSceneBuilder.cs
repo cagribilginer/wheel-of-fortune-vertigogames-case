@@ -72,12 +72,13 @@ namespace Vertigo.Wheel.Editor
             BankView bankView = BuildBank(sidePanel, bankEntryPrefab);
             ActionBarView actionBarView = BuildActions(sidePanel);
 
-            (BombPopupView bombView, CollectPopupView collectView, GiveUpConfirmPopupView giveUpView) =
-                BuildPopupLayer(canvasRoot, bankEntryPrefab);
+            (BombPopupView bombView, CollectPopupView collectView, GiveUpConfirmPopupView giveUpView,
+                MilestonePreviewPopupView milestoneView) = BuildPopupLayer(canvasRoot, bankEntryPrefab);
             VfxView vfxView = BuildVfxLayer(canvasRoot);
+            DebugOverlayView debugView = BuildDebugOverlay(canvasRoot);
 
             BuildGameInstaller(canvasRoot, headerView, wheelView, zoneMapView, bankView, actionBarView,
-                bombView, collectView, giveUpView, vfxView, tilePrefab, bankEntryPrefab);
+                bombView, collectView, giveUpView, milestoneView, vfxView, debugView, tilePrefab, bankEntryPrefab);
 
             EnsureFolder(Path.GetDirectoryName(ScenePath).Replace('\\', '/'));
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -93,13 +94,14 @@ namespace Vertigo.Wheel.Editor
         private static void BuildGameInstaller(
             RectTransform canvasRoot, HeaderView header, WheelView wheel, ZoneMapView zoneMap, BankView bank,
             ActionBarView actionBar, BombPopupView bombPopup, CollectPopupView collectPopup,
-            GiveUpConfirmPopupView giveUpPopup, VfxView vfx, ZoneMapTileView tilePrefab, BankEntryView bankEntryPrefab)
+            GiveUpConfirmPopupView giveUpPopup, MilestonePreviewPopupView milestonePopup, VfxView vfx,
+            DebugOverlayView debugOverlay, ZoneMapTileView tilePrefab, BankEntryView bankEntryPrefab)
         {
             var installer = new GameObject("GameInstaller").AddComponent<GameInstaller>();
             Sprite bombIcon = EditorSpriteUtility.FindSprite("ui_card_icon_death");
 
             installer.Configure(header, wheel, zoneMap, bank, actionBar, bombPopup, collectPopup, giveUpPopup,
-                vfx, tilePrefab, bankEntryPrefab, canvasRoot, bombIcon);
+                milestonePopup, vfx, debugOverlay, tilePrefab, bankEntryPrefab, canvasRoot, bombIcon);
         }
 
         // ------------------------------------------------------------------ pooled prefabs
@@ -359,17 +361,17 @@ namespace Vertigo.Wheel.Editor
 
             scroll.content = content;
 
-            // Fills are tinted bright to survive multiplying against the mid-grey panel art; the sprite's
-            // darker corner pixels still give each card a subtle bevel.
+            // Near-transparent dark fill with a thin coloured stroke — the reference badges read as a sleek
+            // outline, not a filled bevelled pill.
             BuildMilestoneBadge(zoneMap, "ui_card_zonemap_milestone_super", "ui_text_zonemap_milestone_super_value",
                 "UI_icon_chest_gold_nolight", "SUPER ZONE 30",
-                new Color(1f, 0.66f, 0.16f, 1f), new Color(1f, 0.82f, 0.34f, 1f),
-                new Vector2(-16f, 33f));
+                new Color(0.06f, 0.05f, 0.03f, 0.62f), new Color(0.92f, 0.74f, 0.32f, 0.9f),
+                new Vector2(-14f, 30f));
 
             BuildMilestoneBadge(zoneMap, "ui_card_zonemap_milestone_safe", "ui_text_zonemap_milestone_safe_value",
                 "UI_icon_chest_silver_nolight", "SAFE ZONE 10",
-                new Color(0.30f, 0.88f, 0.34f, 1f), new Color(0.48f, 0.96f, 0.52f, 1f),
-                new Vector2(-16f, -33f));
+                new Color(0.04f, 0.07f, 0.04f, 0.62f), new Color(0.46f, 0.86f, 0.50f, 0.9f),
+                new Vector2(-14f, -30f));
 
             var view = zoneMap.gameObject.AddComponent<ZoneMapView>();
             view.RebindReferences();
@@ -378,10 +380,11 @@ namespace Vertigo.Wheel.Editor
 
         // Every SUPER/SAFE milestone card shares these exactly so the two badges are typographically
         // identical — same box, same fixed font size (auto-sizing was letting the longer "SUPER ZONE 60"
-        // shrink relative to "SAFE ZONE 10"), same padding, same icon slot.
-        private static readonly Vector2 MilestoneCardSize = new Vector2(258f, 60f);
-        private const float MilestoneFontSize = 19f;
-        private const float MilestoneIconSize = 44f;
+        // shrink relative to "SAFE ZONE 10"), same padding, same icon slot. Compact, with a thin 4px
+        // stroke rather than the chunky bevelled 12px frame.
+        private static readonly Vector2 MilestoneCardSize = new Vector2(224f, 50f);
+        private const float MilestoneFontSize = 16f;
+        private const float MilestoneIconSize = 30f;
 
         /// <summary>
         /// One top-right milestone card ("SAFE ZONE 10", "SUPER ZONE 30"): an opaque, high-contrast pill
@@ -400,15 +403,18 @@ namespace Vertigo.Wheel.Editor
             card.sizeDelta = MilestoneCardSize;
             card.anchoredPosition = anchoredPosition;
 
-            // Opaque panel sprite for the fill; ui_card_frame_12px_neutral is an outline only (transparent
-            // centre), so tinting it never produced the solid colour these cards need — it just drew a thin
-            // edge blown up to card size. The stroke layer on top is that outline sprite, used as intended.
+            // Opaque panel sprite for the near-transparent dark fill; ui_card_frame_4px_zone on top is a
+            // thin outline (4px 9-slice), for a sleek 1-2px-reading border instead of the old bevel.
             Image bg = AddImage(NewNode(cardName + "_bg", card), "ui_card_panel_zone_bg");
             bg.type = Image.Type.Sliced;
             bg.color = fillColor;
+            bg.raycastTarget = true; // the badge is tappable — it opens the milestone preview
             Stretch((RectTransform)bg.transform, 0, 0, 0, 0);
 
-            Image stroke = AddImage(NewNode(cardName + "_stroke", card), "ui_card_frame_12px_neutral");
+            var button = card.gameObject.AddComponent<Button>();
+            button.targetGraphic = bg;
+
+            Image stroke = AddImage(NewNode(cardName + "_stroke", card), "ui_card_frame_4px_zone");
             stroke.type = Image.Type.Sliced;
             stroke.color = strokeColor;
             Stretch((RectTransform)stroke.transform, 0, 0, 0, 0);
@@ -419,7 +425,7 @@ namespace Vertigo.Wheel.Editor
 
             TextMeshProUGUI text = AddText(NewNode(textName, card), placeholder, MilestoneFontSize);
             text.alignment = TextAlignmentOptions.MidlineLeft;
-            text.color = Color.white;
+            text.color = new Color(strokeColor.r, strokeColor.g, strokeColor.b, 1f);
             text.fontStyle = FontStyles.Bold;
             text.enableAutoSizing = false;
             text.enableWordWrapping = false;
@@ -503,33 +509,26 @@ namespace Vertigo.Wheel.Editor
             RectTransform bank = NewNode("ui_panel_bank", sidePanel);
             Stretch(bank, 0, 74f, 0, 0);
 
-            // Two layers, each doing one job so neither has to be stretched past what it can render cleanly:
-            //   - the fill is ui_card_panel_zone_bg, a fully opaque panel sprite (no transparent centre), so
-            //     the COLLECTED box reads as a solid dark card against the near-black scene;
-            //   - the border is ui_card_frame_12px_neutral, an outline-only sprite (transparent centre) whose
-            //     12px 9-slice corners stay crisp at any panel size, tinted silver for a defined edge.
-            // The earlier single ui_card_frame_12px_neutral fill looked "stretched / low-res" precisely
-            // because it has no centre to fill with — only its thin edge was ever drawn, blown up huge.
+            // Fill: ui_card_panel_zone_bg is an opaque 9-slice (the same one the zone bar and milestone
+            // badges use cleanly), tinted near-black. Rim: ui_card_frame_4px_zone is a 4px outline
+            // (transparent centre) so it only ever draws a crisp 1-2px edge — no blown-up bevel like the old
+            // 12px frame that read as "stretched / blurry".
             Image bg = AddImage(NewNode("ui_image_bank_bg", bank), "ui_card_panel_zone_bg");
             bg.type = Image.Type.Sliced;
-            bg.color = new Color(0.42f, 0.44f, 0.50f, 1f); // multiplies the mid-grey panel art down to a dark slate
+            bg.color = new Color(0.10f, 0.11f, 0.13f, 0.97f);
             Stretch((RectTransform)bg.transform, 0, 0, 0, 0);
 
-            Image frame = AddImage(NewNode("ui_image_bank_frame", bank), "ui_card_frame_12px_neutral");
+            Image frame = AddImage(NewNode("ui_image_bank_frame", bank), "ui_card_frame_4px_zone");
             frame.type = Image.Type.Sliced;
-            frame.color = new Color(0.64f, 0.68f, 0.76f, 1f);
+            frame.color = new Color(0.34f, 0.37f, 0.43f, 0.55f);
             Stretch((RectTransform)frame.transform, 0, 0, 0, 0);
-
-            TextMeshProUGUI title = AddText(NewNode("ui_text_bank_title", bank), "COLLECTED", 26f);
-            title.alignment = TextAlignmentOptions.TopLeft;
-            TopStripText((RectTransform)title.transform, 24f, new Vector2(300, 40));
 
             TextMeshProUGUI empty = AddText(NewNode("ui_text_bank_empty_value", bank), "Spin to earn rewards", 24f);
             empty.alignment = TextAlignmentOptions.Center;
-            Stretch((RectTransform)empty.transform, 20, 20, 20, 60);
+            Stretch((RectTransform)empty.transform, 20, 20, 20, 20);
 
             RectTransform scrollRect = NewNode("ui_scroll_bank", bank);
-            Stretch(scrollRect, 12, 12, 12, 60);
+            Stretch(scrollRect, 12, 12, 12, 14);
             var scroll = scrollRect.gameObject.AddComponent<ScrollRect>();
             scroll.horizontal = false;
             scroll.vertical = true;
@@ -555,7 +554,10 @@ namespace Vertigo.Wheel.Editor
             grid.cellSize = new Vector2(140f, 160f);
             grid.spacing = new Vector2(12f, 12f);
             grid.constraint = GridLayoutGroup.Constraint.Flexible;
+            // Fill left-to-right and wrap: items land in acquisition order reading like a list, not
+            // re-centred each time a row's count changes.
             grid.childAlignment = TextAnchor.UpperLeft;
+            grid.padding = new RectOffset(16, 16, 12, 12);
 
             var contentFitter = content.gameObject.AddComponent<ContentSizeFitter>();
             contentFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
@@ -569,17 +571,15 @@ namespace Vertigo.Wheel.Editor
         }
 
         /// <summary>
-        /// The single EXIT action, top-left of the side panel above the bank grid — replacing the old
-        /// COLLECT/GIVE UP pair. Which of "cash out" or "give up" it actually triggers is
-        /// <c>IdleState.OnExitRequested</c>'s call, not this button's; the view only raises the click.
+        /// The single EXIT action, in a strip below the bank grid. It always opens the cash-out summary
+        /// now (<c>IdleState.OnExitRequested</c>); the view only raises the click and mirrors legality.
         /// </summary>
         private static ActionBarView BuildActions(RectTransform sidePanel)
         {
             RectTransform actions = NewNode("ui_panel_actions", sidePanel);
             BottomStrip(actions, 64f);
 
-            // Centred in a strip that shares the bank panel's own left/right bounds — centred here is
-            // centred relative to the COLLECTED box above it, without needing to reference that box directly.
+            // Centred in a strip that shares the bank panel's own left/right bounds.
             RectTransform buttonRect = NewNode("ui_button_action_exit", actions);
             buttonRect.anchorMin = new Vector2(0.5f, 0.5f);
             buttonRect.anchorMax = new Vector2(0.5f, 0.5f);
@@ -611,8 +611,8 @@ namespace Vertigo.Wheel.Editor
 
         // ------------------------------------------------------------------ popups
 
-        private static (BombPopupView, CollectPopupView, GiveUpConfirmPopupView) BuildPopupLayer(
-            RectTransform canvasRoot, BankEntryView bankEntryPrefab)
+        private static (BombPopupView, CollectPopupView, GiveUpConfirmPopupView, MilestonePreviewPopupView)
+            BuildPopupLayer(RectTransform canvasRoot, BankEntryView bankEntryPrefab)
         {
             RectTransform layer = NewNode("ui_panel_popup_layer", canvasRoot);
             Stretch(layer, 0, 0, 0, 0);
@@ -624,8 +624,9 @@ namespace Vertigo.Wheel.Editor
             BombPopupView bombView = BuildBombPopup(layer);
             CollectPopupView collectView = BuildCollectPopup(layer, bankEntryPrefab);
             GiveUpConfirmPopupView giveUpView = BuildGiveUpConfirmPopup(layer);
+            MilestonePreviewPopupView milestoneView = BuildMilestonePreviewPopup(layer);
 
-            return (bombView, collectView, giveUpView);
+            return (bombView, collectView, giveUpView, milestoneView);
         }
 
         private static BombPopupView BuildBombPopup(RectTransform layer)
@@ -634,51 +635,271 @@ namespace Vertigo.Wheel.Editor
             Stretch(root, 0, 0, 0, 0);
             root.gameObject.AddComponent<CanvasGroup>();
 
+            // Dark but not opaque so the retained bank panel shows through faintly. The exact alpha is
+            // driven by BombPopupView (0.86); this is just the resting tint.
             Image backdrop = AddImage(NewNode("ui_image_popup_bomb_backdrop", root), null);
-            backdrop.color = new Color(0f, 0f, 0f, 0.82f);
+            backdrop.color = new Color(0.02f, 0f, 0f, 0.86f);
             backdrop.raycastTarget = true;
             Stretch((RectTransform)backdrop.transform, 0, 0, 0, 0);
 
+            // Breathing red alert wash over the backdrop. star_glow_alpha is a soft radial, oversized past
+            // the canvas so its falloff never shows an edge; the view yoyos its alpha 0.5..0.9.
+            Image vignette = AddImage(NewNode("ui_image_popup_bomb_vignette", root), "star_glow_alpha");
+            vignette.color = new Color(0.80f, 0.05f, 0.05f, 0.5f);
+            vignette.raycastTarget = false;
+            Stretch((RectTransform)vignette.transform, -220, -220, -220, -220);
+
+            // No modal card: content sits straight on the vignette. This full-bleed transparent node is only
+            // here so PopupViewBase can scale the centred content in on open without moving the corner HUD or
+            // the button row (both siblings under root).
             RectTransform anim = NewNode("ui_transform_popup_bomb_anim", root);
-            FixedCentered(anim, Vector2.zero, new Vector2(900f, 560f));
+            Stretch(anim, 0, 0, 0, 0);
 
-            Image frame = AddImage(NewNode("ui_image_popup_bomb_frame", anim), "ui_card_frame_12px_neutral");
-            frame.type = Image.Type.Sliced;
-            Stretch((RectTransform)frame.transform, 0, 0, 0, 0);
+            Image titleBg = AddImage(NewNode("ui_image_popup_bomb_title_bg", anim), "ui_card_panel_zone_bg");
+            titleBg.type = Image.Type.Sliced;
+            titleBg.color = new Color(0f, 0f, 0f, 0.34f);
+            FixedCentered((RectTransform)titleBg.transform, new Vector2(0, 320), new Vector2(1180, 78));
 
-            Image icon = AddImage(NewNode("ui_image_popup_bomb_icon", anim), "ui_card_icon_death");
-            icon.preserveAspect = true;
-            FixedCentered((RectTransform)icon.transform, new Vector2(0, 140), new Vector2(140, 140));
-
-            TextMeshProUGUI title = AddText(NewNode("ui_text_popup_bomb_title", anim), "EVERYTHING LOST", 40f);
+            TextMeshProUGUI title = AddText(NewNode("ui_text_popup_bomb_title", anim),
+                "OH NO, A BOMB EXPLODED RIGHT IN YOUR HANDS!", 34f);
             title.alignment = TextAlignmentOptions.Center;
-            FixedCentered((RectTransform)title.transform, new Vector2(0, 20), new Vector2(700, 60));
+            title.fontStyle = FontStyles.Bold;
+            title.enableWordWrapping = false;
+            FixedCentered((RectTransform)title.transform, new Vector2(0, 320), new Vector2(1160, 60));
 
-            TextMeshProUGUI zone = AddText(NewNode("ui_text_popup_bomb_zone_value", anim), "You reached Zone 17", 28f);
+            TextMeshProUGUI subtitle = AddText(NewNode("ui_text_popup_bomb_subtitle", anim),
+                "Revive yourself to keep your rewards.", 24f);
+            subtitle.alignment = TextAlignmentOptions.Center;
+            subtitle.color = new Color(0.86f, 0.87f, 0.90f, 1f);
+            FixedCentered((RectTransform)subtitle.transform, new Vector2(0, 262), new Vector2(900, 36));
+
+            TextMeshProUGUI zone = AddText(NewNode("ui_text_popup_bomb_zone_value", anim), "You reached Zone 17", 20f);
             zone.alignment = TextAlignmentOptions.Center;
-            FixedCentered((RectTransform)zone.transform, new Vector2(0, -30), new Vector2(700, 40));
+            zone.color = new Color(0.62f, 0.63f, 0.68f, 1f);
+            FixedCentered((RectTransform)zone.transform, new Vector2(0, 222), new Vector2(900, 30));
 
-            BuildPopupButton(anim, "ui_button_popup_bomb_continue", "ui_transform_popup_bomb_continue_anim",
-                "UI_button_orange_standard", pivotX: 1f, anchoredX: -20f, anchoredY: -180f,
-                animOut: out RectTransform continueAnim);
-            Image continueIcon = AddImage(NewNode("ui_image_popup_bomb_continue_icon", continueAnim), "UI_icon_gold");
-            continueIcon.preserveAspect = true;
-            LeftMiddle((RectTransform)continueIcon.transform, 30f, new Vector2(36, 36));
-            TextMeshProUGUI continueText = AddText(NewNode("ui_text_popup_bomb_continue_value", continueAnim), "220", 28f);
-            continueText.alignment = TextAlignmentOptions.MidlineRight;
-            RightMiddle((RectTransform)continueText.transform, -30f, new Vector2(160, 40));
+            // Big red skull, dead centre, behind the lost-haul strip.
+            Image skull = AddImage(NewNode("ui_image_popup_bomb_icon", anim), "ui_card_icon_death");
+            skull.preserveAspect = true;
+            skull.color = new Color(0.78f, 0.13f, 0.13f, 0.92f);
+            FixedCentered((RectTransform)skull.transform, new Vector2(0, 40), new Vector2(220, 220));
 
-            BuildPopupButton(anim, "ui_button_popup_bomb_restart", "ui_transform_popup_bomb_restart_anim",
-                "UI_button_grey_standard", pivotX: 0f, anchoredX: 20f, anchoredY: -180f,
-                animOut: out RectTransform restartAnim);
-            TextMeshProUGUI restartText = AddText(NewNode("ui_text_popup_bomb_restart_value", restartAnim), "TRY AGAIN", 28f);
-            restartText.alignment = TextAlignmentOptions.Center;
-            Stretch((RectTransform)restartText.transform, 0, 0, 0, 0);
+            // The lost haul: pooled BankEntryView tiles in one horizontal row, centred below the skull.
+            // A deep run can bank more tiles than fit across the screen, so the row is a real horizontal
+            // ScrollRect (RectMask2D clip + HorizontalLayoutGroup) — the player can swipe through the full
+            // haul instead of it clipping at the edges.
+            RectTransform listFrame = NewNode("ui_scroll_popup_bomb_list", anim);
+            FixedCentered(listFrame, new Vector2(0f, -155f), new Vector2(1160f, 176f));
+            listFrame.gameObject.AddComponent<RectMask2D>();
+            var listScroll = listFrame.gameObject.AddComponent<ScrollRect>();
+            listScroll.horizontal = true;
+            listScroll.vertical = false;
+            listScroll.movementType = ScrollRect.MovementType.Elastic;
+            listScroll.scrollSensitivity = 24f;
+
+            // Transparent fill so the ScrollRect (which is its own viewport here) has a raycast target and
+            // actually receives swipe/drag events across the strip.
+            Image listRaycast = listFrame.gameObject.AddComponent<Image>();
+            listRaycast.color = new Color(0f, 0f, 0f, 0f);
+            listRaycast.raycastTarget = true;
+            listRaycast.maskable = false; // its own RectMask2D is not an ancestor mask for itself
+
+            RectTransform content = NewNode("ui_content_popup_bomb_list", listFrame);
+            content.anchorMin = new Vector2(0f, 0f);
+            content.anchorMax = new Vector2(0f, 1f);
+            content.pivot = new Vector2(0f, 0.5f);
+            content.anchoredPosition = Vector2.zero;
+            content.sizeDelta = Vector2.zero;
+
+            var listLayout = content.gameObject.AddComponent<HorizontalLayoutGroup>();
+            listLayout.spacing = 14f;
+            listLayout.childAlignment = TextAnchor.MiddleCenter;
+            listLayout.childForceExpandWidth = false;
+            listLayout.childForceExpandHeight = false;
+            listLayout.childControlWidth = false;
+            listLayout.childControlHeight = false;
+            listLayout.padding = new RectOffset(16, 16, 8, 8);
+
+            var listFitter = content.gameObject.AddComponent<ContentSizeFitter>();
+            listFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            listFitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
+
+            listScroll.viewport = listFrame;
+            listScroll.content = content;
+
+            TextMeshProUGUI empty = AddText(NewNode("ui_text_popup_bomb_empty_value", anim), "Nothing was banked yet", 22f);
+            empty.alignment = TextAlignmentOptions.Center;
+            empty.color = new Color(0.7f, 0.72f, 0.77f, 1f);
+            FixedCentered((RectTransform)empty.transform, new Vector2(0, -140), new Vector2(700, 36));
+
+            BuildBombCurrencyHud(root);
+            BuildBombButtons(root);
 
             var bombView = root.gameObject.AddComponent<BombPopupView>();
             bombView.RebindReferences();
             root.gameObject.SetActive(false);
             return bombView;
+        }
+
+        /// <summary>
+        /// Top-right HUD for the bomb screen: cash value, gold value, and a "+" welded tight to the gold
+        /// amount. One HorizontalLayoutGroup at 6px spacing keeps the group cohesive and right-aligned; a
+        /// ContentSizeFitter lets the row hug its content so it stays pinned to the corner as the numbers
+        /// change.
+        /// </summary>
+        private static void BuildBombCurrencyHud(RectTransform root)
+        {
+            RectTransform row = NewNode("ui_row_popup_bomb_currency", root);
+            row.anchorMin = new Vector2(1f, 1f);
+            row.anchorMax = new Vector2(1f, 1f);
+            row.pivot = new Vector2(1f, 1f);
+            row.anchoredPosition = new Vector2(-28f, -20f);
+
+            var layout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
+            layout.spacing = 6f;
+            layout.childAlignment = TextAnchor.MiddleRight;
+            layout.childControlWidth = true;
+            layout.childControlHeight = true;
+            layout.childForceExpandWidth = false;
+            layout.childForceExpandHeight = false;
+
+            var fitter = row.gameObject.AddComponent<ContentSizeFitter>();
+            fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            Image cashIcon = AddImage(NewNode("ui_image_popup_bomb_cash_icon", row), "UI_icon_cash");
+            cashIcon.preserveAspect = true;
+            AddLayoutSize((RectTransform)cashIcon.transform, 38f, 38f);
+
+            TextMeshProUGUI cash = AddText(NewNode("ui_text_popup_bomb_cash_value", row), "0", 30f);
+            cash.alignment = TextAlignmentOptions.Midline;
+            cash.color = new Color(0.55f, 0.92f, 0.55f, 1f);
+            cash.fontStyle = FontStyles.Bold;
+            cash.enableWordWrapping = false;
+
+            Image goldIcon = AddImage(NewNode("ui_image_popup_bomb_gold_icon", row), "UI_icon_gold");
+            goldIcon.preserveAspect = true;
+            AddLayoutSize((RectTransform)goldIcon.transform, 38f, 38f);
+
+            TextMeshProUGUI gold = AddText(NewNode("ui_text_popup_bomb_gold_value", row), "0", 30f);
+            gold.alignment = TextAlignmentOptions.Midline;
+            gold.color = new Color(1f, 0.83f, 0.35f, 1f);
+            gold.fontStyle = FontStyles.Bold;
+            gold.enableWordWrapping = false;
+
+            // Store-style "+" welded right up against the gold amount — cosmetic only (no purchase flow in
+            // the demo), so a plain Image, not a Button that would look interactive and do nothing.
+            Image plus = AddImage(NewNode("ui_image_popup_bomb_plus", row), "ui_card_panel_zone_bg");
+            plus.type = Image.Type.Sliced;
+            plus.color = new Color(1f, 0.80f, 0.15f, 1f);
+            AddLayoutSize((RectTransform)plus.transform, 38f, 38f);
+            TextMeshProUGUI plusGlyph = AddText(NewNode("ui_text_popup_bomb_plus_glyph", (RectTransform)plus.transform), "+", 32f);
+            plusGlyph.alignment = TextAlignmentOptions.Center;
+            plusGlyph.color = new Color(0.1f, 0.08f, 0f, 1f);
+            plusGlyph.fontStyle = FontStyles.Bold;
+            Stretch((RectTransform)plusGlyph.transform, 0, 2, 0, 0);
+        }
+
+        /// <summary>Pins a fixed preferred size on a node so a layout group lays it out at that size.</summary>
+        private static void AddLayoutSize(RectTransform rt, float width, float height)
+        {
+            var element = rt.gameObject.AddComponent<LayoutElement>();
+            element.preferredWidth = width;
+            element.preferredHeight = height;
+            element.minWidth = width;
+            element.minHeight = height;
+        }
+
+        /// <summary>
+        /// The three defeat-screen buttons, siblings of the scaled content so they hold their row. All are
+        /// always present; BombPopupView only toggles <c>interactable</c> on a revive that isn't available.
+        /// </summary>
+        private static void BuildBombButtons(RectTransform root)
+        {
+            const float y = -350f;
+
+            // GIVE UP — sleek grey, skull on the left (no trash-can art ships; the skull reads as "give up").
+            BuildPopupButton(root, "ui_button_popup_bomb_giveup", "ui_transform_popup_bomb_giveup_anim",
+                "UI_button_grey_standard", pivotX: 0.5f, anchoredX: -330f, anchoredY: y,
+                animOut: out RectTransform giveUpAnim);
+            Image giveUpIcon = AddImage(NewNode("ui_image_popup_bomb_giveup_icon", giveUpAnim), "ui_card_icon_death");
+            giveUpIcon.preserveAspect = true;
+            giveUpIcon.color = new Color(0.85f, 0.86f, 0.9f, 1f);
+            LeftMiddle((RectTransform)giveUpIcon.transform, 26f, new Vector2(30, 30));
+            TextMeshProUGUI giveUpText = AddText(NewNode("ui_text_popup_bomb_giveup_value", giveUpAnim), "GIVE UP", 25f);
+            giveUpText.alignment = TextAlignmentOptions.Center;
+            giveUpText.fontStyle = FontStyles.Bold;
+            Stretch((RectTransform)giveUpText.transform, 44f, 0f, 8f, 0f);
+
+            // REVIVE (Gold) — vibrant green with a glow behind it; coin + cost on top, "REVIVE" below. The
+            // glow goes down first so the button, added next, renders over it.
+            Image continueGlow = AddImage(NewNode("ui_image_popup_bomb_continue_glow", root), "star_glow_alpha");
+            continueGlow.color = new Color(0.35f, 1f, 0.40f, 0.5f);
+            RectTransform glowRt = (RectTransform)continueGlow.transform;
+            glowRt.anchorMin = new Vector2(0.5f, 0.5f);
+            glowRt.anchorMax = new Vector2(0.5f, 0.5f);
+            glowRt.pivot = new Vector2(0.5f, 0.5f);
+            glowRt.sizeDelta = new Vector2(440f, 210f);
+            glowRt.anchoredPosition = new Vector2(0f, y);
+
+            BuildPopupButton(root, "ui_button_popup_bomb_continue", "ui_transform_popup_bomb_continue_anim",
+                "UI_button_grey_standard", pivotX: 0.5f, anchoredX: 0f, anchoredY: y,
+                animOut: out RectTransform continueAnim, tint: new Color(0.28f, 0.72f, 0.33f, 1f));
+
+            // Top line: gold icon + cost, laid out side by side and centred (no overlap).
+            RectTransform costRow = NewNode("ui_row_popup_bomb_continue_cost", continueAnim);
+            FixedCentered(costRow, new Vector2(0f, 16f), new Vector2(200f, 34f));
+            var costLayout = costRow.gameObject.AddComponent<HorizontalLayoutGroup>();
+            costLayout.spacing = 6f;
+            costLayout.childAlignment = TextAnchor.MiddleCenter;
+            costLayout.childControlWidth = true;
+            costLayout.childControlHeight = true;
+            costLayout.childForceExpandWidth = false;
+            costLayout.childForceExpandHeight = false;
+
+            Image continueIcon = AddImage(NewNode("ui_image_popup_bomb_continue_icon", costRow), "UI_icon_gold");
+            continueIcon.preserveAspect = true;
+            AddLayoutSize((RectTransform)continueIcon.transform, 26f, 26f);
+            TextMeshProUGUI continueText = AddText(NewNode("ui_text_popup_bomb_continue_value", costRow), "50", 24f);
+            continueText.alignment = TextAlignmentOptions.Midline;
+            continueText.fontStyle = FontStyles.Bold;
+            continueText.enableWordWrapping = false;
+
+            // Bottom line: the action label.
+            TextMeshProUGUI continueLabel = AddText(NewNode("ui_text_popup_bomb_continue_label", continueAnim), "REVIVE", 22f);
+            continueLabel.alignment = TextAlignmentOptions.Center;
+            continueLabel.fontStyle = FontStyles.Bold;
+            FixedCentered((RectTransform)continueLabel.transform, new Vector2(0f, -18f), new Vector2(280, 32));
+
+            // REVIVE (Ad) — vibrant blue; "REVIVE" and a high-contrast white play badge, centred as one row.
+            BuildPopupButton(root, "ui_button_popup_bomb_advert", "ui_transform_popup_bomb_advert_anim",
+                "UI_button_grey_standard", pivotX: 0.5f, anchoredX: 330f, anchoredY: y,
+                animOut: out RectTransform advertAnim, tint: new Color(0.20f, 0.46f, 0.86f, 1f));
+
+            RectTransform advertRow = NewNode("ui_row_popup_bomb_advert", advertAnim);
+            FixedCentered(advertRow, Vector2.zero, new Vector2(230f, 40f));
+            var advertLayout = advertRow.gameObject.AddComponent<HorizontalLayoutGroup>();
+            advertLayout.spacing = 12f;
+            advertLayout.childAlignment = TextAnchor.MiddleCenter;
+            advertLayout.childControlWidth = true;
+            advertLayout.childControlHeight = true;
+            advertLayout.childForceExpandWidth = false;
+            advertLayout.childForceExpandHeight = false;
+
+            TextMeshProUGUI advertText = AddText(NewNode("ui_text_popup_bomb_advert_value", advertRow), "REVIVE", 24f);
+            advertText.alignment = TextAlignmentOptions.Midline;
+            advertText.fontStyle = FontStyles.Bold;
+            advertText.enableWordWrapping = false;
+
+            Image advertScreen = AddImage(NewNode("ui_image_popup_bomb_advert_icon", advertRow), "ui_card_panel_zone_bg");
+            advertScreen.type = Image.Type.Sliced;
+            advertScreen.color = Color.white;
+            AddLayoutSize((RectTransform)advertScreen.transform, 40f, 28f);
+            TextMeshProUGUI advertPlay = AddText(NewNode("ui_text_popup_bomb_advert_play", (RectTransform)advertScreen.transform), "▶", 18f);
+            advertPlay.alignment = TextAlignmentOptions.Center;
+            advertPlay.color = new Color(0.12f, 0.28f, 0.55f, 1f);
+            advertPlay.fontStyle = FontStyles.Bold;
+            Stretch((RectTransform)advertPlay.transform, 2, 0, 0, 0);
         }
 
         private static CollectPopupView BuildCollectPopup(RectTransform layer, BankEntryView bankEntryPrefab)
@@ -714,6 +935,46 @@ namespace Vertigo.Wheel.Editor
             TextMeshProUGUI zone = AddText(NewNode("ui_text_popup_collect_zone_value", anim), "Cleared 25 zones", 26f);
             zone.alignment = TextAlignmentOptions.Top;
             TopStripText((RectTransform)zone.transform, 84f, new Vector2(1200, 40));
+
+            // Hidden until CLAIM & LEAVE: the "added to inventory" recap that fades in during the claim
+            // celebration. CollectPopupView.Show puts it back down for the next summary. It sits centred
+            // over the reward list (not down by the buttons, where it used to collide with CLAIM & LEAVE)
+            // on its own dark plate, drawn last so it reads on top of the icons behind it.
+            RectTransform bannerPanel = NewNode("ui_panel_popup_collect_banner", anim);
+            FixedCentered(bannerPanel, new Vector2(0f, 10f), new Vector2(820f, 104f));
+            Image bannerBg = AddImage(NewNode("ui_image_popup_collect_banner_bg", bannerPanel), "ui_card_panel_zone_bg");
+            bannerBg.type = Image.Type.Sliced;
+            bannerBg.color = new Color(0f, 0f, 0f, 0.9f);
+            Stretch((RectTransform)bannerBg.transform, 0, 0, 0, 0);
+
+            TextMeshProUGUI banner = AddText(NewNode("ui_text_popup_collect_banner_value", bannerPanel),
+                "Total Rewards Added to Inventory", 28f);
+            banner.alignment = TextAlignmentOptions.Center;
+            banner.fontStyle = FontStyles.Bold;
+            banner.color = new Color(1f, 0.88f, 0.45f, 1f);
+            Stretch((RectTransform)banner.transform, 24, 0, 24, 0);
+
+            bannerPanel.gameObject.SetActive(false);
+
+            // Corner X: a genuine Button (unlike the decorative bits elsewhere) so the player can bail back
+            // to the wheel with the haul untouched.
+            RectTransform cancel = NewNode("ui_button_popup_collect_cancel", anim);
+            cancel.anchorMin = new Vector2(1f, 1f);
+            cancel.anchorMax = new Vector2(1f, 1f);
+            cancel.pivot = new Vector2(1f, 1f);
+            cancel.sizeDelta = new Vector2(56f, 56f);
+            cancel.anchoredPosition = new Vector2(-18f, -18f);
+            Image cancelImage = cancel.gameObject.AddComponent<Image>();
+            cancelImage.sprite = EditorSpriteUtility.FindSprite("UI_button_grey_standard");
+            cancelImage.type = Image.Type.Sliced;
+            cancelImage.raycastTarget = true;
+            cancelImage.maskable = false;
+            var cancelButton = cancel.gameObject.AddComponent<Button>();
+            cancelButton.targetGraphic = cancelImage;
+            cancel.gameObject.AddComponent<UIButtonPunch>();
+            TextMeshProUGUI cancelGlyph = AddText(NewNode("ui_text_popup_collect_cancel_glyph", cancel), "X", 28f);
+            cancelGlyph.alignment = TextAlignmentOptions.Center;
+            Stretch((RectTransform)cancelGlyph.transform, 0, 0, 0, 2);
 
             RectTransform scrollRect = NewNode("ui_scroll_popup_collect_list", anim);
             Stretch(scrollRect, 480f, 100f, 40f, 140f);
@@ -755,9 +1016,12 @@ namespace Vertigo.Wheel.Editor
             BuildPopupButton(anim, "ui_button_popup_collect_confirm", "ui_transform_popup_collect_confirm_anim",
                 "UI_button_orange_standard", pivotX: 0.5f, anchoredX: 0f, anchoredY: 50f,
                 animOut: out RectTransform confirmAnim, fixedAnchorMode: true, anchorPoint: new Vector2(0.75f, 0f));
-            TextMeshProUGUI confirmText = AddText(NewNode("ui_text_popup_collect_confirm_value", confirmAnim), "AWESOME", 30f);
+            TextMeshProUGUI confirmText = AddText(NewNode("ui_text_popup_collect_confirm_value", confirmAnim), "CLAIM & LEAVE", 30f);
             confirmText.alignment = TextAlignmentOptions.Center;
             Stretch((RectTransform)confirmText.transform, 0, 0, 0, 0);
+
+            // Drawn last so the celebration recap sits above the reward list and the action buttons.
+            bannerPanel.SetAsLastSibling();
 
             var collectView = root.gameObject.AddComponent<CollectPopupView>();
             collectView.RebindReferences();
@@ -810,11 +1074,131 @@ namespace Vertigo.Wheel.Editor
             return giveUpView;
         }
 
+        /// <summary>
+        /// The milestone teaser: a dark overlay with a row of preview cards and a one-line description of
+        /// what a Safe / Super zone is worth. Tapping the backdrop or the X closes it. The two card rows
+        /// are pre-built and <see cref="MilestonePreviewPopupView"/> toggles which one shows.
+        /// </summary>
+        private static MilestonePreviewPopupView BuildMilestonePreviewPopup(RectTransform layer)
+        {
+            RectTransform root = NewNode("ui_popup_milestone", layer);
+            Stretch(root, 0, 0, 0, 0);
+
+            Image backdrop = AddImage(NewNode("ui_image_popup_milestone_backdrop", root), null);
+            backdrop.color = new Color(0.02f, 0.03f, 0.02f, 0.88f);
+            backdrop.raycastTarget = true;
+            Stretch((RectTransform)backdrop.transform, 0, 0, 0, 0);
+            var backdropButton = backdrop.gameObject.AddComponent<Button>();
+            backdropButton.transition = Selectable.Transition.None;
+            backdropButton.targetGraphic = backdrop;
+
+            RectTransform anim = NewNode("ui_transform_popup_milestone_anim", root);
+            Stretch(anim, 0, 0, 0, 0);
+
+            TextMeshProUGUI title = AddText(NewNode("ui_text_popup_milestone_title_value", anim), "SAFE ZONE", 40f);
+            title.alignment = TextAlignmentOptions.Center;
+            title.fontStyle = FontStyles.Bold;
+            FixedCentered((RectTransform)title.transform, new Vector2(0f, 305f), new Vector2(900f, 56f));
+
+            // Safe zones ride the Silver wheel, super zones the Golden one — show the actual spin art plus
+            // a few reward-chest preview slots, not a stand-in card game.
+            BuildMilestonePreviewRow(anim, "ui_row_popup_milestone_safe", "ui_spin_silver_base",
+                new[] { "UI_icon_chest_silver_nolight", "UI_icon_gold", "UI_icon_chest_big_nolight" },
+                new Color(0.42f, 0.92f, 0.46f, 1f), active: true);
+            BuildMilestonePreviewRow(anim, "ui_row_popup_milestone_super", "ui_spin_golden_base",
+                new[] { "UI_icon_chest_gold_nolight", "UI_icon_chest_super_nolight", "UI_icon_gold" },
+                new Color(0.96f, 0.78f, 0.36f, 1f), active: false);
+
+            TextMeshProUGUI desc = AddText(NewNode("ui_text_popup_milestone_desc_value", anim),
+                "Win special rewards in bomb-free Safe Zones!", 28f);
+            desc.alignment = TextAlignmentOptions.Center;
+            desc.enableWordWrapping = false;
+            FixedCentered((RectTransform)desc.transform, new Vector2(0f, -300f), new Vector2(1100f, 44f));
+
+            RectTransform close = NewNode("ui_button_popup_milestone_close", anim);
+            close.anchorMin = new Vector2(1f, 1f);
+            close.anchorMax = new Vector2(1f, 1f);
+            close.pivot = new Vector2(1f, 1f);
+            close.sizeDelta = new Vector2(56f, 56f);
+            close.anchoredPosition = new Vector2(-28f, -24f);
+            Image closeImage = close.gameObject.AddComponent<Image>();
+            closeImage.sprite = EditorSpriteUtility.FindSprite("UI_button_grey_standard");
+            closeImage.type = Image.Type.Sliced;
+            closeImage.raycastTarget = true;
+            closeImage.maskable = false;
+            var closeButton = close.gameObject.AddComponent<Button>();
+            closeButton.targetGraphic = closeImage;
+            close.gameObject.AddComponent<UIButtonPunch>();
+            TextMeshProUGUI closeGlyph = AddText(NewNode("ui_text_popup_milestone_close_glyph", close), "X", 28f);
+            closeGlyph.alignment = TextAlignmentOptions.Center;
+            Stretch((RectTransform)closeGlyph.transform, 0, 0, 0, 2);
+
+            var view = root.gameObject.AddComponent<MilestonePreviewPopupView>();
+            view.RebindReferences();
+            root.gameObject.SetActive(false);
+            return view;
+        }
+
+        /// <summary>
+        /// One milestone preview: the real spin wheel for that tier under a soft accent glow, with a strip
+        /// of reward-chest preview slots below it. <see cref="MilestonePreviewPopupView"/> shows exactly one
+        /// of the two rows.
+        /// </summary>
+        private static void BuildMilestonePreviewRow(
+            RectTransform parent, string rowName, string wheelSprite, string[] previewIcons, Color accent, bool active)
+        {
+            RectTransform row = NewNode(rowName, parent);
+            FixedCentered(row, Vector2.zero, new Vector2(1120f, 760f));
+
+            // Vertical rhythm: title (~y 305) -> wheel (~y 95) -> reward slots (~y -165) -> description
+            // (~y -300), leaving ~35px of clear space between each block.
+            Image glow = AddImage(NewNode(rowName + "_glow", row), "star_glow_alpha");
+            glow.color = new Color(accent.r, accent.g, accent.b, 0.32f);
+            FixedCentered((RectTransform)glow.transform, new Vector2(0f, 95f), new Vector2(540f, 540f));
+
+            Image wheel = AddImage(NewNode(rowName + "_wheel", row), wheelSprite);
+            wheel.preserveAspect = true;
+            FixedCentered((RectTransform)wheel.transform, new Vector2(0f, 95f), new Vector2(300f, 300f));
+
+            RectTransform slots = NewNode(rowName + "_slots", row);
+            FixedCentered(slots, new Vector2(0f, -165f), new Vector2(720f, 150f));
+            var slotLayout = slots.gameObject.AddComponent<HorizontalLayoutGroup>();
+            slotLayout.spacing = 40f;
+            slotLayout.padding = new RectOffset(12, 12, 0, 0);
+            slotLayout.childAlignment = TextAnchor.MiddleCenter;
+            slotLayout.childControlWidth = true;
+            slotLayout.childControlHeight = true;
+            slotLayout.childForceExpandWidth = false;
+            slotLayout.childForceExpandHeight = false;
+
+            for (int i = 0; i < previewIcons.Length; i++)
+            {
+                RectTransform slot = NewNode(rowName + "_slot" + i, slots);
+                AddLayoutSize(slot, 140f, 140f);
+
+                Image slotBg = AddImage(NewNode(slot.name + "_bg", slot), "ui_card_panel_zone_bg");
+                slotBg.type = Image.Type.Sliced;
+                slotBg.color = new Color(0.05f, 0.06f, 0.06f, 1f);
+                Stretch((RectTransform)slotBg.transform, 0, 0, 0, 0);
+
+                Image slotStroke = AddImage(NewNode(slot.name + "_stroke", slot), "ui_card_frame_4px_zone");
+                slotStroke.type = Image.Type.Sliced;
+                slotStroke.color = accent;
+                Stretch((RectTransform)slotStroke.transform, 0, 0, 0, 0);
+
+                Image icon = AddImage(NewNode(slot.name + "_icon", slot), previewIcons[i]);
+                icon.preserveAspect = true;
+                FixedCentered((RectTransform)icon.transform, Vector2.zero, new Vector2(96f, 96f));
+            }
+
+            row.gameObject.SetActive(active);
+        }
+
         /// <summary>Shared skeleton for a popup action button: sliced image, Button, and an _anim child.</summary>
         private static void BuildPopupButton(
             RectTransform parent, string buttonName, string animName, string spriteName,
             float pivotX, float anchoredX, float anchoredY, out RectTransform animOut,
-            bool fixedAnchorMode = false, Vector2 anchorPoint = default)
+            bool fixedAnchorMode = false, Vector2 anchorPoint = default, Color tint = default)
         {
             RectTransform buttonRect = NewNode(buttonName, parent);
             buttonRect.anchorMin = fixedAnchorMode ? anchorPoint : new Vector2(0.5f, 0.5f);
@@ -828,6 +1212,8 @@ namespace Vertigo.Wheel.Editor
             image.type = Image.Type.Sliced;
             image.raycastTarget = true;
             image.maskable = false;
+            // No green button art ships, so the ad-revive button borrows the grey sprite under a green tint.
+            if (tint.a > 0f) image.color = tint;
             var button = buttonRect.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
 
@@ -862,6 +1248,84 @@ namespace Vertigo.Wheel.Editor
             var view = layer.gameObject.AddComponent<VfxView>();
             view.RebindReferences();
             return view;
+        }
+
+        // ------------------------------------------------------------------ debug overlay
+
+        /// <summary>
+        /// The cheat bar, bottom-left on its own top-most canvas. Built into every scene but
+        /// <see cref="DebugOverlayView"/> switches itself off outside the editor / development builds.
+        /// </summary>
+        private static DebugOverlayView BuildDebugOverlay(RectTransform canvasRoot)
+        {
+            RectTransform root = NewNode("ui_panel_debug", canvasRoot);
+            root.anchorMin = Vector2.zero;
+            root.anchorMax = Vector2.zero;
+            root.pivot = Vector2.zero;
+            root.sizeDelta = new Vector2(230f, 48f);
+            root.anchoredPosition = new Vector2(16f, 16f);
+
+            var canvas = root.gameObject.AddComponent<Canvas>();
+            canvas.overrideSorting = true;
+            canvas.sortingOrder = 30;
+            root.gameObject.AddComponent<GraphicRaycaster>();
+
+            // The toggle fills the root; the body stacks upward from the root's top edge.
+            BuildDebugButton(root, "ui_button_debug_toggle", "DEBUG", stretchFill: true, topOffset: 0f);
+
+            RectTransform body = NewNode("ui_panel_debug_body", root);
+            body.anchorMin = new Vector2(0f, 1f);
+            body.anchorMax = new Vector2(1f, 1f);
+            body.pivot = new Vector2(0.5f, 0f);
+            body.sizeDelta = new Vector2(0f, 292f);
+            body.anchoredPosition = new Vector2(0f, 8f);
+
+            Image bodyBg = AddImage(NewNode("ui_image_debug_body_bg", body), "ui_card_panel_zone_bg");
+            bodyBg.type = Image.Type.Sliced;
+            bodyBg.color = new Color(0f, 0f, 0f, 0.82f);
+            Stretch((RectTransform)bodyBg.transform, 0, 0, 0, 0);
+
+            BuildDebugButton(body, "ui_button_debug_zone5", "Jump to Zone 5", stretchFill: false, topOffset: -8f);
+            BuildDebugButton(body, "ui_button_debug_zone30", "Jump to Zone 30", stretchFill: false, topOffset: -64f);
+            BuildDebugButton(body, "ui_button_debug_bomb", "Trigger Bomb Defeat", stretchFill: false, topOffset: -120f);
+            BuildDebugButton(body, "ui_button_debug_gold", "+1000 Gold", stretchFill: false, topOffset: -176f);
+            BuildDebugButton(body, "ui_button_debug_items", "+40 Random Items", stretchFill: false, topOffset: -232f);
+
+            var view = root.gameObject.AddComponent<DebugOverlayView>();
+            view.RebindReferences();
+            return view;
+        }
+
+        private static Button BuildDebugButton(
+            RectTransform parent, string name, string label, bool stretchFill, float topOffset)
+        {
+            RectTransform rt = NewNode(name, parent);
+            if (stretchFill)
+            {
+                Stretch(rt, 0, 0, 0, 0);
+            }
+            else
+            {
+                rt.anchorMin = new Vector2(0f, 1f);
+                rt.anchorMax = new Vector2(1f, 1f);
+                rt.pivot = new Vector2(0.5f, 1f);
+                rt.sizeDelta = new Vector2(-16f, 48f);
+                rt.anchoredPosition = new Vector2(0f, topOffset);
+            }
+
+            Image image = rt.gameObject.AddComponent<Image>();
+            image.sprite = EditorSpriteUtility.FindSprite("UI_button_grey_standard");
+            image.type = Image.Type.Sliced;
+            image.raycastTarget = true;
+            image.maskable = false;
+            var button = rt.gameObject.AddComponent<Button>();
+            button.targetGraphic = image;
+
+            TextMeshProUGUI text = AddText(NewNode(name + "_label", rt), label, 18f);
+            text.alignment = TextAlignmentOptions.Center;
+            Stretch((RectTransform)text.transform, 6, 0, 6, 0);
+
+            return button;
         }
 
         // ------------------------------------------------------------------ node/anchor helpers
@@ -963,6 +1427,7 @@ namespace Vertigo.Wheel.Editor
             image.maskable = false;
             return image;
         }
+
 
         private static TextMeshProUGUI AddText(RectTransform node, string text, float fontSize)
         {

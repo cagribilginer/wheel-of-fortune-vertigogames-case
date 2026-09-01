@@ -27,7 +27,10 @@ namespace Vertigo.Wheel.UI.Views
         public void SetEntry(Sprite icon, int amount)
         {
             _ui_image_bank_entry_icon_value.sprite = icon;
-            _ui_text_bank_entry_amount_value.SetText("x{0}", amount);
+            SetAmount(amount);
         }
+
+        /// <summary>Just the count — the fly-in tween drives this every frame while the number climbs.</summary>
+        public void SetAmount(int amount) => _ui_text_bank_entry_amount_value.SetText("x{0}", amount);
     }
 }

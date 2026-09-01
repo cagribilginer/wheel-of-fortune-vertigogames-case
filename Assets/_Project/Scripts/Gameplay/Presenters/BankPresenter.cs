@@ -27,15 +27,19 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly RewardCatalog _catalog;
         private readonly RewardBank _bank;
         private readonly Transform _flightLayer;
+        private readonly AudioPresenter _audio;
         private readonly ObjectPool<BankEntryView> _pool;
         private readonly List<BankEntryView> _active = new List<BankEntryView>();
 
-        public BankPresenter(BankView view, BankEntryView entryPrefab, RewardCatalog catalog, RewardBank bank, Transform flightLayer)
+        public BankPresenter(
+            BankView view, BankEntryView entryPrefab, RewardCatalog catalog, RewardBank bank,
+            Transform flightLayer, AudioPresenter audio)
         {
             _view = view;
             _catalog = catalog;
             _bank = bank;
             _flightLayer = flightLayer;
+            _audio = audio;
 
             _pool = new ObjectPool<BankEntryView>(
                 () => UnityEngine.Object.Instantiate(entryPrefab, _view.Content),
@@ -66,10 +70,18 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             Refresh();
             LayoutRebuilder.ForceRebuildLayoutImmediate(_view.Content);
 
+            // Refresh has already rebuilt the grid from the post-grant bank, so this cell exists whether the
+            // reward is a brand-new row (appended last) or a stack that was already there.
             int index = IndexOf(outcome.Reward);
             if (index < 0) { onComplete(); return; }
 
-            RectTransform target = _active[index].Rect;
+            BankEntryView targetEntry = _active[index];
+            RectTransform target = targetEntry.Rect;
+
+            // Hold the number at its pre-win value until the icon actually lands, then count it up.
+            int finalAmount = _bank.Entries[index].Amount;
+            int startAmount = Mathf.Max(0, finalAmount - outcome.Amount);
+            targetEntry.SetAmount(startAmount);
 
             var ghostGo = new GameObject("bank_fly_ghost", typeof(RectTransform), typeof(Image));
             var ghostRect = (RectTransform)ghostGo.transform;
@@ -85,9 +97,19 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             ghostRect.DOMove(target.position, 0.5f).SetEase(Ease.InBack).OnComplete(() =>
             {
                 UnityEngine.Object.Destroy(ghostGo);
+
                 target.DOKill();
-                target.DOPunchScale(Vector3.one * 0.25f, 0.2f);
-                onComplete();
+                target.localScale = Vector3.one;
+                target.DOPunchScale(Vector3.one * 0.2f, 0.2f);
+
+                _audio.PlayReward();
+
+                DOVirtual.Int(startAmount, finalAmount, 0.4f, v => targetEntry.SetAmount(v))
+                    .OnComplete(() =>
+                    {
+                        targetEntry.SetAmount(finalAmount);
+                        onComplete();
+                    });
             });
         }
 

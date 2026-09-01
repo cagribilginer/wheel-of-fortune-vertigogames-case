@@ -24,6 +24,12 @@ namespace Vertigo.Wheel.UI.Views
         [SerializeField] private Button _ui_button_wheel_spin;
         [SerializeField] private WheelSlotView[] _slots = Array.Empty<WheelSlotView>();
 
+        /// <summary>
+        /// The panel root. Nothing else repositions it, so the zone-advance transition is free to slide it
+        /// off-screen and back — unlike <see cref="Rotor"/>, which owns the spin rotation.
+        /// </summary>
+        public RectTransform Root => (RectTransform)transform;
+
         public RectTransform Rotor => _ui_transform_wheel_rotor;
         public RectTransform Indicator => _ui_transform_wheel_indicator;
         public RectTransform SpinButtonRect => (RectTransform)_ui_button_wheel_spin.transform;
