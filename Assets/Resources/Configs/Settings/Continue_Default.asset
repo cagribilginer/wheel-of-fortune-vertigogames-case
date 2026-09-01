@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _baseCost: 50
   _costPerZone: 10
-  _maxContinuesPerRun: 1
+  _maxAdRevivesPerRun: 1

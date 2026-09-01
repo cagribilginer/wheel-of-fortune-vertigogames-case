@@ -29,5 +29,6 @@ namespace Vertigo.Wheel.Core.States
         public virtual void OnCancelled() { }
         public virtual void OnRestartRequested() { }
         public virtual void OnContinueRequested() { }
+        public virtual void OnAdContinueRequested() { }
     }
 }

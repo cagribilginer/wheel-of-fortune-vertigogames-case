@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Vertigo.Wheel.Core.Rewards;
 using Vertigo.Wheel.Core.Spin;
 using Vertigo.Wheel.Core.Zones;
@@ -21,7 +22,13 @@ namespace Vertigo.Wheel.Core.Run
 
         private int _currentZone = 1;
         private RunPhase _phase = RunPhase.Idle;
-        private int _continuesUsed;
+        private int _goldRevivesUsed;
+        private int _adRevivesUsed;
+
+        // The haul the last bomb took, snapshotted the instant before the bank was cleared. A revive
+        // (paid or ad) pours it back in; a restart or a fresh run discards it. Null whenever no bomb is
+        // currently pending an answer.
+        private List<BankEntry> _lostHaul;
 
         public RunModel(IZoneClassifier classifier, GoldWallet wallet, RewardId goldRewardId)
         {
@@ -40,7 +47,23 @@ namespace Vertigo.Wheel.Core.Run
 
         public int CurrentZone => _currentZone;
 
-        public int ContinuesUsedThisRun => _continuesUsed;
+        /// <summary>Paid gold revives taken this run. Drives the doubling price of the next one.</summary>
+        public int GoldRevivesUsedThisRun => _goldRevivesUsed;
+
+        /// <summary>Free ad revives taken this run. Capped by <see cref="ContinueService"/>.</summary>
+        public int AdRevivesUsedThisRun => _adRevivesUsed;
+
+        /// <summary>Total revives (gold + ad) taken this run.</summary>
+        public int ContinuesUsedThisRun => _goldRevivesUsed + _adRevivesUsed;
+
+        /// <summary>
+        /// What the pending bomb took, for the game-over screen to show as "what you stand to lose".
+        /// Empty unless a bomb is currently waiting on a revive-or-restart decision.
+        /// </summary>
+        public IReadOnlyList<BankEntry> LostHaul => _lostHaul ?? (IReadOnlyList<BankEntry>)Array.Empty<BankEntry>();
+
+        /// <summary>The persistent wallet balance, surfaced here so a state can hand it to the presentation.</summary>
+        public int WalletBalance => _wallet.Balance;
 
         public ZoneType CurrentZoneType => _classifier.Classify(_currentZone);
 
@@ -58,7 +81,7 @@ namespace Vertigo.Wheel.Core.Run
 
         public bool CanSpin => CashOutPolicy.CanSpin(_phase);
 
-        public bool CanLeave => CashOutPolicy.CanLeave(CurrentZoneType, _phase);
+        public bool CanLeave => CashOutPolicy.CanLeave(_phase, !Bank.IsEmpty);
 
         public bool CanGiveUp => CashOutPolicy.CanGiveUp(_phase);
 
@@ -77,22 +100,67 @@ namespace Vertigo.Wheel.Core.Run
             ZoneChanged?.Invoke(_currentZone);
         }
 
+        /// <summary>
+        /// Warp the run straight to a zone. Only the debug overlay calls this — the normal flow moves one
+        /// zone at a time through <see cref="AdvanceZone"/>. The haul and phase are left as they are; the
+        /// caller re-enters zone setup to rebuild the wheel.
+        /// </summary>
+        public void JumpToZone(int zone)
+        {
+            if (zone < 1) throw new ArgumentOutOfRangeException(nameof(zone), zone, "Zones are 1-indexed.");
+            if (zone == _currentZone) return;
+
+            _currentZone = zone;
+            ZoneChanged?.Invoke(_currentZone);
+        }
+
         /// <summary>The bomb: the entire haul is lost and the run ends. The gold wallet is untouched.</summary>
         public void Detonate()
         {
+            _lostHaul = new List<BankEntry>(Bank.Entries);
             Bank.Clear();
             Phase = RunPhase.GameOver;
             RunEnded?.Invoke(RunEndReason.Bomb);
         }
 
         /// <summary>
-        /// Spend gold to survive the bomb and stay on the same zone with the haul intact.
-        /// The purchase itself is the caller's (ContinueService) business; this records the consequence.
+        /// Survive the bomb with a paid gold revive: stay on the same zone, haul restored. The purchase
+        /// itself is the caller's (ContinueService) business; this records the consequence and bumps the
+        /// per-run gold-revive count that makes the next one cost double.
         /// </summary>
-        public void ApplyContinue()
+        public void ApplyGoldRevive()
         {
-            _continuesUsed++;
+            _goldRevivesUsed++;
+            RestoreLostHaul();
             Phase = RunPhase.Idle;
+        }
+
+        /// <summary>
+        /// Survive the bomb with a free ad revive: same effect as <see cref="ApplyGoldRevive"/> but bumps
+        /// the ad-revive count instead, which <see cref="ContinueService"/> caps per run.
+        /// </summary>
+        public void ApplyAdRevive()
+        {
+            _adRevivesUsed++;
+            RestoreLostHaul();
+            Phase = RunPhase.Idle;
+        }
+
+        /// <summary>
+        /// Pours the snapshotted bomb haul back into the bank. A no-op when nothing is pending — so calling
+        /// a revive without a preceding <see cref="Detonate"/> leaves the bank alone.
+        /// </summary>
+        private void RestoreLostHaul()
+        {
+            if (_lostHaul == null) return;
+
+            for (int i = 0; i < _lostHaul.Count; i++)
+            {
+                BankEntry entry = _lostHaul[i];
+                Bank.Add(entry.Reward, entry.Amount, entry.UnitValue);
+            }
+
+            _lostHaul = null;
         }
 
         /// <summary>
@@ -123,7 +191,9 @@ namespace Vertigo.Wheel.Core.Run
         public void ResetRun()
         {
             Bank.Clear();
-            _continuesUsed = 0;
+            _goldRevivesUsed = 0;
+            _adRevivesUsed = 0;
+            _lostHaul = null;
 
             bool zoneChanged = _currentZone != 1;
             _currentZone = 1;

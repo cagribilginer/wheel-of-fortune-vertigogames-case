@@ -35,11 +35,32 @@ namespace Vertigo.Wheel.Core.States
 
         void PlayBomb(Action onComplete);
 
-        void ShowGameOver(int zoneReached, bool continueOffered, int continueCost);
+        /// <summary>
+        /// The bomb defeat / revive screen. <paramref name="lostHaul"/> is what the bomb just took (the run
+        /// bank is already empty by now) so the screen can show the player what a revive would win back;
+        /// <paramref name="playerGold"/> is the persistent wallet balance shown in the corner. The two
+        /// revive offers are independent: paid needs an affordable, unused continue slot, ad only an unused one.
+        /// </summary>
+        void ShowGameOver(
+            int zoneReached, IReadOnlyList<BankEntry> lostHaul, int playerGold,
+            bool goldReviveOffered, int goldReviveCost, bool adReviveOffered);
         void HideGameOver();
 
+        /// <summary>
+        /// The cash-out summary. Nothing is committed yet — the player can still cancel back to the wheel —
+        /// so this shows the live haul for them to weigh.
+        /// </summary>
         void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared);
+
+        /// <summary>Plain dismissal (the player cancelled): close the summary, no reward flourish.</summary>
         void HideCashOut();
+
+        /// <summary>
+        /// The player confirmed "CLAIM &amp; LEAVE". The wallet has already been credited; this plays the
+        /// claim celebration (chest punch, jingle, counter count-up) and calls <paramref name="onComplete"/>
+        /// once it has finished, at which point the state machine resets the run.
+        /// </summary>
+        void ClaimCashOut(Action onComplete);
 
         void ShowGiveUpConfirm(int rewardsAtStake);
         void HideGiveUpConfirm();

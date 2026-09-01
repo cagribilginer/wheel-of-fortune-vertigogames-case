@@ -387,7 +387,7 @@ namespace Vertigo.Wheel.Editor
             var so = new SerializedObject(asset);
             so.FindProperty("_baseCost").intValue = 50;
             so.FindProperty("_costPerZone").intValue = 10;
-            so.FindProperty("_maxContinuesPerRun").intValue = 1;
+            so.FindProperty("_maxAdRevivesPerRun").intValue = 1;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 

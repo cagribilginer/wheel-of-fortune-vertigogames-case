@@ -17,5 +17,6 @@ namespace Vertigo.Wheel.Core.States
         void OnCancelled();
         void OnRestartRequested();
         void OnContinueRequested();
+        void OnAdContinueRequested();
     }
 }

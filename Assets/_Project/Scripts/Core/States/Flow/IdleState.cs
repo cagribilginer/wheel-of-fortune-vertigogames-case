@@ -45,15 +45,14 @@ namespace Vertigo.Wheel.Core.States.Flow
         }
 
         /// <summary>
-        /// The single EXIT button's action: walk away with the haul when that is legal, otherwise fall back
-        /// to the (bank-forfeiting) give-up confirm — the same two rules <see cref="OnLeaveRequested"/> and
-        /// <see cref="OnGiveUpRequested"/> already enforce, just resolved in one place instead of needing two
-        /// separate buttons to expose them.
+        /// The single EXIT button's action: walk away with the haul. Legal from any zone now — the only
+        /// precondition is an idle wheel with something banked, which <see cref="RunModel.CanLeave"/>
+        /// checks. The bank-forfeiting give-up confirm is still modelled (<see cref="GiveUpConfirmState"/>)
+        /// but no longer reachable from this button.
         /// </summary>
         public override void OnExitRequested()
         {
-            if (Context.Run.CanLeave) { Machine.Change<CashOutState>(); return; }
-            if (Context.Run.CanGiveUp) Machine.Change<GiveUpConfirmState>();
+            if (Context.Run.CanLeave) Machine.Change<CashOutState>();
         }
     }
 }

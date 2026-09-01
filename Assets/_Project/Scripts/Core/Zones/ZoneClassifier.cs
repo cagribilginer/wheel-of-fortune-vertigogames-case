@@ -43,6 +43,10 @@ namespace Vertigo.Wheel.Core.Zones
             if (zone < 1)
                 throw new ArgumentOutOfRangeException(nameof(zone), zone, "Zones are 1-indexed; the first zone is 1.");
 
+            // The opening zone is always safe: the run should never be able to end on the very first spin,
+            // and the player needs one bomb-free zone to bank something before any risk is on the table.
+            if (zone == 1) return ZoneType.Safe;
+
             if (zone % _superInterval == 0) return ZoneType.Super;
             if (zone % _safeInterval == 0) return ZoneType.Safe;
             return ZoneType.Normal;
