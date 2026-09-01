@@ -107,7 +107,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 target.localScale = Vector3.one;
                 target.DOPunchScale(Vector3.one * 0.2f, 0.2f);
 
-                _audio.PlayReward();
+                // The reveal sting already played at the wheel stop; this is the softer "into the bag" swoosh.
+                _audio.PlayBankCollect();
 
                 DOVirtual.Int(startAmount, finalAmount, 0.4f, v => targetEntry.SetAmount(v))
                     .OnComplete(() =>

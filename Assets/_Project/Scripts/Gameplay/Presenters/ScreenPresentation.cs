@@ -59,7 +59,9 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _header.SetVisible(false);
 
             // The wheel exits downward, re-themes and re-populates its slots off-screen, then rides back
-            // up — only then does the zone strip scroll and the flow reach Idle.
+            // up — only then does the zone strip scroll and the flow reach Idle. One swoosh covers the
+            // whole move, tier swaps included (a Bronze->Silver change always rides a zone transition).
+            _audio.PlayWheelTransition();
             _wheel.PlayZoneTransition(
                 wheel, ThemeFor(wheel.Tier), () => _zoneMap.ShowZone(zone, onComplete));
         }

@@ -33,6 +33,8 @@ namespace Vertigo.Wheel.Editor
         private const string LibraryProp_PopupOpen = "_popupOpen";
         private const string LibraryProp_PopupClose = "_popupClose";
         private const string LibraryProp_RewardChime = "_rewardChime";
+        private const string LibraryProp_BankCollect = "_bankCollect";
+        private const string LibraryProp_WheelTransition = "_wheelTransition";
         private const string LibraryProp_BombExplosion = "_bombExplosion";
         private const string LibraryProp_DefeatAmbience = "_defeatAmbience";
         private const string ThemeProp_Tick = "_tick";
@@ -52,6 +54,13 @@ namespace Vertigo.Wheel.Editor
 
         [MenuItem("Tools/Vertigo/Audio/Auto Wire Audio (Preview)")]
         public static void PreviewFromMenu() => Run(apply: false, force: true, silentWhenIdle: false);
+
+        /// <summary>
+        /// Fills only the audio slots that are currently empty, leaving every already-wired slot exactly as
+        /// it is. Use this after adding a new slot so the existing assignments are not re-planned around it.
+        /// </summary>
+        [MenuItem("Tools/Vertigo/Audio/Wire Empty Audio Slots")]
+        public static void WireEmptySlotsFromMenu() => Run(apply: true, force: false, silentWhenIdle: false);
 
         /// <summary>
         /// Gap-fill pass for the import hook: only touches slots that are currently empty, and does nothing
@@ -76,6 +85,8 @@ namespace Vertigo.Wheel.Editor
                 new Slot("Wheel Tick", ScoreTick),
                 new Slot("Button Click", ScoreButtonClick),
                 new Slot("Reward Chime", ScoreRewardChime),
+                new Slot("Bank Collect", ScoreBankCollect),
+                new Slot("Wheel Transition", ScoreWheelTransition),
                 new Slot("Bomb Explosion", ScoreBombExplosion),
                 new Slot("Popup Open", ScorePopupOpen),
                 new Slot("Popup Close", ScorePopupClose),
@@ -215,6 +226,21 @@ namespace Vertigo.Wheel.Editor
             0.20f * AtMost(c.SustainRatio, 0.72f, 0.3f) +
             Keyword(c, 0.5f, "reward", "win", "coin", "collect", "chime", "success", "pickup", "prize", "star", "bonus", "positive");
 
+        // A short, soft, bright "into the bag" tick — like the reward chime but quicker and less bell-like,
+        // so the two never collapse onto the same clip.
+        private static float ScoreBankCollect(ClipFeatures c) =>
+            0.35f * Band(c.Length, 0.05f, 0.5f, 0.25f) +
+            0.25f * AtLeast(c.ZeroCrossingRate, 1800f, 2200f) +
+            0.20f * AtMost(c.LowRatio, 0.4f, 0.3f) +
+            0.20f * AtMost(c.SustainRatio, 0.5f, 0.3f) +
+            Keyword(c, 0.5f, "collect", "coin", "pickup", "grab", "drop", "cash", "gem", "pop", "bag", "pouch");
+
+        // The mechanical wheel slide between zones: a whoosh, a touch longer than the popup swooshes.
+        private static float ScoreWheelTransition(ClipFeatures c) =>
+            0.7f * Whoosh(c) +
+            0.3f * Band(c.Length, 0.25f, 1.1f, 0.4f) +
+            Keyword(c, 0.45f, "swoosh", "whoosh", "slide", "transition", "swipe", "spin", "wheel", "move", "rotate");
+
         private static float ScoreBombExplosion(ClipFeatures c) =>
             0.38f * AtLeast(c.LowRatio, 0.45f, 0.3f) +
             0.20f * Band(c.Length, 0.4f, 2.5f, 0.7f) +
@@ -309,6 +335,8 @@ namespace Vertigo.Wheel.Editor
             {
                 case "Button Click": return LibraryProp_ButtonClick;
                 case "Reward Chime": return LibraryProp_RewardChime;
+                case "Bank Collect": return LibraryProp_BankCollect;
+                case "Wheel Transition": return LibraryProp_WheelTransition;
                 case "Bomb Explosion": return LibraryProp_BombExplosion;
                 case "Popup Open": return LibraryProp_PopupOpen;
                 case "Popup Close": return LibraryProp_PopupClose;
