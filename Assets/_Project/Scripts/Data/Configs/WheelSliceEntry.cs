@@ -36,7 +36,7 @@ namespace Vertigo.Wheel.Data.Configs
         public int ResolveBaseAmount()
         {
             // A unique drop is always a single item: neither an authored override nor zone scaling can
-            // turn a knife or a chest into a stack of five.
+            // turn a built weapon, a cosmetic or a chest into a stack of five.
             if (_reward != null && !_reward.IsStackable) return 1;
 
             return _baseAmountOverride > 0 ? _baseAmountOverride

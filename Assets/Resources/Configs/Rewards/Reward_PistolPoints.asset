@@ -16,5 +16,5 @@ MonoBehaviour:
   _displayName: Pistol Points
   _icon: {fileID: 21300000, guid: 3091e6a3f64ce4a479af31aebda4104d, type: 3}
   _category: 0
-  _defaultBaseAmount: 1
+  _defaultBaseAmount: 3
   _estimatedValue: 1

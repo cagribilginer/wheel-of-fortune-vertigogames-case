@@ -16,5 +16,5 @@ MonoBehaviour:
   _displayName: SMG Points
   _icon: {fileID: 21300000, guid: 4fab29b05ccd749ac9b9389a7ab8ff21, type: 3}
   _category: 0
-  _defaultBaseAmount: 1
+  _defaultBaseAmount: 4
   _estimatedValue: 1

@@ -16,5 +16,5 @@ MonoBehaviour:
   _displayName: Submachine Points
   _icon: {fileID: 21300000, guid: cdd863e7609bf41b58da2803e6bdbc9e, type: 3}
   _category: 0
-  _defaultBaseAmount: 1
+  _defaultBaseAmount: 5
   _estimatedValue: 2

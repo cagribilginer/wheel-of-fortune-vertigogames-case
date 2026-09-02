@@ -37,12 +37,15 @@ namespace Vertigo.Wheel.Data.Configs
         public int EstimatedValue => _estimatedValue;
 
         /// <summary>
-        /// Whether more than one of this reward can be granted at once. Consumables and currencies stack —
-        /// their amounts also grow with zone depth. A weapon, cosmetic, skin/armour-point or chest is a
-        /// single unique drop: its count is always 1 and zone scaling never touches it.
+        /// Whether more than one of this reward can be granted at once. Consumables, currencies and craft
+        /// shards (the "Points" rewards) stack — their amounts also grow with zone depth. A fully-built
+        /// weapon, a cosmetic or a chest is a single unique drop: its count is always 1 and zone scaling
+        /// never touches it.
         /// </summary>
         public bool IsStackable =>
-            _category == RewardCategory.Consumable || _category == RewardCategory.Currency;
+            _category == RewardCategory.Consumable ||
+            _category == RewardCategory.Currency ||
+            _category == RewardCategory.Points;
 
 #if UNITY_EDITOR
         private void OnValidate()

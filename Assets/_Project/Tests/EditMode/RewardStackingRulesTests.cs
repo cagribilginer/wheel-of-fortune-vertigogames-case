@@ -24,9 +24,9 @@ namespace Vertigo.Wheel.Tests.EditMode
 
         [TestCase(RewardCategory.Consumable, true)]
         [TestCase(RewardCategory.Currency, true)]
+        [TestCase(RewardCategory.Points, true)]
         [TestCase(RewardCategory.Weapon, false)]
         [TestCase(RewardCategory.Cosmetic, false)]
-        [TestCase(RewardCategory.Points, false)]
         [TestCase(RewardCategory.Chest, false)]
         public void IsStackable_FollowsCategory(RewardCategory category, bool expected)
         {

@@ -21,8 +21,8 @@ namespace Vertigo.Wheel.Core.Spin
         public readonly int UnitValue;
 
         /// <summary>
-        /// Whether zone scaling applies to this slice's amount. False for unique drops (weapons, cosmetics,
-        /// skin/armour points, chests), which are always granted as a single item regardless of zone depth.
+        /// Whether zone scaling applies to this slice's amount. False for unique drops (fully-built weapons,
+        /// cosmetics, chests), which are always granted as a single item regardless of zone depth.
         /// </summary>
         public readonly bool Scalable;
 
