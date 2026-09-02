@@ -71,6 +71,37 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.That(bombs / (double)SampleCount, Is.EqualTo(0.125d).Within(0.02d));
         }
 
+        /// <summary>
+        /// End-to-end sanity on the shipped bronze wheel: build one through the real factory (7 rewards +
+        /// one weight-1 bomb, exactly as Wheel_Bronze_Band1/2/3.asset author it), spin it 1000 times and
+        /// confirm the bomb lands ~12.5% of the time — i.e. no pity/mercy rule is quietly holding it back.
+        /// </summary>
+        [Test]
+        public void BronzeWheel_SpunAThousandTimes_DetonatesRoughlyOneInEight()
+        {
+            var factory = new ZoneWheelFactory(
+                new Vertigo.Wheel.Core.Zones.ZoneClassifier(),
+                new StubBlueprintProvider(bombIndex: 0),
+                new Vertigo.Wheel.Core.Rewards.LinearRewardScaling());
+            WheelModel bronze = factory.Build(2); // zone 2: a normal bronze zone
+
+            Assume.That(bronze.Tier, Is.EqualTo(WheelTier.Bronze));
+            Assume.That(bronze.BombCount, Is.EqualTo(1));
+
+            var service = new SpinService(Seeded(4242));
+
+            const int spins = 1000;
+            int bombs = 0;
+            for (int i = 0; i < spins; i++)
+                if (service.Spin(bronze).IsBomb) bombs++;
+
+            double frequency = bombs / (double)spins;
+            TestContext.Out.WriteLine(
+                $"Bronze wheel bomb frequency over {spins} spins: {bombs}/{spins} = {frequency:P2} (ideal 12.50%).");
+
+            Assert.That(frequency, Is.EqualTo(0.125d).Within(0.04d));
+        }
+
         [Test]
         public void HeavilyWeightedSlot_SkewsProportionally()
         {
