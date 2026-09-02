@@ -53,7 +53,8 @@ namespace Vertigo.Wheel.Data.Configs
                 ResolveBaseAmount(),
                 _weight,
                 _reward.EstimatedValue,
-                scalable: _reward.IsStackable);
+                scalable: _reward.IsStackable,
+                maxAmount: _reward.MaxAmountPerDrop);
         }
     }
 }

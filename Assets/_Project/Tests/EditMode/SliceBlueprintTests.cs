@@ -59,5 +59,32 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             Assert.That(slice.ToSlice(7, new IdentityScaling()).Amount, Is.EqualTo(12));
         }
+
+        [Test]
+        public void ShardSlice_RampsUpButNeverExceedsItsCeiling()
+        {
+            var shard = SliceBlueprint.CreateReward(Knife, baseAmount: 1, scalable: true, maxAmount: 5);
+            var curve = new LinearRewardScaling();
+
+            Assert.That(shard.ToSlice(1, curve).Amount, Is.EqualTo(1), "zone 1 pays the base");
+            Assert.That(shard.ToSlice(6, curve).Amount, Is.EqualTo(3), "still ramping mid-run");
+            Assert.That(shard.ToSlice(15, curve).Amount, Is.EqualTo(5), "reaches the ceiling");
+            Assert.That(shard.ToSlice(99, curve).Amount, Is.EqualTo(5), "and stays there however deep");
+        }
+
+        [Test]
+        public void AZeroCeiling_MeansNoCeiling()
+        {
+            var slice = SliceBlueprint.CreateReward(Cash, baseAmount: 10, scalable: true, maxAmount: 0);
+
+            Assert.That(slice.ToSlice(29, new LinearRewardScaling()).Amount, Is.EqualTo(80));
+        }
+
+        [Test]
+        public void ACeilingBelowTheBaseAmount_IsRejected()
+        {
+            Assert.Throws<System.ArgumentOutOfRangeException>(
+                () => SliceBlueprint.CreateReward(Knife, baseAmount: 6, maxAmount: 5));
+        }
     }
 }

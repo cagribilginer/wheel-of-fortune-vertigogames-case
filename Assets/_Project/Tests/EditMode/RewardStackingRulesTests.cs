@@ -2,6 +2,7 @@ using System.Reflection;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
+using Vertigo.Wheel.Core.Rewards;
 using Vertigo.Wheel.Core.Spin;
 using Vertigo.Wheel.Data.Configs;
 
@@ -70,6 +71,27 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             Assert.That(entry.ResolveBaseAmount(), Is.EqualTo(3));
             Assert.That(entry.ToBlueprint().Scalable, Is.True);
+        }
+
+        [TestCase(RewardCategory.Points, RewardDefinition.PointsCeiling)]
+        [TestCase(RewardCategory.Currency, 0)]
+        [TestCase(RewardCategory.Consumable, 0)]
+        [TestCase(RewardCategory.Weapon, 0)]
+        public void MaxAmountPerDrop_CapsOnlyShards(RewardCategory category, int expected)
+        {
+            Assert.That(Make(category, baseAmount: 1).MaxAmountPerDrop, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void WheelSliceEntry_CarriesTheShardCeilingIntoTheBlueprint()
+        {
+            WheelSliceEntry entry = MakeEntry(Make(RewardCategory.Points, baseAmount: 1), baseAmountOverride: 0);
+
+            SliceBlueprint blueprint = entry.ToBlueprint();
+            Assert.That(blueprint.Scalable, Is.True);
+            Assert.That(blueprint.MaxAmount, Is.EqualTo(RewardDefinition.PointsCeiling));
+            Assert.That(blueprint.ToSlice(99, new LinearRewardScaling()).Amount,
+                Is.EqualTo(RewardDefinition.PointsCeiling));
         }
 
         private RewardDefinition Make(RewardCategory category, int baseAmount)

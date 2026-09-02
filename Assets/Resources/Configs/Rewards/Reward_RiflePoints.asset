@@ -16,5 +16,5 @@ MonoBehaviour:
   _displayName: Rifle Points
   _icon: {fileID: 21300000, guid: 68bc07f85d63043db99f48576184d4cc, type: 3}
   _category: 0
-  _defaultBaseAmount: 4
+  _defaultBaseAmount: 1
   _estimatedValue: 1

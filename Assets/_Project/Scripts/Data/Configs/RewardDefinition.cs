@@ -47,6 +47,16 @@ namespace Vertigo.Wheel.Data.Configs
             _category == RewardCategory.Currency ||
             _category == RewardCategory.Points;
 
+        /// <summary>
+        /// Hard ceiling on a single drop's count after zone scaling, or 0 for no ceiling. Craft shards
+        /// (the "Points" rewards) top out at 5 however deep the run goes; consumables and currencies are
+        /// left uncapped so a deep run still feels rewarding.
+        /// </summary>
+        public int MaxAmountPerDrop => _category == RewardCategory.Points ? PointsCeiling : 0;
+
+        /// <summary>The shard ceiling from the design brief: Points rewards never exceed this.</summary>
+        public const int PointsCeiling = 5;
+
 #if UNITY_EDITOR
         private void OnValidate()
         {

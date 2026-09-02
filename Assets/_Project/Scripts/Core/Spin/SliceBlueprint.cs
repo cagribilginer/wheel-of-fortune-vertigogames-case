@@ -26,8 +26,14 @@ namespace Vertigo.Wheel.Core.Spin
         /// </summary>
         public readonly bool Scalable;
 
+        /// <summary>
+        /// Hard ceiling on the materialised amount, or 0 for no ceiling. Craft shards (the "Points"
+        /// rewards) cap here so a deep zone never turns a small shard drop into a pile of them.
+        /// </summary>
+        public readonly int MaxAmount;
+
         private SliceBlueprint(
-            SliceKind kind, RewardId reward, int baseAmount, int weight, int unitValue, bool scalable)
+            SliceKind kind, RewardId reward, int baseAmount, int weight, int unitValue, bool scalable, int maxAmount)
         {
             Kind = kind;
             Reward = reward;
@@ -35,10 +41,11 @@ namespace Vertigo.Wheel.Core.Spin
             Weight = weight;
             UnitValue = unitValue;
             Scalable = scalable;
+            MaxAmount = maxAmount;
         }
 
         public static SliceBlueprint CreateReward(
-            RewardId reward, int baseAmount, int weight = 1, int unitValue = 1, bool scalable = true)
+            RewardId reward, int baseAmount, int weight = 1, int unitValue = 1, bool scalable = true, int maxAmount = 0)
         {
             if (reward.IsEmpty)
                 throw new ArgumentException("A reward slice must carry a non-empty RewardId.", nameof(reward));
@@ -48,8 +55,13 @@ namespace Vertigo.Wheel.Core.Spin
                 throw new ArgumentOutOfRangeException(nameof(weight), weight, "Weight cannot be negative.");
             if (unitValue < 0)
                 throw new ArgumentOutOfRangeException(nameof(unitValue), unitValue, "Unit value cannot be negative.");
+            if (maxAmount < 0)
+                throw new ArgumentOutOfRangeException(nameof(maxAmount), maxAmount, "Max amount cannot be negative.");
+            if (maxAmount > 0 && maxAmount < baseAmount)
+                throw new ArgumentOutOfRangeException(
+                    nameof(maxAmount), maxAmount, "A ceiling below the base amount would never let zone 1 pay out.");
 
-            return new SliceBlueprint(SliceKind.Reward, reward, baseAmount, weight, unitValue, scalable);
+            return new SliceBlueprint(SliceKind.Reward, reward, baseAmount, weight, unitValue, scalable, maxAmount);
         }
 
         public static SliceBlueprint CreateBomb(int weight = 1)
@@ -57,7 +69,7 @@ namespace Vertigo.Wheel.Core.Spin
             if (weight < 0)
                 throw new ArgumentOutOfRangeException(nameof(weight), weight, "Weight cannot be negative.");
 
-            return new SliceBlueprint(SliceKind.Bomb, RewardId.None, 0, weight, 0, scalable: false);
+            return new SliceBlueprint(SliceKind.Bomb, RewardId.None, 0, weight, 0, scalable: false, maxAmount: 0);
         }
 
         public bool IsBomb => Kind == SliceKind.Bomb;
@@ -70,6 +82,7 @@ namespace Vertigo.Wheel.Core.Spin
             if (IsBomb) return WheelSlice.CreateBomb(Weight);
 
             int amount = Scalable ? scaling.Scale(BaseAmount, zone) : BaseAmount;
+            if (MaxAmount > 0 && amount > MaxAmount) amount = MaxAmount;
             return WheelSlice.CreateReward(Reward, amount, Weight, UnitValue);
         }
     }

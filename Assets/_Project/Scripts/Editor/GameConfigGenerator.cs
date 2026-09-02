@@ -71,25 +71,25 @@ namespace Vertigo.Wheel.Editor
         private static readonly RewardSpec[] Rewards =
         {
             // --- band 1 pool: zones 1-9 -------------------------------------------------
-            new RewardSpec("Reward_PistolPoints",     "Pistol Points",    "UI_Icons_Pistol_Points",      RewardCategory.Points,      3, 1),
-            new RewardSpec("Reward_KnifePoints",      "Knife Points",     "UI_Icons_Knife_Points",       RewardCategory.Points,      2, 1),
-            new RewardSpec("Reward_ArmorPoints",      "Armor Points",     "UI_Icons_Armor_Points",       RewardCategory.Points,      3, 1),
-            new RewardSpec("Reward_VestPoints",       "Vest Points",      "UI_Icons_Vest_Points",        RewardCategory.Points,      3, 1),
-            new RewardSpec("Reward_ShotgunPoints",    "Shotgun Points",   "UI_Icons_Shotgun_Points",     RewardCategory.Points,      3, 1),
+            new RewardSpec("Reward_PistolPoints",     "Pistol Points",    "UI_Icons_Pistol_Points",      RewardCategory.Points,      1, 1),
+            new RewardSpec("Reward_KnifePoints",      "Knife Points",     "UI_Icons_Knife_Points",       RewardCategory.Points,      1, 1),
+            new RewardSpec("Reward_ArmorPoints",      "Armor Points",     "UI_Icons_Armor_Points",       RewardCategory.Points,      1, 1),
+            new RewardSpec("Reward_VestPoints",       "Vest Points",      "UI_Icons_Vest_Points",        RewardCategory.Points,      1, 1),
+            new RewardSpec("Reward_ShotgunPoints",    "Shotgun Points",   "UI_Icons_Shotgun_Points",     RewardCategory.Points,      1, 1),
             new RewardSpec("Reward_Tier1Shotgun",     "Shotgun",          "UI_Icon_Renders_tier1_shotgun", RewardCategory.Weapon,    1, 25),
             new RewardSpec("Reward_Cash",             "Cash",             "UI_icon_cash",                RewardCategory.Currency,   50, 1),
 
             // --- band 2 pool: zones 10-19 -----------------------------------------------
-            new RewardSpec("Reward_SmgPoints",        "SMG Points",       "UI_Icons_SMG_Points",         RewardCategory.Points,      4, 1),
-            new RewardSpec("Reward_RiflePoints",      "Rifle Points",     "UI_Icons_Rifle_Points",       RewardCategory.Points,      4, 1),
+            new RewardSpec("Reward_SmgPoints",        "SMG Points",       "UI_Icons_SMG_Points",         RewardCategory.Points,      1, 1),
+            new RewardSpec("Reward_RiflePoints",      "Rifle Points",     "UI_Icons_Rifle_Points",       RewardCategory.Points,      1, 1),
             new RewardSpec("Reward_Tier2Rifle",       "Assault Rifle",    "UI_Icon_Renders_tier2_rifle", RewardCategory.Weapon,      1, 40),
             new RewardSpec("Reward_Tier2Mle",         "Melee Weapon",     "UI_Icon_Renders_tier2_mle",   RewardCategory.Weapon,      1, 40),
             new RewardSpec("Reward_GrenadeM67",       "M67 Grenade",      "ui_icon_render_cons_grenade_m67", RewardCategory.Consumable, 3, 8),
             new RewardSpec("Reward_Healthshot",       "Regenerator",      "ui_icon_render_cons_healthshot_2_regenerator", RewardCategory.Consumable, 3, 8),
 
             // --- band 3 pool: zones 20+ -------------------------------------------------
-            new RewardSpec("Reward_SniperPoints",     "Sniper Points",    "UI_Icons_Sniper_Points",      RewardCategory.Points,      5, 2),
-            new RewardSpec("Reward_SubmachinePoints", "Submachine Points","UI_Icons_Submachine_Points",  RewardCategory.Points,      5, 2),
+            new RewardSpec("Reward_SniperPoints",     "Sniper Points",    "UI_Icons_Sniper_Points",      RewardCategory.Points,      1, 2),
+            new RewardSpec("Reward_SubmachinePoints", "Submachine Points","UI_Icons_Submachine_Points",  RewardCategory.Points,      1, 2),
             new RewardSpec("Reward_Tier3Sniper",      "Sniper Rifle",     "UI_Icon_Renders_tier3_sniper", RewardCategory.Weapon,     1, 80),
             new RewardSpec("Reward_Tier3Smg",         "Submachine Gun",   "UI_Icon_Renders_tier3_smg",   RewardCategory.Weapon,      1, 80),
             new RewardSpec("Reward_Molotov",          "Molotov",          "ui_icon_render_t_cons_molotov", RewardCategory.Consumable, 4, 10),
