@@ -47,8 +47,6 @@ crashlytics-build.properties
 *.app
 
 # ---- Project specific ----
-/Screenshots/*.png
-!/Screenshots/aspect_*.png
 *.keystore
 *.keystore.meta
 *.mp4
