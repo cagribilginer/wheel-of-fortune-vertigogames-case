@@ -105,7 +105,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void HideGameOver()
         {
-            _audio.PlayPopupClose();
+            // No dismiss sting here: every route out of this screen is an action button (Give Up / Gold
+            // Revive / Ad Revive), and each already fires the shared button-click cue via UIButtonPunch —
+            // the same single cue the EXIT button plays. Layering PlayPopupClose on top made these buttons
+            // sound different from every other button in the game.
             _bomb.Hide();
         }
 
@@ -136,7 +139,9 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void HideCashOut()
         {
-            _audio.PlayPopupClose();
+            // Dismissing the cash-out summary is the corner X only, and it already fires the shared
+            // button-click cue via UIButtonPunch — exactly what the Safe/Super milestone popup's close X
+            // plays. No extra PlayPopupClose so the two dismiss the same way.
             _collect.Hide();
         }
 
