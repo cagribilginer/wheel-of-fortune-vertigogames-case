@@ -33,10 +33,16 @@ namespace Vertigo.Wheel.Data.Configs
 
         public bool IsBomb => _kind == SliceKind.Bomb;
 
-        public int ResolveBaseAmount() =>
-            _baseAmountOverride > 0 ? _baseAmountOverride
-            : _reward != null ? _reward.DefaultBaseAmount
-            : 1;
+        public int ResolveBaseAmount()
+        {
+            // A unique drop is always a single item: neither an authored override nor zone scaling can
+            // turn a knife or a chest into a stack of five.
+            if (_reward != null && !_reward.IsStackable) return 1;
+
+            return _baseAmountOverride > 0 ? _baseAmountOverride
+                : _reward != null ? _reward.DefaultBaseAmount
+                : 1;
+        }
 
         public SliceBlueprint ToBlueprint()
         {
@@ -46,7 +52,8 @@ namespace Vertigo.Wheel.Data.Configs
                 _reward.RewardId,
                 ResolveBaseAmount(),
                 _weight,
-                _reward.EstimatedValue);
+                _reward.EstimatedValue,
+                scalable: _reward.IsStackable);
         }
     }
 }

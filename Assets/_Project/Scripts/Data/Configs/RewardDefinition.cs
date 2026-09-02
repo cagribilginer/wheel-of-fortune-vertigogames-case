@@ -36,6 +36,14 @@ namespace Vertigo.Wheel.Data.Configs
         public int DefaultBaseAmount => _defaultBaseAmount;
         public int EstimatedValue => _estimatedValue;
 
+        /// <summary>
+        /// Whether more than one of this reward can be granted at once. Consumables and currencies stack —
+        /// their amounts also grow with zone depth. A weapon, cosmetic, skin/armour-point or chest is a
+        /// single unique drop: its count is always 1 and zone scaling never touches it.
+        /// </summary>
+        public bool IsStackable =>
+            _category == RewardCategory.Consumable || _category == RewardCategory.Currency;
+
 #if UNITY_EDITOR
         private void OnValidate()
         {
@@ -43,6 +51,16 @@ namespace Vertigo.Wheel.Data.Configs
 
             if (_icon == null)
                 Debug.LogWarning($"[Vertigo] Reward '{name}' has no icon assigned.", this);
+
+            // A unique drop is a single item by definition; a non-1 base amount here is a mistake and would
+            // otherwise show a misleading count in the inspector and on the wheel.
+            if (!IsStackable && _defaultBaseAmount != 1)
+            {
+                Debug.LogWarning(
+                    $"[Vertigo] Reward '{name}' is {_category} (not stackable) but its base amount is " +
+                    $"{_defaultBaseAmount}; forcing it to 1.", this);
+                _defaultBaseAmount = 1;
+            }
         }
 #endif
     }

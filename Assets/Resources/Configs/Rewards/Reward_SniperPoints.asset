@@ -16,5 +16,5 @@ MonoBehaviour:
   _displayName: Sniper Points
   _icon: {fileID: 21300000, guid: a6acc823c86434ea6ba80e6bdf605ac7, type: 3}
   _category: 0
-  _defaultBaseAmount: 30
+  _defaultBaseAmount: 1
   _estimatedValue: 2

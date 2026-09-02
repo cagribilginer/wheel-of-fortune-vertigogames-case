@@ -16,5 +16,5 @@ MonoBehaviour:
   _displayName: Armor Points
   _icon: {fileID: 21300000, guid: 312ec73e8443a435c9e82ea73ca06414, type: 3}
   _category: 0
-  _defaultBaseAmount: 12
+  _defaultBaseAmount: 1
   _estimatedValue: 1

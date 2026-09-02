@@ -16,5 +16,5 @@ MonoBehaviour:
   _displayName: Shotgun Points
   _icon: {fileID: 21300000, guid: f397741a21d0249f6aa6782f73f91999, type: 3}
   _category: 0
-  _defaultBaseAmount: 14
+  _defaultBaseAmount: 1
   _estimatedValue: 1
