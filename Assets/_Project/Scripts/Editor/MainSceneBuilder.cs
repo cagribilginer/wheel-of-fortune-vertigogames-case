@@ -1368,7 +1368,8 @@ namespace Vertigo.Wheel.Editor
         /// The cheat bar, bottom-left on its own top-most canvas. Parented under the safe-area node and
         /// held off the edge by an extra inset so it never clips into rounded corners or the home
         /// indicator. Built into every scene but <see cref="DebugOverlayView"/> switches itself off
-        /// outside the editor / development builds.
+        /// outside the editor / development builds, and even there starts hidden until its hotkey is
+        /// pressed so it never lands in a gameplay recording.
         /// </summary>
         private static DebugOverlayView BuildDebugOverlay(RectTransform safeArea)
         {
