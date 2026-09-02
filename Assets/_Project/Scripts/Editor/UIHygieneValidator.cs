@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -48,6 +50,40 @@ namespace Vertigo.Wheel.Editor
 
         [MenuItem("Tools/Vertigo/Validate UI Hygiene")]
         private static void Open() => GetWindow<UIHygieneValidator>("UI Hygiene");
+
+        /// <summary>
+        /// Headless entry point for batchmode / CI (<c>-executeMethod
+        /// Vertigo.Wheel.Editor.UIHygieneValidator.ValidateToConsole</c>). Logs the finding list and raises
+        /// a <see cref="Debug.LogError"/> — which fails a batch run — when anything is found.
+        /// </summary>
+        public static void ValidateToConsole()
+        {
+            const string mainScene = "Assets/_Project/Scenes/Main.unity";
+            if (SceneManager.GetActiveScene().path != mainScene)
+                EditorSceneManager.OpenScene(mainScene, OpenSceneMode.Single);
+
+            var window = CreateInstance<UIHygieneValidator>();
+            try
+            {
+                window.Scan();
+
+                if (window._findings.Count == 0)
+                {
+                    Debug.Log("[Vertigo] UI Hygiene: 0 issues found across rules 1-5.");
+                    return;
+                }
+
+                var sb = new StringBuilder($"[Vertigo] UI Hygiene: {window._findings.Count} issue(s) found.\n");
+                foreach (Finding finding in window._findings)
+                    sb.AppendLine($"  [Rule {finding.Rule}] {finding.Message}");
+
+                Debug.LogError(sb.ToString());
+            }
+            finally
+            {
+                DestroyImmediate(window);
+            }
+        }
 
         private void OnEnable() => Scan();
 
@@ -243,13 +279,18 @@ namespace Vertigo.Wheel.Editor
         private static bool IsBackdrop(Graphic graphic) =>
             graphic.gameObject.name.EndsWith("_backdrop", StringComparison.Ordinal);
 
+        // includeInactive: true throughout. The scan walks inactive graphics (GetComponentsInChildren(true)),
+        // and the popups it cares about most — the bomb-defeat and cash-out scroll lists — are built
+        // SetActive(false). Without the flag GetComponentInParent stops at the first inactive ancestor and
+        // reports null, so every draggable viewport Image inside a hidden popup was flagged as a Rule 1
+        // false positive even though its ScrollRect parent was right there.
         private static bool HasInteractiveAncestor(Transform transform)
         {
             Transform parent = transform.parent;
             if (parent == null) return false;
 
-            return parent.GetComponentInParent<Button>() != null
-                || parent.GetComponentInParent<ScrollRect>() != null;
+            return parent.GetComponentInParent<Button>(true) != null
+                || parent.GetComponentInParent<ScrollRect>(true) != null;
         }
 
         private static bool HasMaskAncestor(Transform transform)
@@ -257,8 +298,8 @@ namespace Vertigo.Wheel.Editor
             Transform parent = transform.parent;
             if (parent == null) return false;
 
-            return parent.GetComponentInParent<RectMask2D>() != null
-                || parent.GetComponentInParent<Mask>() != null;
+            return parent.GetComponentInParent<RectMask2D>(true) != null
+                || parent.GetComponentInParent<Mask>(true) != null;
         }
 
         private static string Path(Transform t)
