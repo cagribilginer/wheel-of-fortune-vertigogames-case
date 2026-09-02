@@ -1,6 +1,7 @@
 using System;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.UI;
 using Vertigo.Wheel.Core.Spin;
 using Vertigo.Wheel.Core.States;
 using Vertigo.Wheel.Data.Configs;
@@ -38,6 +39,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly float _homeY;
         private readonly float _hiddenY;
         private bool _hasShownZone;
+        private bool _slotsLaidOut;
 
         public WheelPresenter(
             WheelView view, WheelSpinConfig spinConfig, RewardCatalog catalog, Sprite bombIcon, IAudioService audio)
@@ -51,11 +53,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _homeY = _view.Root.anchoredPosition.y;
             _hiddenY = _homeY - 900f; // a 720px panel plus margin: clears the bottom of the safe area entirely
 
-            // The editor's [ContextMenu] WheelSlotLayout tool is design-time-only convenience; nothing
-            // guarantees a human ever ran it. Doing the same placement here means a fresh Play session is
-            // correct regardless — otherwise every slot starts stacked at the rotor's centre instead of
-            // over its painted hole in the base art, which is indistinguishable from "no icon at all".
-            LayoutSlots();
+            // Slot placement is deliberately NOT done here. The constructor runs inside GameInstaller.Awake,
+            // before the Canvas has completed its first layout pass, so the rotor's rect still reads 0 wide.
+            // It is done instead on the first SetTheme (the zone-setup cinematic), by which point the layout
+            // has settled — see LayoutSlots.
 
             // Built once and restarted per tick rather than fired fresh each time: ~45 ticks happen over one
             // spin, and a prebuilt, paused, non-autokilled tween is the zero-alloc way to replay that.
@@ -115,6 +116,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 _tickClip = theme.Tick;
             }
 
+            // First zone setup: the Canvas has laid out by now, so the rotor rect is real. Placing the
+            // slots here rather than in the constructor is the whole fix for the "rect width was 0" path.
+            if (!_slotsLaidOut) LayoutSlots();
+
             PopulateSlots(wheel);
         }
 
@@ -129,14 +134,24 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             float wheelSize = _view.Rotor.rect.width;
             if (wheelSize < 50f)
             {
-                // A degenerate rect here collapses every slot's radius to ~0, stacking all eight on the
-                // rotor's centre — indistinguishable from "no icon at all" and easy to mistake for a
-                // population bug. Falling back to the design size keeps the wheel correct either way; the
-                // warning makes it visible if this path is ever actually taken instead of silently masking it.
-                Debug.LogWarning(
-                    $"[Vertigo] WheelPresenter: rotor rect width was {wheelSize:F1}px when laying out slots; " +
-                    $"falling back to the {DesignWheelSize:F0}px design size.");
+                // Called before the rotor's rect resolved (an AspectRatioFitter drives it). Flush the
+                // pending layout and re-read before deciding anything.
+                Canvas.ForceUpdateCanvases();
+                LayoutRebuilder.ForceRebuildLayoutImmediate(_view.Root);
+                wheelSize = _view.Rotor.rect.width;
+            }
+
+            if (wheelSize < 50f)
+            {
+                // Still degenerate: fall back to the authored fixed size (MainSceneBuilder.BuildWheel pins
+                // the panel to 720x720). A degenerate rect would otherwise collapse every slot's radius to
+                // ~0 and stack all eight on the rotor centre. Silent because the fallback value is the
+                // correct one; a stacked-slot bug would show up in the Game view immediately anyway.
                 wheelSize = DesignWheelSize;
+            }
+            else
+            {
+                _slotsLaidOut = true;
             }
 
             // 0.303 puts a slot's centre (icons are centred in the slot, no local offset) dead in the middle
