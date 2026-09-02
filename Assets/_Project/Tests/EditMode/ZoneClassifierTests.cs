@@ -50,6 +50,48 @@ namespace Vertigo.Wheel.Tests.EditMode
         public void NonPositiveZone_Throws(int zone) =>
             Assert.Throws<ArgumentOutOfRangeException>(() => _classifier.Classify(zone));
 
+        /// <summary>
+        /// The milestone-badge bug: once past zone 25, the "next safe zone" badge was showing 30 — but 30
+        /// is the Golden Super zone, not a regular Safe zone, so the badge must read 35.
+        /// </summary>
+        [Test]
+        public void NextZoneOfType_FromZone26_ResolvesSafe35AndSuper30()
+        {
+            Assert.That(_classifier.NextZoneOfType(26, ZoneType.Safe), Is.EqualTo(35));
+            Assert.That(_classifier.NextZoneOfType(26, ZoneType.Super), Is.EqualTo(30));
+        }
+
+        [TestCase(1, 5)]
+        [TestCase(4, 5)]
+        [TestCase(5, 10)]
+        [TestCase(9, 10)]
+        [TestCase(25, 35)]   // 30 is Super — the next regular Safe zone is 35
+        [TestCase(29, 35)]
+        [TestCase(30, 35)]
+        [TestCase(31, 35)]
+        [TestCase(35, 40)]
+        [TestCase(55, 65)]   // 60 is Super
+        public void NextZoneOfType_Safe_StepsOverSuperZones(int fromZone, int expected) =>
+            Assert.That(_classifier.NextZoneOfType(fromZone, ZoneType.Safe), Is.EqualTo(expected));
+
+        [TestCase(1, 30)]
+        [TestCase(26, 30)]
+        [TestCase(29, 30)]
+        [TestCase(30, 60)]
+        [TestCase(31, 60)]
+        [TestCase(59, 60)]
+        [TestCase(60, 90)]
+        public void NextZoneOfType_Super_IsTheNextSuperInterval(int fromZone, int expected) =>
+            Assert.That(_classifier.NextZoneOfType(fromZone, ZoneType.Super), Is.EqualTo(expected));
+
+        [Test]
+        public void NextZoneOfType_Normal_IsTheImmediateNextRiskyZone() =>
+            Assert.That(_classifier.NextZoneOfType(5, ZoneType.Normal), Is.EqualTo(6));
+
+        [Test]
+        public void NextZoneOfType_ClampsANonPositiveStart_ThenZoneOneIsTheFirstSafe() =>
+            Assert.That(_classifier.NextZoneOfType(-4, ZoneType.Safe), Is.EqualTo(1));
+
         [Test]
         public void DefaultIntervals_AreConsistent() =>
             Assert.That(_classifier.IntervalsAreConsistent, Is.True);

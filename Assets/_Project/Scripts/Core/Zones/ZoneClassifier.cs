@@ -51,5 +51,24 @@ namespace Vertigo.Wheel.Core.Zones
             if (zone % _safeInterval == 0) return ZoneType.Safe;
             return ZoneType.Normal;
         }
+
+        /// <summary>
+        /// The first zone after <paramref name="fromZone"/> that <see cref="Classify"/> calls
+        /// <paramref name="type"/>. Walks one zone at a time so a Safe search steps over the Super zones
+        /// (30, 60, …) that a raw "next multiple of 5" would wrongly land on. The scan is bounded by one
+        /// super interval plus one safe interval — far enough that a zone of any type is always found for
+        /// the shipped configuration.
+        /// </summary>
+        public int NextZoneOfType(int fromZone, ZoneType type)
+        {
+            if (fromZone < 0) fromZone = 0;
+
+            int guard = fromZone + _superInterval + _safeInterval + 1;
+            for (int zone = fromZone + 1; zone <= guard; zone++)
+                if (Classify(zone) == type)
+                    return zone;
+
+            return fromZone;
+        }
     }
 }

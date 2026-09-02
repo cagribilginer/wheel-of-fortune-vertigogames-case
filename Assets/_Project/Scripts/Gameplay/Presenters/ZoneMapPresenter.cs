@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UI;
 using Vertigo.Wheel.Core.Zones;
-using Vertigo.Wheel.Data.Configs;
 using Vertigo.Wheel.UI.Views;
 
 namespace Vertigo.Wheel.Gameplay.Presenters
@@ -40,19 +39,13 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         private readonly ZoneMapView _view;
         private readonly IZoneClassifier _classifier;
-        private readonly int _safeInterval;
-        private readonly int _superInterval;
         private readonly ObjectPool<ZoneMapTileView> _pool;
         private readonly List<ZoneMapTileView> _active = new List<ZoneMapTileView>();
 
-        public ZoneMapPresenter(
-            ZoneMapView view, ZoneMapTileView tilePrefab, IZoneClassifier classifier,
-            ZoneProgressionConfig progression)
+        public ZoneMapPresenter(ZoneMapView view, ZoneMapTileView tilePrefab, IZoneClassifier classifier)
         {
             _view = view;
             _classifier = classifier;
-            _safeInterval = Mathf.Max(1, progression.SafeZoneInterval);
-            _superInterval = Mathf.Max(1, progression.SuperZoneInterval);
 
             _pool = new ObjectPool<ZoneMapTileView>(
                 () => Object.Instantiate(tilePrefab, _view.Content),
@@ -63,7 +56,9 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void ShowZone(int zone, System.Action onComplete)
         {
-            _view.SetMilestoneTargets(NextMilestone(zone, _safeInterval), NextMilestone(zone, _superInterval));
+            _view.SetMilestoneTargets(
+                _classifier.NextZoneOfType(zone, ZoneType.Safe),
+                _classifier.NextZoneOfType(zone, ZoneType.Super));
 
             int horizon = Mathf.Max(MinimumWindow, zone + LookaheadZones);
             while (_active.Count < horizon) BuildTile(_active.Count + 1);
@@ -73,9 +68,6 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
             Scroll(zone, onComplete);
         }
-
-        /// <summary>The next multiple of <paramref name="interval"/> strictly greater than <paramref name="zone"/>.</summary>
-        private static int NextMilestone(int zone, int interval) => (zone / interval + 1) * interval;
 
         private void BuildTile(int zoneNumber)
         {
