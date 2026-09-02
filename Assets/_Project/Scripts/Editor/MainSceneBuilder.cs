@@ -488,10 +488,9 @@ namespace Vertigo.Wheel.Editor
             indicator.anchorMax = new Vector2(0.5f, 1f);
             indicator.pivot = new Vector2(0.5f, 0f);
             indicator.sizeDelta = new Vector2(120f, 120f);
-            // The top slot's outer edge sits at R+70 = 297 from the wheel's centre (R=227, slot half-size
-            // 70); pulled down from the wheelPanel's own top edge (360) so the indicator's tip lands right
-            // on it instead of pointing at 63px of empty space above the wheel.
-            indicator.anchoredPosition = new Vector2(0f, -60f);
+            // Pulled well down from the wheelPanel's own top edge (360) so the triangle overlaps the wheel
+            // rim and visibly bites into the top slot, rather than floating tip-to-edge above it.
+            indicator.anchoredPosition = new Vector2(0f, -140f);
 
             Image indicatorImage = AddImage(NewNode("ui_image_wheel_indicator_value", indicator), "ui_spin_bronze_indicator");
             indicatorImage.preserveAspect = true;
