@@ -81,7 +81,7 @@ namespace Vertigo.Wheel.Core.Run
 
         public bool CanSpin => CashOutPolicy.CanSpin(_phase);
 
-        public bool CanLeave => CashOutPolicy.CanLeave(_phase, !Bank.IsEmpty);
+        public bool CanLeave => CashOutPolicy.CanLeave(_phase, !Bank.IsEmpty, CurrentZoneType);
 
         public bool CanGiveUp => CashOutPolicy.CanGiveUp(_phase);
 

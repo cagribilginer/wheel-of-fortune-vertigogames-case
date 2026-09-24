@@ -112,11 +112,23 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void LeaveOnANormalZoneWithAHaul_OpensTheCashOutSummary()
+        public void LeaveOnANormalZoneWithAHaul_IsIgnored()
         {
             _machine.RequestSpin();                        // zone 1 -> 2, banks a reward
 
             Assert.That(_run.CurrentZoneType, Is.EqualTo(ZoneType.Normal));
+            _machine.RequestLeave();
+
+            Assert.That(_machine.IsIn<IdleState>(), Is.True, "Normal zones may not be cashed out from.");
+            Assert.That(_view.CashOutVisible, Is.False);
+        }
+
+        [Test]
+        public void LeaveOnASafeZoneWithAHaul_OpensTheCashOutSummary()
+        {
+            AdvanceToZone(5);                              // zone 5 is safe
+
+            Assert.That(_run.CurrentZoneType, Is.EqualTo(ZoneType.Safe));
             _machine.RequestLeave();
 
             Assert.That(_machine.IsIn<CashOutState>(), Is.True);
@@ -140,7 +152,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void CancellingCashOut_ReturnsToTheSameZoneWithTheHaulIntact()
         {
-            _machine.RequestSpin();                        // zone 1 -> 2, banks a reward
+            AdvanceToZone(5);                              // zone 5 is safe, so leaving is legal here
             int zoneBefore = _run.CurrentZone;
             long bankedBefore = _run.Bank.TotalValue;
 
@@ -155,15 +167,17 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void ExitIsOfferedWheneverTheBankHasSomething()
+        public void ExitIsOfferedOnlyOnSafeOrSuperZonesWithAHaul()
         {
             Assert.That(_view.CanLeave, Is.False, "zone 1, empty bank");
 
             _machine.RequestSpin();                        // zone 1 -> 2, banks a reward
-            Assert.That(_view.CanLeave, Is.True, "zone 2, has a haul");
+            Assert.That(_run.CurrentZoneType, Is.EqualTo(ZoneType.Normal));
+            Assert.That(_view.CanLeave, Is.False, "zone 2 is Normal, even with a haul");
 
-            _machine.RequestSpin();                        // zone 2 -> 3
-            Assert.That(_view.CanLeave, Is.True, "zone 3, still has a haul");
+            AdvanceToZone(5);
+            Assert.That(_run.CurrentZoneType, Is.EqualTo(ZoneType.Safe));
+            Assert.That(_view.CanLeave, Is.True, "zone 5 is Safe, and the haul survived getting there");
         }
 
         [Test]
