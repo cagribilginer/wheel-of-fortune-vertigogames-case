@@ -60,7 +60,6 @@ namespace Vertigo.Wheel.Editor
             Stretch(safeArea, 0, 0, 0, 0);
             safeArea.gameObject.AddComponent<SafeAreaFitter>();
 
-            HeaderView headerView = BuildHeader(safeArea);
             ZoneMapView zoneMapView = BuildZoneMap(safeArea, tilePrefab);
 
             RectTransform playArea = NewNode("ui_panel_play", safeArea);
@@ -79,7 +78,7 @@ namespace Vertigo.Wheel.Editor
             // home indicator and landscape notches on a real device / the Device Simulator.
             DebugOverlayView debugView = BuildDebugOverlay(safeArea);
 
-            BuildGameInstaller(canvasRoot, headerView, wheelView, zoneMapView, bankView, actionBarView,
+            BuildGameInstaller(canvasRoot, wheelView, zoneMapView, bankView, actionBarView,
                 bombView, collectView, giveUpView, milestoneView, vfxView, debugView, tilePrefab, bankEntryPrefab);
 
             EnsureFolder(Path.GetDirectoryName(ScenePath).Replace('\\', '/'));
@@ -94,7 +93,7 @@ namespace Vertigo.Wheel.Editor
         // ------------------------------------------------------------------ composition root
 
         private static void BuildGameInstaller(
-            RectTransform canvasRoot, HeaderView header, WheelView wheel, ZoneMapView zoneMap, BankView bank,
+            RectTransform canvasRoot, WheelView wheel, ZoneMapView zoneMap, BankView bank,
             ActionBarView actionBar, BombPopupView bombPopup, CollectPopupView collectPopup,
             GiveUpConfirmPopupView giveUpPopup, MilestonePreviewPopupView milestonePopup, VfxView vfx,
             DebugOverlayView debugOverlay, ZoneMapTileView tilePrefab, BankEntryView bankEntryPrefab)
@@ -102,7 +101,7 @@ namespace Vertigo.Wheel.Editor
             var installer = new GameObject("GameInstaller").AddComponent<GameInstaller>();
             Sprite bombIcon = EditorSpriteUtility.FindSprite("ui_card_icon_death");
 
-            installer.Configure(header, wheel, zoneMap, bank, actionBar, bombPopup, collectPopup, giveUpPopup,
+            installer.Configure(wheel, zoneMap, bank, actionBar, bombPopup, collectPopup, giveUpPopup,
                 milestonePopup, vfx, debugOverlay, tilePrefab, bankEntryPrefab, canvasRoot, bombIcon);
         }
 
@@ -271,32 +270,6 @@ namespace Vertigo.Wheel.Editor
             Image bg = AddImage(NewNode("ui_image_background", canvasRoot), null);
             bg.color = new Color(0.08f, 0.08f, 0.10f, 1f);
             Stretch((RectTransform)bg.transform, 0, 0, 0, 0);
-        }
-
-        // ------------------------------------------------------------------ header
-
-        private static HeaderView BuildHeader(RectTransform safeArea)
-        {
-            RectTransform header = NewNode("ui_panel_header", safeArea);
-            TopStrip(header, 100f, 0f);
-
-            Image bg = AddImage(NewNode("ui_image_header_bg", header), "ui_card_panel_zone_bg");
-            bg.type = Image.Type.Sliced;
-            Stretch((RectTransform)bg.transform, 0, 0, 0, 0);
-
-            Image goldIcon = AddImage(NewNode("ui_image_header_gold_icon", header), "UI_icon_gold");
-            goldIcon.preserveAspect = true;
-            // -180 left only ~112px of clearance before the icon's box collides with a right-aligned value
-            // — comfortable for "1,250" but not for a run's gold climbing into five or six digits.
-            RightMiddle((RectTransform)goldIcon.transform, -220f, new Vector2(56, 56));
-
-            TextMeshProUGUI gold = AddText(NewNode("ui_text_header_gold_value", header), "1,250", 40f);
-            gold.alignment = TextAlignmentOptions.MidlineRight;
-            RightMiddle((RectTransform)gold.transform, -40f, new Vector2(300, 80));
-
-            var headerView = header.gameObject.AddComponent<HeaderView>();
-            headerView.RebindReferences();
-            return headerView;
         }
 
         // ------------------------------------------------------------------ zone map
@@ -758,7 +731,7 @@ namespace Vertigo.Wheel.Editor
             empty.color = new Color(0.7f, 0.72f, 0.77f, 1f);
             FixedCentered((RectTransform)empty.transform, new Vector2(0, -140), new Vector2(700, 36));
 
-            BuildBombCurrencyHud(root);
+            BuildCurrencyHud(root, "bomb");
             BuildBombButtons(root);
 
             var bombView = root.gameObject.AddComponent<BombPopupView>();
@@ -768,14 +741,15 @@ namespace Vertigo.Wheel.Editor
         }
 
         /// <summary>
-        /// Top-right HUD for the bomb screen: cash value, gold value, and a "+" welded tight to the gold
-        /// amount. One HorizontalLayoutGroup at 6px spacing keeps the group cohesive and right-aligned; a
+        /// Top-right HUD shared by the bomb screen and the cash-out summary: cash value then gold value.
+        /// One HorizontalLayoutGroup at 6px spacing keeps the group cohesive and right-aligned; a
         /// ContentSizeFitter lets the row hug its content so it stays pinned to the corner as the numbers
-        /// change.
+        /// change. <paramref name="popupName"/> (e.g. "bomb", "collect") keeps every node's name scoped to
+        /// the popup it is actually built into, even though both popups get an identical-looking row.
         /// </summary>
-        private static void BuildBombCurrencyHud(RectTransform root)
+        private static void BuildCurrencyHud(RectTransform root, string popupName)
         {
-            RectTransform row = NewNode("ui_row_popup_bomb_currency", root);
+            RectTransform row = NewNode($"ui_row_popup_{popupName}_currency", root);
             row.anchorMin = new Vector2(1f, 1f);
             row.anchorMax = new Vector2(1f, 1f);
             row.pivot = new Vector2(1f, 1f);
@@ -793,37 +767,25 @@ namespace Vertigo.Wheel.Editor
             fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
             fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-            Image cashIcon = AddImage(NewNode("ui_image_popup_bomb_cash_icon", row), "UI_icon_cash");
+            Image cashIcon = AddImage(NewNode($"ui_image_popup_{popupName}_cash_icon", row), "UI_icon_cash");
             cashIcon.preserveAspect = true;
             AddLayoutSize((RectTransform)cashIcon.transform, 38f, 38f);
 
-            TextMeshProUGUI cash = AddText(NewNode("ui_text_popup_bomb_cash_value", row), "0", 30f);
+            TextMeshProUGUI cash = AddText(NewNode($"ui_text_popup_{popupName}_cash_value", row), "0", 30f);
             cash.alignment = TextAlignmentOptions.Midline;
             cash.color = new Color(0.55f, 0.92f, 0.55f, 1f);
             cash.fontStyle = FontStyles.Bold;
             cash.enableWordWrapping = false;
 
-            Image goldIcon = AddImage(NewNode("ui_image_popup_bomb_gold_icon", row), "UI_icon_gold");
+            Image goldIcon = AddImage(NewNode($"ui_image_popup_{popupName}_gold_icon", row), "UI_icon_gold");
             goldIcon.preserveAspect = true;
             AddLayoutSize((RectTransform)goldIcon.transform, 38f, 38f);
 
-            TextMeshProUGUI gold = AddText(NewNode("ui_text_popup_bomb_gold_value", row), "0", 30f);
+            TextMeshProUGUI gold = AddText(NewNode($"ui_text_popup_{popupName}_gold_value", row), "0", 30f);
             gold.alignment = TextAlignmentOptions.Midline;
             gold.color = new Color(1f, 0.83f, 0.35f, 1f);
             gold.fontStyle = FontStyles.Bold;
             gold.enableWordWrapping = false;
-
-            // Store-style "+" welded right up against the gold amount — cosmetic only (no purchase flow in
-            // the demo), so a plain Image, not a Button that would look interactive and do nothing.
-            Image plus = AddImage(NewNode("ui_image_popup_bomb_plus", row), "ui_card_panel_zone_bg");
-            plus.type = Image.Type.Sliced;
-            plus.color = new Color(1f, 0.80f, 0.15f, 1f);
-            AddLayoutSize((RectTransform)plus.transform, 38f, 38f);
-            TextMeshProUGUI plusGlyph = AddText(NewNode("ui_text_popup_bomb_plus_glyph", (RectTransform)plus.transform), "+", 32f);
-            plusGlyph.alignment = TextAlignmentOptions.Center;
-            plusGlyph.color = new Color(0.1f, 0.08f, 0f, 1f);
-            plusGlyph.fontStyle = FontStyles.Bold;
-            Stretch((RectTransform)plusGlyph.transform, 0, 2, 0, 0);
         }
 
         /// <summary>Pins a fixed preferred size on a node so a layout group lays it out at that size.</summary>
@@ -1042,25 +1004,9 @@ namespace Vertigo.Wheel.Editor
             zone.alignment = TextAlignmentOptions.Top;
             TopStripText((RectTransform)zone.transform, 84f, new Vector2(1200, 40));
 
-            // Hidden until CLAIM & LEAVE: the "added to inventory" recap that fades in during the claim
-            // celebration. CollectPopupView.Show puts it back down for the next summary. It sits centred
-            // over the reward list (not down by the buttons, where it used to collide with CLAIM & LEAVE)
-            // on its own dark plate, drawn last so it reads on top of the icons behind it.
-            RectTransform bannerPanel = NewNode("ui_panel_popup_collect_banner", anim);
-            FixedCentered(bannerPanel, new Vector2(0f, 10f), new Vector2(820f, 104f));
-            Image bannerBg = AddImage(NewNode("ui_image_popup_collect_banner_bg", bannerPanel), "ui_card_panel_zone_bg");
-            bannerBg.type = Image.Type.Sliced;
-            bannerBg.color = new Color(0f, 0f, 0f, 0.9f);
-            Stretch((RectTransform)bannerBg.transform, 0, 0, 0, 0);
-
-            TextMeshProUGUI banner = AddText(NewNode("ui_text_popup_collect_banner_value", bannerPanel),
-                "Total Rewards Added to Inventory", 28f);
-            banner.alignment = TextAlignmentOptions.Center;
-            banner.fontStyle = FontStyles.Bold;
-            banner.color = new Color(1f, 0.88f, 0.45f, 1f);
-            Stretch((RectTransform)banner.transform, 24, 0, 24, 0);
-
-            bannerPanel.gameObject.SetActive(false);
+            // Same top-right cash/gold HUD as the bomb screen — what the wallet is about to receive from
+            // this claim, not the pre-claim "added to inventory" banner this replaced.
+            BuildCurrencyHud(root, "collect");
 
             // Corner X: a genuine Button (unlike the decorative bits elsewhere) so the player can bail back
             // to the wheel with the haul untouched.
@@ -1128,9 +1074,6 @@ namespace Vertigo.Wheel.Editor
             TextMeshProUGUI confirmText = AddText(NewNode("ui_text_popup_collect_confirm_value", confirmAnim), "CLAIM & LEAVE", 30f);
             confirmText.alignment = TextAlignmentOptions.Center;
             Stretch((RectTransform)confirmText.transform, 0, 0, 0, 0);
-
-            // Drawn last so the celebration recap sits above the reward list and the action buttons.
-            bannerPanel.SetAsLastSibling();
 
             var collectView = root.gameObject.AddComponent<CollectPopupView>();
             collectView.RebindReferences();

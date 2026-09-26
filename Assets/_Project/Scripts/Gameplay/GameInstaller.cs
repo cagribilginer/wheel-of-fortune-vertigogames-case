@@ -25,7 +25,6 @@ namespace Vertigo.Wheel.Gameplay
     /// </summary>
     public sealed class GameInstaller : MonoBehaviour
     {
-        [SerializeField] private HeaderView _header;
         [SerializeField] private WheelView _wheel;
         [SerializeField] private ZoneMapView _zoneMap;
         [SerializeField] private BankView _bank;
@@ -48,24 +47,17 @@ namespace Vertigo.Wheel.Gameplay
         /// </summary>
         public GameStateMachine Machine { get; private set; }
 
-        // The header presenter has no per-zone collaborator now that the zone number moved to the zone
-        // strip — it only mirrors the wallet onto the header. The composition root holds it so its
-        // subscription lives exactly as long as the scene does.
-        private HeaderPresenter _headerPresenter;
-
-        // Held for the same reason as the header presenter: it owns the milestone badge -> preview-popup
-        // subscription and must outlive this method.
+        // Held so its milestone badge -> preview-popup subscription outlives this method.
         private MilestonePreviewPresenter _milestonePreviewPresenter;
 
         /// <summary>Called once by the editor scene-build step; never touched by hand.</summary>
         public void Configure(
-            HeaderView header, WheelView wheel, ZoneMapView zoneMap, BankView bank, ActionBarView actionBar,
+            WheelView wheel, ZoneMapView zoneMap, BankView bank, ActionBarView actionBar,
             BombPopupView bombPopup, CollectPopupView collectPopup, GiveUpConfirmPopupView giveUpPopup,
             MilestonePreviewPopupView milestonePopup, VfxView vfx, DebugOverlayView debugOverlay,
             ZoneMapTileView zoneMapTilePrefab, BankEntryView bankEntryPrefab, Transform flightLayer,
             Sprite bombSlotIcon)
         {
-            _header = header;
             _wheel = wheel;
             _zoneMap = zoneMap;
             _bank = bank;
@@ -103,16 +95,16 @@ namespace Vertigo.Wheel.Gameplay
             var wheelFactory = new ZoneWheelFactory(
                 classifier, progression, progression.Scaling, new UnityRandomProvider());
             var spinService = new SpinService(new WeightedSliceResolver(new UnityRandomProvider()));
-            var wallet = new GoldWallet(new PlayerPrefsSaveService());
-            var continueService = new ContinueService(wallet, continueConfig.ToSettings());
-            var runModel = new RunModel(classifier, wallet, new RewardId("Reward_Gold"));
+            var goldRewardId = new RewardId("Reward_Gold");
+            var cashRewardId = new RewardId("Reward_Cash");
+            var wallet = new Wallet(new PlayerPrefsSaveService());
+            var continueService = new ContinueService(wallet, goldRewardId, continueConfig.ToSettings());
+            var runModel = new RunModel(classifier, wallet, goldRewardId, cashRewardId);
 
             var audioLibrary = Resources.Load<AudioLibrary>("Configs/Settings/AudioLibrary");
             IAudioService audioService = new AudioService(new PlayerPrefsSaveService(), transform);
             AudioHub.Initialize(audioService, audioLibrary);
             var audioPresenter = new AudioPresenter(audioService, audioLibrary);
-
-            _headerPresenter = new HeaderPresenter(_header, wallet);
 
             // Skipped when the scene predates the milestone popup — a rebuild adds it.
             if (_milestonePopup != null)
@@ -127,7 +119,7 @@ namespace Vertigo.Wheel.Gameplay
             var vfxPresenter = new VfxPresenter(_vfx);
 
             var presentation = new ScreenPresentation(
-                _header, wheelPresenter, zoneMapPresenter, bankPresenter, actionBarPresenter, popupPresenter,
+                wheelPresenter, zoneMapPresenter, bankPresenter, actionBarPresenter, popupPresenter,
                 vfxPresenter, audioPresenter, bronzeTheme, silverTheme, goldenTheme);
 
             var context = new GameContext(runModel, wheelFactory, spinService, continueService, presentation);
@@ -140,7 +132,8 @@ namespace Vertigo.Wheel.Gameplay
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (_debugOverlay != null)
-                new DebugPresenter(runModel, machine, wallet, catalog, bankPresenter).WireInput(_debugOverlay);
+                new DebugPresenter(runModel, machine, wallet, goldRewardId, catalog, bankPresenter)
+                    .WireInput(_debugOverlay);
 #endif
 
             GameFlow.Start(machine);

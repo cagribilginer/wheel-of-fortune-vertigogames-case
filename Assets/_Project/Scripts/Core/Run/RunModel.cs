@@ -17,8 +17,15 @@ namespace Vertigo.Wheel.Core.Run
     public sealed class RunModel
     {
         private readonly IZoneClassifier _classifier;
-        private readonly GoldWallet _wallet;
-        private readonly RewardId _goldRewardId;
+        private readonly Wallet _wallet;
+
+        // The currency GoldBalance reports and ContinueService prices revives in.
+        private readonly RewardId _goldCurrency;
+
+        // The currency CashBalance reports. Every "cash"/"gold" number shown anywhere in the UI is one of
+        // these two wallet balances — never a run-local haul total or a different score wearing the same
+        // label, so a currency always means the same number wherever it appears.
+        private readonly RewardId _cashCurrency;
 
         private int _currentZone = 1;
         private RunPhase _phase = RunPhase.Idle;
@@ -30,11 +37,12 @@ namespace Vertigo.Wheel.Core.Run
         // currently pending an answer.
         private List<BankEntry> _lostHaul;
 
-        public RunModel(IZoneClassifier classifier, GoldWallet wallet, RewardId goldRewardId)
+        public RunModel(IZoneClassifier classifier, Wallet wallet, RewardId goldCurrency, RewardId cashCurrency)
         {
             _classifier = classifier ?? throw new ArgumentNullException(nameof(classifier));
             _wallet = wallet ?? throw new ArgumentNullException(nameof(wallet));
-            _goldRewardId = goldRewardId;
+            _goldCurrency = goldCurrency;
+            _cashCurrency = cashCurrency;
 
             Bank = new RewardBank();
         }
@@ -62,8 +70,11 @@ namespace Vertigo.Wheel.Core.Run
         /// </summary>
         public IReadOnlyList<BankEntry> LostHaul => _lostHaul ?? (IReadOnlyList<BankEntry>)Array.Empty<BankEntry>();
 
-        /// <summary>The persistent wallet balance, surfaced here so a state can hand it to the presentation.</summary>
-        public int WalletBalance => _wallet.Balance;
+        /// <summary>The persistent gold balance, surfaced here so a state can hand it to the presentation.</summary>
+        public int GoldBalance => _wallet.BalanceOf(_goldCurrency);
+
+        /// <summary>The persistent cash balance — same wallet, same rules, just a different id.</summary>
+        public int CashBalance => _wallet.BalanceOf(_cashCurrency);
 
         public ZoneType CurrentZoneType => _classifier.Classify(_currentZone);
 
@@ -114,7 +125,7 @@ namespace Vertigo.Wheel.Core.Run
             ZoneChanged?.Invoke(_currentZone);
         }
 
-        /// <summary>The bomb: the entire haul is lost and the run ends. The gold wallet is untouched.</summary>
+        /// <summary>The bomb: the entire haul is lost and the run ends. The wallet is untouched.</summary>
         public void Detonate()
         {
             _lostHaul = new List<BankEntry>(Bank.Entries);
@@ -164,15 +175,18 @@ namespace Vertigo.Wheel.Core.Run
         }
 
         /// <summary>
-        /// Walk away with the haul. Any banked gold converts into the persistent wallet, which is the only
-        /// way the wallet ever grows — so a continue is always paid for by a previous successful run.
+        /// Walk away with the haul. Banked gold and cash convert into the persistent wallet; everything else
+        /// (weapons, cosmetics, chests) is left behind with the rest of the run. This is the only way either
+        /// wallet balance ever grows — so a continue is always paid for by a previous successful run.
         /// </summary>
         public void CashOut()
         {
-            if (!_goldRewardId.IsEmpty)
+            IReadOnlyList<BankEntry> entries = Bank.Entries;
+            for (int i = 0; i < entries.Count; i++)
             {
-                int bankedGold = Bank.AmountOf(_goldRewardId);
-                if (bankedGold > 0) _wallet.Add(bankedGold);
+                BankEntry entry = entries[i];
+                if (entry.Amount > 0 && (entry.Reward == _goldCurrency || entry.Reward == _cashCurrency))
+                    _wallet.Add(entry.Reward, entry.Amount);
             }
 
             Phase = RunPhase.CashOut;

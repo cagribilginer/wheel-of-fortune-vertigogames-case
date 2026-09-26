@@ -18,16 +18,20 @@ namespace Vertigo.Wheel.Core.States.Flow
             Context.Run.Phase = RunPhase.CashOut;
 
             // Zones are 1-indexed and CurrentZone is the one the player is standing on but has not
-            // finished, so the number of *cleared* zones is one less.
-            Context.Presentation.ShowCashOut(Context.Run.Bank.Entries, Context.Run.CurrentZone - 1);
+            // finished, so the number of *cleared* zones is one less. The wallet balances shown are the
+            // ones before this claim lands — ClaimCashOut's count-up is what shows them climbing.
+            Context.Presentation.ShowCashOut(
+                Context.Run.Bank.Entries, Context.Run.CurrentZone - 1,
+                Context.Run.GoldBalance, Context.Run.CashBalance);
         }
 
         public override void OnConfirmed()
         {
-            // Credit the wallet now so the header counter can animate to the real new total during the
-            // claim celebration. The run itself is not reset until that celebration finishes.
+            // Credit the wallet now, then read the resulting balances back out so the summary's own
+            // cash/gold row can count up to them during the claim celebration. The run itself is not reset
+            // until that celebration finishes.
             Context.Run.CashOut();
-            Context.Presentation.ClaimCashOut(() =>
+            Context.Presentation.ClaimCashOut(Context.Run.GoldBalance, Context.Run.CashBalance, () =>
             {
                 Context.Run.ResetRun();
                 Machine.Change<ZoneSetupState>();

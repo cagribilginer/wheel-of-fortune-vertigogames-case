@@ -7,7 +7,7 @@ namespace Vertigo.Wheel.Data.Services
     /// <summary>
     /// Pools a handful of <see cref="AudioSource"/>s on a runtime-only GameObject it creates itself — no
     /// scene node, no Inspector wiring, the same "self-contained service <c>GameInstaller</c> just news up"
-    /// shape as <see cref="GoldWallet"/> or <c>ContinueService</c>. One more source is reserved for the
+    /// shape as <see cref="Wallet"/> or <c>ContinueService</c>. One more source is reserved for the
     /// music bus, so a future looped track (e.g. a per-tier spin loop) has somewhere to play that isn't the
     /// SFX pool.
     /// <para>

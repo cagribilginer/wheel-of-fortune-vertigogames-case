@@ -71,17 +71,14 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         }
 
         public void ShowGameOver(
-            int zoneReached, IReadOnlyList<BankEntry> lostHaul, int playerGold,
+            int zoneReached, IReadOnlyList<BankEntry> lostHaul, int playerGold, int playerCash,
             bool goldReviveOffered, int goldReviveCost, bool adReviveOffered)
         {
             for (int i = 0; i < _activeBombList.Count; i++) _bombListPool.Release(_activeBombList[i]);
             _activeBombList.Clear();
 
-            long lostValue = 0;
             for (int i = 0; i < lostHaul.Count; i++)
             {
-                lostValue += lostHaul[i].TotalValue;
-
                 BankEntryView entry = _bombListPool.Get();
                 entry.SetEntry(_catalog.IconFor(lostHaul[i].Reward), lostHaul[i].Amount);
                 entry.transform.SetSiblingIndex(i);
@@ -95,11 +92,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _audio.PlayPopupOpen();
             _audio.PlayDefeatAmbience();
 
-            // The corner HUD shows two numbers: "cash" is the worth of the haul now on the line, "gold" is
-            // the persistent wallet a paid revive spends from.
-            int lostCash = lostValue > int.MaxValue ? int.MaxValue : (int)lostValue;
+            // The corner HUD shows the actual wallet — the same two numbers ShowCashOut shows — not a
+            // score built from the lost haul's value.
             _bomb.Show(
-                zoneReached, lostHaul.Count, lostCash, playerGold,
+                zoneReached, lostHaul.Count, playerCash, playerGold,
                 goldReviveOffered, goldReviveCost, adReviveOffered);
         }
 
@@ -112,7 +108,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _bomb.Hide();
         }
 
-        public void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared)
+        public void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared, int playerGold, int playerCash)
         {
             for (int i = 0; i < _activeList.Count; i++) _listPool.Release(_activeList[i]);
             _activeList.Clear();
@@ -134,7 +130,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
             _collect.SetChest(ChestFor(total));
             _audio.PlayPopupOpen();
-            _collect.Show(zonesCleared);
+            _collect.Show(zonesCleared, playerCash, playerGold);
         }
 
         public void HideCashOut()
@@ -145,10 +141,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _collect.Hide();
         }
 
-        public void ClaimCashOut(System.Action onComplete)
+        public void ClaimCashOut(int playerGold, int playerCash, System.Action onComplete)
         {
             _audio.PlayClaim();
-            _collect.PlayClaim(() =>
+            _collect.PlayClaim(playerCash, playerGold, () =>
             {
                 _audio.PlayPopupClose();
                 onComplete();

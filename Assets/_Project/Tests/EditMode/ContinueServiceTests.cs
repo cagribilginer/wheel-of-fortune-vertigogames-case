@@ -1,6 +1,7 @@
 using System;
 using NUnit.Framework;
 using Vertigo.Wheel.Core.Run;
+using Vertigo.Wheel.Tests.EditMode.Doubles;
 
 namespace Vertigo.Wheel.Tests.EditMode
 {
@@ -8,15 +9,15 @@ namespace Vertigo.Wheel.Tests.EditMode
     public sealed class ContinueServiceTests
     {
         private InMemorySaveService _save;
-        private GoldWallet _wallet;
+        private Wallet _wallet;
         private ContinueService _service;
 
         [SetUp]
         public void SetUp()
         {
             _save = new InMemorySaveService();
-            _wallet = new GoldWallet(_save);
-            _service = new ContinueService(_wallet, ContinueSettings.Default);
+            _wallet = new Wallet(_save);
+            _service = new ContinueService(_wallet, TestWheels.Gold, ContinueSettings.Default);
         }
 
         [TestCase(1, 0, 60)]
@@ -34,21 +35,21 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void UnaffordableGoldRevive_IsNotOffered()
         {
-            _wallet.Add(10);
+            _wallet.Add(TestWheels.Gold, 10);
             Assert.That(_service.IsGoldReviveOffered(zoneReached: 17, goldRevivesUsedThisRun: 0), Is.False);
         }
 
         [Test]
         public void AffordableGoldRevive_IsOffered()
         {
-            _wallet.Add(220);
+            _wallet.Add(TestWheels.Gold, 220);
             Assert.That(_service.IsGoldReviveOffered(zoneReached: 17, goldRevivesUsedThisRun: 0), Is.True);
         }
 
         [Test]
         public void GoldRevive_HasNoPerRunCap()
         {
-            _wallet.Add(100_000);
+            _wallet.Add(TestWheels.Gold, 100_000);
 
             Assert.That(_service.IsGoldReviveOffered(17, goldRevivesUsedThisRun: 1), Is.True);
             Assert.That(_service.IsGoldReviveOffered(17, goldRevivesUsedThisRun: 4), Is.True);
@@ -57,7 +58,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void GoldRevive_IsRefusedOnceTheDoubledPriceIsUnaffordable()
         {
-            _wallet.Add(700);   // covers 220 and 440, not the 880 third revive
+            _wallet.Add(TestWheels.Gold, 700);   // covers 220 and 440, not the 880 third revive
 
             Assert.That(_service.IsGoldReviveOffered(17, 0), Is.True);
             Assert.That(_service.IsGoldReviveOffered(17, 1), Is.True);
@@ -74,55 +75,65 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void Purchase_DebitsExactlyTheCost_IncludingTheDoubledSecond()
         {
-            _wallet.Add(1_000);
+            _wallet.Add(TestWheels.Gold, 1_000);
 
             Assert.That(_service.TryPurchase(17, 0), Is.True);
-            Assert.That(_wallet.Balance, Is.EqualTo(1_000 - 220));
+            Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.EqualTo(1_000 - 220));
 
             Assert.That(_service.TryPurchase(17, 1), Is.True, "a second gold revive is allowed");
-            Assert.That(_wallet.Balance, Is.EqualTo(1_000 - 220 - 440), "at the doubled price");
+            Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.EqualTo(1_000 - 220 - 440), "at the doubled price");
         }
 
         [Test]
         public void FailedPurchase_LeavesTheWalletUntouched()
         {
-            _wallet.Add(10);
+            _wallet.Add(TestWheels.Gold, 10);
 
             Assert.That(_service.TryPurchase(17, 0), Is.False);
-            Assert.That(_wallet.Balance, Is.EqualTo(10));
+            Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.EqualTo(10));
         }
 
         [Test]
         public void Wallet_PersistsThroughTheSaveService()
         {
-            _wallet.Add(120);
+            _wallet.Add(TestWheels.Gold, 120);
 
-            var reloaded = new GoldWallet(_save);
-            Assert.That(reloaded.Balance, Is.EqualTo(120));
+            var reloaded = new Wallet(_save);
+            Assert.That(reloaded.BalanceOf(TestWheels.Gold), Is.EqualTo(120));
         }
 
         [Test]
         public void WalletReset_ZeroesTheBalance()
         {
-            _wallet.Add(120);
-            _wallet.Reset();
+            _wallet.Add(TestWheels.Gold, 120);
+            _wallet.Reset(TestWheels.Gold);
 
-            Assert.That(_wallet.Balance, Is.Zero);
+            Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.Zero);
         }
 
         [Test]
         public void Wallet_RaisesChangedWithTheNewBalance()
         {
             int observed = -1;
-            _wallet.Changed += balance => observed = balance;
+            _wallet.Changed += (currency, balance) => observed = balance;
 
-            _wallet.Add(75);
+            _wallet.Add(TestWheels.Gold, 75);
 
             Assert.That(observed, Is.EqualTo(75));
         }
 
         [Test]
+        public void Wallet_KeepsDifferentCurrenciesSeparate()
+        {
+            _wallet.Add(TestWheels.Gold, 50);
+            _wallet.Add(TestWheels.Pistol, 5);
+
+            Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.EqualTo(50));
+            Assert.That(_wallet.BalanceOf(TestWheels.Pistol), Is.EqualTo(5));
+        }
+
+        [Test]
         public void Wallet_RejectsNegativeCredit() =>
-            Assert.Throws<ArgumentOutOfRangeException>(() => _wallet.Add(-1));
+            Assert.Throws<ArgumentOutOfRangeException>(() => _wallet.Add(TestWheels.Gold, -1));
     }
 }

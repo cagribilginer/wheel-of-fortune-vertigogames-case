@@ -1,4 +1,5 @@
 using System;
+using Vertigo.Wheel.Core.Rewards;
 using Vertigo.Wheel.Core.Run;
 using Vertigo.Wheel.Core.States;
 using Vertigo.Wheel.Core.States.Flow;
@@ -19,17 +20,20 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         private readonly RunModel _run;
         private readonly GameStateMachine _machine;
-        private readonly GoldWallet _wallet;
+        private readonly Wallet _wallet;
+        private readonly RewardId _goldCurrency;
         private readonly RewardCatalog _catalog;
         private readonly BankPresenter _bank;
         private readonly Random _rng = new Random();
 
         public DebugPresenter(
-            RunModel run, GameStateMachine machine, GoldWallet wallet, RewardCatalog catalog, BankPresenter bank)
+            RunModel run, GameStateMachine machine, Wallet wallet, RewardId goldCurrency,
+            RewardCatalog catalog, BankPresenter bank)
         {
             _run = run;
             _machine = machine;
             _wallet = wallet;
+            _goldCurrency = goldCurrency;
             _catalog = catalog;
             _bank = bank;
         }
@@ -39,7 +43,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             view.JumpToZone5Clicked += () => JumpToZone(5);
             view.JumpToZone30Clicked += () => JumpToZone(30);
             view.TriggerBombClicked += TriggerBombDefeat;
-            view.GrantGoldClicked += () => _wallet.Add(GoldGrant);
+            view.GrantGoldClicked += () => _wallet.Add(_goldCurrency, GoldGrant);
             view.GrantItemsClicked += GrantItems;
         }
 

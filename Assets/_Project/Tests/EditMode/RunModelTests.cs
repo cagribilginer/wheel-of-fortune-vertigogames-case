@@ -11,15 +11,15 @@ namespace Vertigo.Wheel.Tests.EditMode
     public sealed class RunModelTests
     {
         private InMemorySaveService _save;
-        private GoldWallet _wallet;
+        private Wallet _wallet;
         private RunModel _run;
 
         [SetUp]
         public void SetUp()
         {
             _save = new InMemorySaveService();
-            _wallet = new GoldWallet(_save);
-            _run = new RunModel(new ZoneClassifier(), _wallet, TestWheels.Gold);
+            _wallet = new Wallet(_save);
+            _run = new RunModel(new ZoneClassifier(), _wallet, TestWheels.Gold, TestWheels.Cash);
         }
 
         [Test]
@@ -75,12 +75,15 @@ namespace Vertigo.Wheel.Tests.EditMode
         /// continue that is meant to answer it.
         /// </summary>
         [Test]
-        public void Detonate_LeavesTheGoldWalletIntact()
+        public void Detonate_LeavesTheWalletIntact()
         {
-            _wallet.Add(300);
+            _wallet.Add(TestWheels.Gold, 300);
+            _wallet.Add(TestWheels.Cash, 75);
+
             _run.Detonate();
 
-            Assert.That(_wallet.Balance, Is.EqualTo(300));
+            Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.EqualTo(300));
+            Assert.That(_wallet.BalanceOf(TestWheels.Cash), Is.EqualTo(75));
         }
 
         [Test]
@@ -91,7 +94,7 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             _run.CashOut();
 
-            Assert.That(_wallet.Balance, Is.EqualTo(180));
+            Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.EqualTo(180));
             Assert.That(_run.Phase, Is.EqualTo(RunPhase.CashOut));
         }
 
@@ -101,7 +104,51 @@ namespace Vertigo.Wheel.Tests.EditMode
             _run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Pistol, 5));
             _run.CashOut();
 
-            Assert.That(_wallet.Balance, Is.Zero);
+            Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.Zero);
+        }
+
+        /// <summary>
+        /// The regression this guards: "gold"/"cash" shown anywhere in the UI must always mean the same
+        /// wallet balance. Before this, one screen computed its own haul-weighted score under the "cash"
+        /// label while another showed the actual currency amount — same name, two different numbers.
+        /// </summary>
+        [Test]
+        public void CashBalance_TracksItsOwnCurrencyIndependentlyOfGold()
+        {
+            _wallet.Add(TestWheels.Gold, 100);
+            _wallet.Add(TestWheels.Cash, 25);
+
+            Assert.That(_run.GoldBalance, Is.EqualTo(100));
+            Assert.That(_run.CashBalance, Is.EqualTo(25));
+        }
+
+        [Test]
+        public void CashOut_OnlyBanksGoldAndCash()
+        {
+            // Pistol is neither of the two wallet currencies, so it must survive the run's end without
+            // ever touching the wallet — the rest of the haul (weapons, cosmetics, chests) stays behind.
+            _run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Pistol, 999));
+            _run.CashOut();
+
+            Assert.That(_wallet.BalanceOf(TestWheels.Pistol), Is.Zero,
+                "Pistol Points are not a wallet currency, so cashing out must not bank them.");
+        }
+
+        /// <summary>
+        /// Regression for a real report: gold climbed after "Claim &amp; Leave" but cash stayed flat. The two
+        /// currencies share every step of this path (<see cref="RunModel.CashOut"/>, <see cref="Wallet"/>),
+        /// so a bank holding both must credit both — nothing here is allowed to special-case gold over cash.
+        /// </summary>
+        [Test]
+        public void CashOut_CreditsBothWalletCurrenciesFromTheSameBank()
+        {
+            _run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Gold, 40), 3);
+            _run.Grant(new SpinOutcome(2, SliceKind.Reward, TestWheels.Cash, 50), 1);
+
+            _run.CashOut();
+
+            Assert.That(_run.GoldBalance, Is.EqualTo(40), "Gold should be credited.");
+            Assert.That(_run.CashBalance, Is.EqualTo(50), "Cash should be credited too.");
         }
 
         [Test]
@@ -137,10 +184,10 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void ResetRun_PreservesTheWallet()
         {
-            _wallet.Add(90);
+            _wallet.Add(TestWheels.Gold, 90);
             _run.ResetRun();
 
-            Assert.That(_wallet.Balance, Is.EqualTo(90));
+            Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.EqualTo(90));
         }
 
         [Test]
@@ -218,8 +265,10 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void NullDependencies_Throw()
         {
-            Assert.Throws<ArgumentNullException>(() => new RunModel(null, _wallet, TestWheels.Gold));
-            Assert.Throws<ArgumentNullException>(() => new RunModel(new ZoneClassifier(), null, TestWheels.Gold));
+            Assert.Throws<ArgumentNullException>(
+                () => new RunModel(null, _wallet, TestWheels.Gold, TestWheels.Cash));
+            Assert.Throws<ArgumentNullException>(
+                () => new RunModel(new ZoneClassifier(), null, TestWheels.Gold, TestWheels.Cash));
         }
     }
 }

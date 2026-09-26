@@ -18,7 +18,7 @@ namespace Vertigo.Wheel.Tests.EditMode
     public sealed class FullRunTests
     {
         private InMemorySaveService _save;
-        private GoldWallet _wallet;
+        private Wallet _wallet;
         private RunModel _run;
         private StubBlueprintProvider _blueprints;
         private InstantPresentation _view;
@@ -27,8 +27,8 @@ namespace Vertigo.Wheel.Tests.EditMode
         private void Build(IRandomProvider random, int bombWeight = 1)
         {
             _save = new InMemorySaveService();
-            _wallet = new GoldWallet(_save);
-            _run = new RunModel(new ZoneClassifier(), _wallet, TestWheels.Gold);
+            _wallet = new Wallet(_save);
+            _run = new RunModel(new ZoneClassifier(), _wallet, TestWheels.Gold, TestWheels.Cash);
 
             _blueprints = new StubBlueprintProvider(bombIndex: 0) { BombWeight = bombWeight };
             var factory = new ZoneWheelFactory(new ZoneClassifier(), _blueprints, new LinearRewardScaling());
@@ -37,7 +37,7 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             var context = new GameContext(
                 _run, factory, new SpinService(new WeightedSliceResolver(random)),
-                new ContinueService(_wallet, ContinueSettings.Default), _view);
+                new ContinueService(_wallet, TestWheels.Gold, ContinueSettings.Default), _view);
 
             _machine = GameFlow.Build(context);
             GameFlow.Start(_machine);
@@ -144,7 +144,7 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             _machine.Confirm();
 
-            Assert.That(_wallet.Balance, Is.EqualTo(bankedGold));
+            Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.EqualTo(bankedGold));
             Assert.That(_run.CurrentZone, Is.EqualTo(1));
             Assert.That(_run.Bank.IsEmpty, Is.True);
         }

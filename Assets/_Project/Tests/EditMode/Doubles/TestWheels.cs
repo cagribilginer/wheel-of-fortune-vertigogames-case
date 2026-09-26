@@ -10,6 +10,7 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
         public static readonly RewardId Pistol = new RewardId("pistol_points");
         public static readonly RewardId Rifle = new RewardId("rifle_points");
         public static readonly RewardId Gold = new RewardId("gold");
+        public static readonly RewardId Cash = new RewardId("cash");
 
         /// <summary>Seven reward slices plus one bomb at <paramref name="bombIndex"/>, all weight 1.</summary>
         public static WheelModel NormalWheel(int bombIndex = 0, int amount = 10)

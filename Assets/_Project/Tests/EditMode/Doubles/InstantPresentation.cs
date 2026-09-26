@@ -37,10 +37,15 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
         public int GameOverZoneShown { get; private set; }
         public bool AdReviveOffered { get; private set; }
         public int PlayerGoldShown { get; private set; }
+        public int PlayerCashShown { get; private set; }
         public List<BankEntry> LostHaulShown { get; } = new List<BankEntry>();
 
         public bool CashOutVisible { get; private set; }
         public int CashOutZonesCleared { get; private set; }
+        public int CashOutGoldShown { get; private set; }
+        public int CashOutCashShown { get; private set; }
+        public int ClaimGoldShown { get; private set; }
+        public int ClaimCashShown { get; private set; }
         public List<BankEntry> CashOutHaul { get; } = new List<BankEntry>();
 
         public bool GiveUpConfirmVisible { get; private set; }
@@ -84,7 +89,7 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
         }
 
         public virtual void ShowGameOver(
-            int zoneReached, IReadOnlyList<BankEntry> lostHaul, int playerGold,
+            int zoneReached, IReadOnlyList<BankEntry> lostHaul, int playerGold, int playerCash,
             bool goldReviveOffered, int goldReviveCost, bool adReviveOffered)
         {
             GameOverVisible = true;
@@ -93,6 +98,7 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             ContinueCostShown = goldReviveCost;
             AdReviveOffered = adReviveOffered;
             PlayerGoldShown = playerGold;
+            PlayerCashShown = playerCash;
 
             LostHaulShown.Clear();
             for (int i = 0; i < lostHaul.Count; i++) LostHaulShown.Add(lostHaul[i]);
@@ -100,19 +106,23 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
 
         public virtual void HideGameOver() => GameOverVisible = false;
 
-        public virtual void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared)
+        public virtual void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared, int playerGold, int playerCash)
         {
             CashOutVisible = true;
             CashOutZonesCleared = zonesCleared;
+            CashOutGoldShown = playerGold;
+            CashOutCashShown = playerCash;
             CashOutHaul.Clear();
             for (int i = 0; i < haul.Count; i++) CashOutHaul.Add(haul[i]);
         }
 
         public virtual void HideCashOut() => CashOutVisible = false;
 
-        public virtual void ClaimCashOut(Action onComplete)
+        public virtual void ClaimCashOut(int playerGold, int playerCash, Action onComplete)
         {
             CashOutVisible = false;
+            ClaimGoldShown = playerGold;
+            ClaimCashShown = playerCash;
             onComplete?.Invoke();
         }
 

@@ -22,7 +22,8 @@ namespace Vertigo.Wheel.Core.States.Flow
             Context.Presentation.ShowGameOver(
                 zoneReached,
                 Context.Run.LostHaul,
-                Context.Run.WalletBalance,
+                Context.Run.GoldBalance,
+                Context.Run.CashBalance,
                 Context.ContinueService.IsGoldReviveOffered(zoneReached, goldUsed),
                 Context.ContinueService.CostFor(zoneReached, goldUsed),
                 Context.ContinueService.IsAdReviveOffered(adUsed));

@@ -1,4 +1,5 @@
 using System;
+using Vertigo.Wheel.Core.Rewards;
 
 namespace Vertigo.Wheel.Core.Run
 {
@@ -16,12 +17,14 @@ namespace Vertigo.Wheel.Core.Run
         // Guards the doubling shift from overflowing a long before the int clamp in CostFor catches it.
         private const int MaxDoublingShift = 40;
 
-        private readonly GoldWallet _wallet;
+        private readonly Wallet _wallet;
+        private readonly RewardId _currency;
         private readonly ContinueSettings _settings;
 
-        public ContinueService(GoldWallet wallet, ContinueSettings settings)
+        public ContinueService(Wallet wallet, RewardId currency, ContinueSettings settings)
         {
             _wallet = wallet ?? throw new ArgumentNullException(nameof(wallet));
+            _currency = currency;
             _settings = settings;
         }
 
@@ -47,7 +50,7 @@ namespace Vertigo.Wheel.Core.Run
         /// no per-run limit on it.
         /// </summary>
         public bool IsGoldReviveOffered(int zoneReached, int goldRevivesUsedThisRun) =>
-            _wallet.CanAfford(CostFor(zoneReached, goldRevivesUsedThisRun));
+            _wallet.CanAfford(_currency, CostFor(zoneReached, goldRevivesUsedThisRun));
 
         /// <summary>
         /// The ad revive is the one free escape, capped per run (default once). No wallet check — watching
@@ -61,7 +64,7 @@ namespace Vertigo.Wheel.Core.Run
         {
             if (!IsGoldReviveOffered(zoneReached, goldRevivesUsedThisRun)) return false;
 
-            return _wallet.TrySpend(CostFor(zoneReached, goldRevivesUsedThisRun));
+            return _wallet.TrySpend(_currency, CostFor(zoneReached, goldRevivesUsedThisRun));
         }
     }
 }

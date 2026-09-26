@@ -3,7 +3,7 @@ using Vertigo.Wheel.Core.Run;
 
 namespace Vertigo.Wheel.Data.Services
 {
-    /// <summary>Player-side <see cref="ISaveService"/>. The gold wallet is the only thing that persists.</summary>
+    /// <summary>Player-side <see cref="ISaveService"/>. The wallet is the only thing that persists.</summary>
     public sealed class PlayerPrefsSaveService : ISaveService
     {
         public int GetInt(string key, int defaultValue = 0) => PlayerPrefs.GetInt(key, defaultValue);

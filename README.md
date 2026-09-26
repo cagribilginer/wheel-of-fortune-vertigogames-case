@@ -21,7 +21,7 @@ Each run starts on **Zone 1** (always safe) and moves one zone at a time:
 | **Spin** | Weighted random slice on the current zone's wheel. Grants a reward, or detonates a bomb. |
 | **Bank** | Rewards accumulate per-run, stacked by id. This is what a bomb takes. |
 | **Zone type** | `Normal` carries a bomb; `Safe` (zone 1, then every _N_) and `Super` (every _M_) are bomb-free and pay more. |
-| **Cash out** | Leave at any idle zone with a non-empty bank. Banked gold converts to the persistent wallet — the only way the wallet ever grows. |
+| **Cash out** | Leave at any idle zone with a non-empty bank. Banked gold and cash convert to the persistent wallet — the only way either balance ever grows. |
 | **Bomb** | The whole bank is lost and the run ends — but the lost haul is snapshotted first (see §4). |
 | **Revive** | Gold revive: uncapped, price doubles per use in a run. Ad revive: one free per run. Either restores the snapshotted haul. |
 
@@ -45,13 +45,13 @@ scene, a camera, or the UI assembly.
 
 ### MVP with a hard Core/Presentation seam
 
-- **Model** — `RunModel`, `RewardBank`, `GoldWallet`, `ZoneClassifier`, `ContinueService`,
+- **Model** — `RunModel`, `RewardBank`, `Wallet`, `ZoneClassifier`, `ContinueService`,
   `CashOutPolicy`. All pure logic.
-- **View** — `HeaderView`, `WheelView`, `BankView`, `BombPopupView`, … Each derives from
+- **View** — `WheelView`, `BankView`, `BombPopupView`, `CollectPopupView`, … Each derives from
   `UIViewBase` and wires its own child references **by GameObject name** (`Bind(ref field,
   "ui_node_name")`) — no dragging references in the Inspector, no `FindObjectOfType`.
 - **Presenter** — `ScreenPresentation` composed of per-region presenters (`WheelPresenter`,
-  `BankPresenter`, `PopupPresenter`, `HeaderPresenter`, `AudioPresenter`, …). Presenters own all
+  `BankPresenter`, `PopupPresenter`, `AudioPresenter`, …). Presenters own all
   Unity/DOTween/animation concerns.
 
 The seam between Core and Presentation is the **`IWheelPresentation`** interface. It contains no
@@ -142,7 +142,7 @@ sequence of `Bank.Add` calls, not a special path.
 
 `CashOutState.Enter` shows the summary and commits **nothing**. `OnCancelled` drops the player
 straight back onto the wheel with the haul intact. Only `OnConfirmed` runs `RunModel.CashOut()`
-(the one place banked gold enters the wallet), plays the claim celebration, and — once it
+(the one place banked gold and cash enter the wallet), plays the claim celebration, and — once it
 finishes — resets the run.
 
 ### `CashOutPolicy`
@@ -196,8 +196,9 @@ else is proven faster in EditMode; this proves the composition root itself.
 - **DOTween pipelines** — wheel spin easing, chest `DOPunchScale` on claim, popup open/close
   scale+fade (`PopupViewBase`), reward tiles flying from the wheel slot into their bank cell
   (`BankPresenter.FlyIn`), the red bomb-alert vignette yoyo.
-- **Dynamic counters** — `HeaderView` counts the gold value up smoothly (`DOVirtual.Int`,
-  `Ease.OutCubic`) instead of snapping; the claim flow animates the wallet to its new total.
+- **Dynamic counters** — `CollectPopupView`'s cash/gold row counts up smoothly (`CountingLabel`,
+  `DOVirtual.Int`, `Ease.OutCubic`) instead of snapping; the claim flow animates it to the wallet's
+  new post-claim totals.
 - **Milestone UI** — Safe / Super badges on the zone bar open a preview modal showing that band's
   wheel tier and reward slots.
 - **Responsive layout** — `SafeAreaFitter` on the gameplay and popup layers keeps content clear of
