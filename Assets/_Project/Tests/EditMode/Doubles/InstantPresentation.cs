@@ -24,7 +24,6 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
 
         public bool CanSpin { get; private set; }
         public bool CanLeave { get; private set; }
-        public bool CanGiveUp { get; private set; }
 
         public int SpinsPlayed { get; private set; }
         public int LastSlotIndex { get; private set; } = -1;
@@ -48,9 +47,6 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
         public int ClaimCashShown { get; private set; }
         public List<BankEntry> CashOutHaul { get; } = new List<BankEntry>();
 
-        public bool GiveUpConfirmVisible { get; private set; }
-        public int GiveUpRewardsAtStake { get; private set; }
-
         public virtual void ShowZone(int zone, ZoneType zoneType, WheelModel wheel, Action onComplete)
         {
             ZonesShown++;
@@ -60,11 +56,10 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             onComplete?.Invoke();
         }
 
-        public virtual void SetInputState(bool canSpin, bool canLeave, bool canGiveUp)
+        public virtual void SetInputState(bool canSpin, bool canLeave)
         {
             CanSpin = canSpin;
             CanLeave = canLeave;
-            CanGiveUp = canGiveUp;
         }
 
         public virtual void PlaySpin(int slotIndex, Action onComplete)
@@ -126,12 +121,5 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             onComplete?.Invoke();
         }
 
-        public virtual void ShowGiveUpConfirm(int rewardsAtStake)
-        {
-            GiveUpConfirmVisible = true;
-            GiveUpRewardsAtStake = rewardsAtStake;
-        }
-
-        public virtual void HideGiveUpConfirm() => GiveUpConfirmVisible = false;
     }
 }

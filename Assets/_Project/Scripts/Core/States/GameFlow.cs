@@ -22,7 +22,6 @@ namespace Vertigo.Wheel.Core.States
             machine.Register(new BombHitState(context));
             machine.Register(new GameOverState(context));
             machine.Register(new CashOutState(context));
-            machine.Register(new GiveUpConfirmState(context));
 
             return machine;
         }

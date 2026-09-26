@@ -19,12 +19,11 @@ namespace Vertigo.Wheel.Core.States.Flow
             Context.Run.Phase = RunPhase.Idle;
             Context.Presentation.SetInputState(
                 canSpin: Context.Run.CanSpin,
-                canLeave: Context.Run.CanLeave,
-                canGiveUp: Context.Run.CanGiveUp);
+                canLeave: Context.Run.CanLeave);
         }
 
         public override void Exit() =>
-            Context.Presentation.SetInputState(canSpin: false, canLeave: false, canGiveUp: false);
+            Context.Presentation.SetInputState(canSpin: false, canLeave: false);
 
         public override void OnSpinRequested()
         {
@@ -38,17 +37,9 @@ namespace Vertigo.Wheel.Core.States.Flow
             Machine.Change<CashOutState>();
         }
 
-        public override void OnGiveUpRequested()
-        {
-            if (!Context.Run.CanGiveUp) return;
-            Machine.Change<GiveUpConfirmState>();
-        }
-
         /// <summary>
         /// The single EXIT button's action: walk away with the haul. Legal from any zone now — the only
-        /// precondition is an idle wheel with something banked, which <see cref="RunModel.CanLeave"/>
-        /// checks. The bank-forfeiting give-up confirm is still modelled (<see cref="GiveUpConfirmState"/>)
-        /// but no longer reachable from this button.
+        /// precondition is an idle wheel with something banked, which <see cref="RunModel.CanLeave"/> checks.
         /// </summary>
         public override void OnExitRequested()
         {

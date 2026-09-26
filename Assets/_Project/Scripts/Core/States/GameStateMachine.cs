@@ -65,7 +65,6 @@ namespace Vertigo.Wheel.Core.States
         // Input surface. Each call is forwarded to the current state, which ignores what it does not accept.
         public void RequestSpin() => Current?.OnSpinRequested();
         public void RequestLeave() => Current?.OnLeaveRequested();
-        public void RequestGiveUp() => Current?.OnGiveUpRequested();
         public void RequestExit() => Current?.OnExitRequested();
         public void Confirm() => Current?.OnConfirmed();
         public void Cancel() => Current?.OnCancelled();

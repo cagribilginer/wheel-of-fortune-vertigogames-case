@@ -10,7 +10,7 @@ using Vertigo.Wheel.UI.Views.Popups;
 
 namespace Vertigo.Wheel.Gameplay.Presenters
 {
-    /// <summary>Bomb, cash-out and give-up-confirm popups: population, chest sizing, and input forwarding.</summary>
+    /// <summary>Bomb and cash-out popups: population, chest sizing, and input forwarding.</summary>
     public sealed class PopupPresenter
     {
         // Ascending by total haul value; the highest tier at or below the total wins. Reuses the chest
@@ -26,7 +26,6 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         private readonly BombPopupView _bomb;
         private readonly CollectPopupView _collect;
-        private readonly GiveUpConfirmPopupView _giveUp;
         private readonly RewardCatalog _catalog;
         private readonly AudioPresenter _audio;
         private readonly ObjectPool<BankEntryView> _listPool;
@@ -35,12 +34,11 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly List<BankEntryView> _activeBombList = new List<BankEntryView>();
 
         public PopupPresenter(
-            BombPopupView bomb, CollectPopupView collect, GiveUpConfirmPopupView giveUp,
+            BombPopupView bomb, CollectPopupView collect,
             BankEntryView entryPrefab, RewardCatalog catalog, AudioPresenter audio)
         {
             _bomb = bomb;
             _collect = collect;
-            _giveUp = giveUp;
             _catalog = catalog;
             _audio = audio;
 
@@ -66,8 +64,6 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _bomb.AdContinueClicked += machine.RequestAdContinue;
             _collect.ConfirmClicked += machine.Confirm;
             _collect.CancelClicked += machine.Cancel;
-            _giveUp.ConfirmClicked += machine.Confirm;
-            _giveUp.CancelClicked += machine.Cancel;
         }
 
         public void ShowGameOver(
@@ -149,18 +145,6 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 _audio.PlayPopupClose();
                 onComplete();
             });
-        }
-
-        public void ShowGiveUpConfirm(int rewardsAtStake)
-        {
-            _audio.PlayPopupOpen();
-            _giveUp.Show(rewardsAtStake);
-        }
-
-        public void HideGiveUpConfirm()
-        {
-            _audio.PlayPopupClose();
-            _giveUp.Hide();
         }
 
         private Sprite ChestFor(long totalValue)

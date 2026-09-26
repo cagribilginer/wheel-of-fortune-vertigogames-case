@@ -152,20 +152,6 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void GiveUp_ForfeitsTheHaul()
-        {
-            _run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Pistol, 60));
-
-            RunEndReason? reason = null;
-            _run.RunEnded += r => reason = r;
-
-            _run.GiveUp();
-
-            Assert.That(_run.Bank.IsEmpty, Is.True);
-            Assert.That(reason, Is.EqualTo(RunEndReason.GaveUp));
-        }
-
-        [Test]
         public void ResetRun_ReturnsToZoneOneWithAnEmptyBank()
         {
             _run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Pistol, 10));

@@ -94,8 +94,6 @@ namespace Vertigo.Wheel.Core.Run
 
         public bool CanLeave => CashOutPolicy.CanLeave(_phase, !Bank.IsEmpty, CurrentZoneType);
 
-        public bool CanGiveUp => CashOutPolicy.CanGiveUp(_phase);
-
         /// <summary>Banks a non-bomb spin result.</summary>
         public void Grant(SpinOutcome outcome, int unitValue = 1)
         {
@@ -191,14 +189,6 @@ namespace Vertigo.Wheel.Core.Run
 
             Phase = RunPhase.CashOut;
             RunEnded?.Invoke(RunEndReason.CashedOut);
-        }
-
-        /// <summary>Abandon the run from a risky zone, forfeiting the haul.</summary>
-        public void GiveUp()
-        {
-            Bank.Clear();
-            Phase = RunPhase.GameOver;
-            RunEnded?.Invoke(RunEndReason.GaveUp);
         }
 
         /// <summary>Back to zone 1 with an empty bank. This is what "restart" means.</summary>

@@ -71,7 +71,7 @@ namespace Vertigo.Wheel.Editor
             BankView bankView = BuildBank(sidePanel, bankEntryPrefab);
             ActionBarView actionBarView = BuildActions(sidePanel);
 
-            (BombPopupView bombView, CollectPopupView collectView, GiveUpConfirmPopupView giveUpView,
+            (BombPopupView bombView, CollectPopupView collectView,
                 MilestonePreviewPopupView milestoneView) = BuildPopupLayer(canvasRoot, bankEntryPrefab);
             VfxView vfxView = BuildVfxLayer(canvasRoot);
             // Inside the safe-area node, not the raw canvas, so the cheat bar clears rounded corners, the
@@ -79,7 +79,7 @@ namespace Vertigo.Wheel.Editor
             DebugOverlayView debugView = BuildDebugOverlay(safeArea);
 
             BuildGameInstaller(canvasRoot, wheelView, zoneMapView, bankView, actionBarView,
-                bombView, collectView, giveUpView, milestoneView, vfxView, debugView, tilePrefab, bankEntryPrefab);
+                bombView, collectView, milestoneView, vfxView, debugView, tilePrefab, bankEntryPrefab);
 
             EnsureFolder(Path.GetDirectoryName(ScenePath).Replace('\\', '/'));
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -95,13 +95,13 @@ namespace Vertigo.Wheel.Editor
         private static void BuildGameInstaller(
             RectTransform canvasRoot, WheelView wheel, ZoneMapView zoneMap, BankView bank,
             ActionBarView actionBar, BombPopupView bombPopup, CollectPopupView collectPopup,
-            GiveUpConfirmPopupView giveUpPopup, MilestonePreviewPopupView milestonePopup, VfxView vfx,
+            MilestonePreviewPopupView milestonePopup, VfxView vfx,
             DebugOverlayView debugOverlay, ZoneMapTileView tilePrefab, BankEntryView bankEntryPrefab)
         {
             var installer = new GameObject("GameInstaller").AddComponent<GameInstaller>();
             Sprite bombIcon = EditorSpriteUtility.FindSprite("ui_card_icon_death");
 
-            installer.Configure(wheel, zoneMap, bank, actionBar, bombPopup, collectPopup, giveUpPopup,
+            installer.Configure(wheel, zoneMap, bank, actionBar, bombPopup, collectPopup,
                 milestonePopup, vfx, debugOverlay, tilePrefab, bankEntryPrefab, canvasRoot, bombIcon);
         }
 
@@ -600,7 +600,7 @@ namespace Vertigo.Wheel.Editor
 
         // ------------------------------------------------------------------ popups
 
-        private static (BombPopupView, CollectPopupView, GiveUpConfirmPopupView, MilestonePreviewPopupView)
+        private static (BombPopupView, CollectPopupView, MilestonePreviewPopupView)
             BuildPopupLayer(RectTransform canvasRoot, BankEntryView bankEntryPrefab)
         {
             RectTransform layer = NewNode("ui_panel_popup_layer", canvasRoot);
@@ -616,10 +616,9 @@ namespace Vertigo.Wheel.Editor
 
             BombPopupView bombView = BuildBombPopup(layer);
             CollectPopupView collectView = BuildCollectPopup(layer, bankEntryPrefab);
-            GiveUpConfirmPopupView giveUpView = BuildGiveUpConfirmPopup(layer);
             MilestonePreviewPopupView milestoneView = BuildMilestonePreviewPopup(layer);
 
-            return (bombView, collectView, giveUpView, milestoneView);
+            return (bombView, collectView, milestoneView);
         }
 
         private static BombPopupView BuildBombPopup(RectTransform layer)
@@ -1079,52 +1078,6 @@ namespace Vertigo.Wheel.Editor
             collectView.RebindReferences();
             root.gameObject.SetActive(false);
             return collectView;
-        }
-
-        private static GiveUpConfirmPopupView BuildGiveUpConfirmPopup(RectTransform layer)
-        {
-            RectTransform root = NewNode("ui_popup_confirm_giveup", layer);
-            Stretch(root, 0, 0, 0, 0);
-
-            Image backdrop = AddImage(NewNode("ui_image_popup_confirm_giveup_backdrop", root), null);
-            backdrop.color = new Color(0f, 0f, 0f, 0.82f);
-            backdrop.raycastTarget = true;
-            // Bleeds past the popup layer's safe-area inset so the dim always covers the full screen edge.
-            Stretch((RectTransform)backdrop.transform, -140, -140, -140, -140);
-
-            RectTransform anim = NewNode("ui_transform_popup_confirm_giveup_anim", root);
-            FixedCentered(anim, Vector2.zero, new Vector2(820f, 420f));
-
-            Image frame = AddImage(NewNode("ui_image_popup_confirm_giveup_frame", anim), "ui_card_frame_12px_neutral");
-            frame.type = Image.Type.Sliced;
-            Stretch((RectTransform)frame.transform, 0, 0, 0, 0);
-
-            TextMeshProUGUI title = AddText(NewNode("ui_text_popup_confirm_giveup_title", anim), "Give up this run?", 34f);
-            title.alignment = TextAlignmentOptions.Center;
-            FixedCentered((RectTransform)title.transform, new Vector2(0, 110), new Vector2(700, 50));
-
-            TextMeshProUGUI body = AddText(NewNode("ui_text_popup_confirm_giveup_body_value", anim), "You will lose 6 rewards.", 26f);
-            body.alignment = TextAlignmentOptions.Center;
-            FixedCentered((RectTransform)body.transform, new Vector2(0, 40), new Vector2(700, 40));
-
-            BuildPopupButton(anim, "ui_button_popup_confirm_giveup_yes", "ui_transform_popup_confirm_giveup_yes_anim",
-                "UI_button_orange_standard", pivotX: 1f, anchoredX: -20f, anchoredY: -130f,
-                animOut: out RectTransform yesAnim);
-            TextMeshProUGUI yesText = AddText(NewNode("ui_text_popup_confirm_giveup_yes_value", yesAnim), "GIVE UP", 26f);
-            yesText.alignment = TextAlignmentOptions.Center;
-            Stretch((RectTransform)yesText.transform, 0, 0, 0, 0);
-
-            BuildPopupButton(anim, "ui_button_popup_confirm_giveup_no", "ui_transform_popup_confirm_giveup_no_anim",
-                "UI_button_grey_standard", pivotX: 0f, anchoredX: 20f, anchoredY: -130f,
-                animOut: out RectTransform noAnim);
-            TextMeshProUGUI noText = AddText(NewNode("ui_text_popup_confirm_giveup_no_value", noAnim), "CANCEL", 26f);
-            noText.alignment = TextAlignmentOptions.Center;
-            Stretch((RectTransform)noText.transform, 0, 0, 0, 0);
-
-            var giveUpView = root.gameObject.AddComponent<GiveUpConfirmPopupView>();
-            giveUpView.RebindReferences();
-            root.gameObject.SetActive(false);
-            return giveUpView;
         }
 
         /// <summary>

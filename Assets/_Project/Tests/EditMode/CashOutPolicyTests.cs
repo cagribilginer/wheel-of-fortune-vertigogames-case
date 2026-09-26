@@ -36,11 +36,5 @@ namespace Vertigo.Wheel.Tests.EditMode
         [TestCase(RunPhase.GameOver, false)]
         public void Spinning_IsOnlyAllowedWhenIdle(RunPhase phase, bool expected) =>
             Assert.That(CashOutPolicy.CanSpin(phase), Is.EqualTo(expected));
-
-        /// <summary>Giving up is available on any idle zone — unlike collecting, it costs the haul.</summary>
-        [TestCase(RunPhase.Idle, true)]
-        [TestCase(RunPhase.Spinning, false)]
-        public void GivingUp_IsAllowedOnAnyIdleZone(RunPhase phase, bool expected) =>
-            Assert.That(CashOutPolicy.CanGiveUp(phase), Is.EqualTo(expected));
     }
 }

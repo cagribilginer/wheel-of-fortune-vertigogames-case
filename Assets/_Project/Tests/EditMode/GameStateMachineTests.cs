@@ -181,34 +181,6 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void GiveUp_ForfeitsTheHaulAndRestarts()
-        {
-            _machine.RequestSpin();
-            _machine.RequestGiveUp();
-
-            Assert.That(_machine.IsIn<GiveUpConfirmState>(), Is.True);
-            Assert.That(_view.GiveUpConfirmVisible, Is.True);
-
-            _machine.Confirm();
-
-            Assert.That(_run.CurrentZone, Is.EqualTo(1));
-            Assert.That(_run.Bank.IsEmpty, Is.True);
-            Assert.That(_view.GiveUpConfirmVisible, Is.False);
-        }
-
-        [Test]
-        public void CancellingGiveUp_ReturnsToIdleWithTheHaulIntact()
-        {
-            _machine.RequestSpin();
-            _machine.RequestGiveUp();
-            _machine.Cancel();
-
-            Assert.That(_machine.IsIn<IdleState>(), Is.True);
-            Assert.That(_run.Bank.IsEmpty, Is.False, "the haul survives a cancelled give-up");
-            Assert.That(_run.CurrentZone, Is.EqualTo(2));
-        }
-
-        [Test]
         public void ContinueIsNotOfferedWithAnEmptyWallet()
         {
             AdvanceToZone(2);                             // zone 1 is safe; the bomb only bites from zone 2
@@ -317,7 +289,6 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             machine.RequestSpin();
             machine.RequestLeave();
-            machine.RequestGiveUp();
 
             Assert.That(machine.IsIn<SpinningState>(), Is.True, "No input may be honoured mid-spin.");
             Assert.That(blocking.SpinCalls, Is.EqualTo(1), "A second spin must not have been started.");

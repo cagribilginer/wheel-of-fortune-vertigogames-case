@@ -60,10 +60,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 wheel, ThemeFor(wheel.Tier), () => _zoneMap.ShowZone(zone, onComplete));
         }
 
-        public void SetInputState(bool canSpin, bool canLeave, bool canGiveUp)
+        public void SetInputState(bool canSpin, bool canLeave)
         {
             _wheel.SetInteractable(canSpin);
-            _actionBar.SetInputState(canLeave, canGiveUp);
+            _actionBar.SetInputState(canLeave);
         }
 
         public void PlaySpin(int slotIndex, Action onComplete) => _wheel.PlaySpin(slotIndex, onComplete);
@@ -119,10 +119,6 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void ClaimCashOut(int playerGold, int playerCash, Action onComplete) =>
             _popups.ClaimCashOut(playerGold, playerCash, onComplete);
-
-        public void ShowGiveUpConfirm(int rewardsAtStake) => _popups.ShowGiveUpConfirm(rewardsAtStake);
-
-        public void HideGiveUpConfirm() => _popups.HideGiveUpConfirm();
 
         private WheelThemeConfig ThemeFor(WheelTier tier)
         {

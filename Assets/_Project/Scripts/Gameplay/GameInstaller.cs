@@ -31,7 +31,6 @@ namespace Vertigo.Wheel.Gameplay
         [SerializeField] private ActionBarView _actionBar;
         [SerializeField] private BombPopupView _bombPopup;
         [SerializeField] private CollectPopupView _collectPopup;
-        [SerializeField] private GiveUpConfirmPopupView _giveUpPopup;
         [SerializeField] private MilestonePreviewPopupView _milestonePopup;
         [SerializeField] private VfxView _vfx;
         [SerializeField] private DebugOverlayView _debugOverlay;
@@ -53,7 +52,7 @@ namespace Vertigo.Wheel.Gameplay
         /// <summary>Called once by the editor scene-build step; never touched by hand.</summary>
         public void Configure(
             WheelView wheel, ZoneMapView zoneMap, BankView bank, ActionBarView actionBar,
-            BombPopupView bombPopup, CollectPopupView collectPopup, GiveUpConfirmPopupView giveUpPopup,
+            BombPopupView bombPopup, CollectPopupView collectPopup,
             MilestonePreviewPopupView milestonePopup, VfxView vfx, DebugOverlayView debugOverlay,
             ZoneMapTileView zoneMapTilePrefab, BankEntryView bankEntryPrefab, Transform flightLayer,
             Sprite bombSlotIcon)
@@ -64,7 +63,6 @@ namespace Vertigo.Wheel.Gameplay
             _actionBar = actionBar;
             _bombPopup = bombPopup;
             _collectPopup = collectPopup;
-            _giveUpPopup = giveUpPopup;
             _milestonePopup = milestonePopup;
             _vfx = vfx;
             _debugOverlay = debugOverlay;
@@ -115,7 +113,7 @@ namespace Vertigo.Wheel.Gameplay
                 _bank, _bankEntryPrefab, catalog, runModel.Bank, _flightLayer, audioPresenter);
             var actionBarPresenter = new ActionBarPresenter(_actionBar);
             var popupPresenter = new PopupPresenter(
-                _bombPopup, _collectPopup, _giveUpPopup, _bankEntryPrefab, catalog, audioPresenter);
+                _bombPopup, _collectPopup, _bankEntryPrefab, catalog, audioPresenter);
             var vfxPresenter = new VfxPresenter(_vfx);
 
             var presentation = new ScreenPresentation(

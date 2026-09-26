@@ -7,9 +7,6 @@ namespace Vertigo.Wheel.Core.Run
         Bomb = 0,
 
         /// <summary>Walked away from a safe or super zone. The haul was kept.</summary>
-        CashedOut = 1,
-
-        /// <summary>Abandoned voluntarily from a risky zone. The haul was forfeited.</summary>
-        GaveUp = 2
+        CashedOut = 1
     }
 }

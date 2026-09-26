@@ -62,15 +62,14 @@ headlessly (see §5).
 ### Finite state machine
 
 `GameStateMachine` drains a queue of state changes and forwards a fixed input surface
-(`RequestSpin`, `RequestLeave`, `RequestGiveUp`, `Confirm`, `Cancel`, `RequestContinue`,
+(`RequestSpin`, `RequestLeave`, `Confirm`, `Cancel`, `RequestContinue`,
 `RequestAdContinue`, `RequestRestart`) to the current state, which ignores what it does not accept.
 
 ```
 BootState → ZoneSetupState → IdleState ⇄ SpinningState → ResolvingState → RewardGrantedState
                                 │                              │
                                 │                              └→ BombHitState → GameOverState
-                                ├→ CashOutState (confirm/cancel)
-                                └→ GiveUpConfirmState (modelled, not wired to a button)
+                                └→ CashOutState (confirm/cancel)
 ```
 
 `IdleState` is the only state that accepts player input, and it asks `RunModel` /

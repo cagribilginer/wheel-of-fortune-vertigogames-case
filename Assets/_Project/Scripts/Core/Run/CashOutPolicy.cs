@@ -18,12 +18,6 @@ namespace Vertigo.Wheel.Core.Run
         public static bool CanLeave(RunPhase phase, bool bankHasRewards, ZoneType zoneType) =>
             phase == RunPhase.Idle && bankHasRewards && (zoneType == ZoneType.Safe || zoneType == ZoneType.Super);
 
-        /// <summary>
-        /// Giving up is allowed in any idle zone — it is the "I am in a bad spot" exit — but unlike
-        /// collecting it forfeits the bank, so it is never a free reroll.
-        /// </summary>
-        public static bool CanGiveUp(RunPhase phase) => phase == RunPhase.Idle;
-
         public static bool CanSpin(RunPhase phase) => phase == RunPhase.Idle;
     }
 }

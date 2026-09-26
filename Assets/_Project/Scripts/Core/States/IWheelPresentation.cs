@@ -20,7 +20,7 @@ namespace Vertigo.Wheel.Core.States
         void ShowZone(int zone, ZoneType zoneType, WheelModel wheel, Action onComplete);
 
         /// <summary>Mirrors the current input legality onto the buttons. Never decides it.</summary>
-        void SetInputState(bool canSpin, bool canLeave, bool canGiveUp);
+        void SetInputState(bool canSpin, bool canLeave);
 
         /// <summary>Rotates the wheel to a slot the logic has already committed to.</summary>
         void PlaySpin(int slotIndex, Action onComplete);
@@ -66,8 +66,5 @@ namespace Vertigo.Wheel.Core.States
         /// resets the run.
         /// </summary>
         void ClaimCashOut(int playerGold, int playerCash, Action onComplete);
-
-        void ShowGiveUpConfirm(int rewardsAtStake);
-        void HideGiveUpConfirm();
     }
 }
