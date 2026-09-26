@@ -30,7 +30,13 @@ namespace Vertigo.Wheel.Data.Configs
             return _byId.TryGetValue(id, out RewardDefinition definition) ? definition : null;
         }
 
-        public Sprite IconFor(RewardId id) => Find(id)?.Icon;
+        // Not "?.": that null-conditional skips Unity's overloaded null check, so a destroyed-but-not-
+        // collected ScriptableObject would read as non-null here and fail on the property access instead.
+        public Sprite IconFor(RewardId id)
+        {
+            RewardDefinition definition = Find(id);
+            return definition != null ? definition.Icon : null;
+        }
 
         private void EnsureIndex()
         {

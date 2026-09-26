@@ -153,7 +153,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             for (int i = 0; i < ChestTiers.Length; i++)
                 if (totalValue >= ChestTiers[i].Value) id = ChestTiers[i].RewardId;
 
-            return _catalog.Find(id)?.Icon;
+            // Not "?.": that null-conditional skips Unity's overloaded null check, so a destroyed-but-not-
+            // collected ScriptableObject would read as non-null here and fail on the property access instead.
+            RewardDefinition definition = _catalog.Find(id);
+            return definition != null ? definition.Icon : null;
         }
     }
 }

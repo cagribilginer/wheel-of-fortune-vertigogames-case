@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using Vertigo.Wheel.Core.Run;
 
-namespace Vertigo.Wheel.Core.Run
+namespace Vertigo.Wheel.Tests.EditMode.Doubles
 {
-    /// <summary>Non-persistent <see cref="ISaveService"/> for unit tests and editor previews.</summary>
+    /// <summary>Non-persistent <see cref="ISaveService"/> double, so a test's wallet never touches PlayerPrefs.</summary>
     public sealed class InMemorySaveService : ISaveService
     {
         private readonly Dictionary<string, int> _values = new Dictionary<string, int>();
