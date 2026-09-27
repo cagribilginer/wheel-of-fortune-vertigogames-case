@@ -40,9 +40,15 @@ namespace Vertigo.Wheel.UI.Views
             _rect = (RectTransform)transform;
         }
 
-        protected override void OnEnable() => _dirty = true;
+        protected override void OnEnable()
+        {
+            _dirty = true;
+        }
 
-        protected override void OnRectTransformDimensionsChange() => _dirty = true;
+        protected override void OnRectTransformDimensionsChange()
+        {
+            _dirty = true;
+        }
 
         private void Update()
         {

@@ -18,7 +18,10 @@ namespace Vertigo.Wheel.UI.Views
         [SerializeField] private Image _ui_image_zonemap_tile_marker_value;
         [SerializeField] private TextMeshProUGUI _ui_text_zonemap_tile_number_value;
 
-        public RectTransform Rect => (RectTransform)transform;
+        public RectTransform Rect
+        {
+            get { return (RectTransform)transform; }
+        }
 
         protected override void CacheReferences()
         {
@@ -26,7 +29,10 @@ namespace Vertigo.Wheel.UI.Views
             Bind(ref _ui_text_zonemap_tile_number_value, "ui_text_zonemap_tile_number_value");
         }
 
-        public void SetZoneNumber(int zone) => _ui_text_zonemap_tile_number_value.SetText("{0}", zone);
+        public void SetZoneNumber(int zone)
+        {
+            _ui_text_zonemap_tile_number_value.SetText("{0}", zone);
+        }
 
         /// <summary>A passed (or upcoming) zone: no marker, just the number in the presenter's colour/weight.</summary>
         public void SetPlain(Color numberColor, bool bold)

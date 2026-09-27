@@ -72,7 +72,10 @@ namespace Vertigo.Wheel.Core.Spin
             return new SliceBlueprint(SliceKind.Bomb, RewardId.None, 0, weight, 0, scalable: false, maxAmount: 0);
         }
 
-        public bool IsBomb => Kind == SliceKind.Bomb;
+        public bool IsBomb
+        {
+            get { return Kind == SliceKind.Bomb; }
+        }
 
         /// <summary>Materialises this blueprint for a specific zone.</summary>
         public WheelSlice ToSlice(int zone, IRewardScaling scaling)

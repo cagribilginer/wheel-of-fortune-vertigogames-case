@@ -48,13 +48,21 @@ namespace Vertigo.Wheel.Core.Spin
             return new WheelSlice(SliceKind.Bomb, RewardId.None, 0, weight, 0);
         }
 
-        public bool IsBomb => Kind == SliceKind.Bomb;
+        public bool IsBomb
+        {
+            get { return Kind == SliceKind.Bomb; }
+        }
 
-        public bool Equals(WheelSlice other) =>
-            Kind == other.Kind && Reward.Equals(other.Reward) && Amount == other.Amount &&
-            Weight == other.Weight && UnitValue == other.UnitValue;
+        public bool Equals(WheelSlice other)
+        {
+            return Kind == other.Kind && Reward.Equals(other.Reward) && Amount == other.Amount &&
+                Weight == other.Weight && UnitValue == other.UnitValue;
+        }
 
-        public override bool Equals(object obj) => obj is WheelSlice other && Equals(other);
+        public override bool Equals(object obj)
+        {
+            return obj is WheelSlice other && Equals(other);
+        }
 
         public override int GetHashCode()
         {
@@ -69,7 +77,9 @@ namespace Vertigo.Wheel.Core.Spin
             }
         }
 
-        public override string ToString() =>
-            IsBomb ? $"[Bomb w{Weight}]" : $"[{Reward} x{Amount} w{Weight}]";
+        public override string ToString()
+        {
+            return IsBomb ? $"[Bomb w{Weight}]" : $"[{Reward} x{Amount} w{Weight}]";
+        }
     }
 }

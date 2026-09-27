@@ -27,6 +27,9 @@ namespace Vertigo.Wheel.Core.States
         }
 
         /// <summary>Enters the flow. Boot resets the run and falls through to the first zone.</summary>
-        public static void Start(GameStateMachine machine) => machine.Change<BootState>();
+        public static void Start(GameStateMachine machine)
+        {
+            machine.Change<BootState>();
+        }
     }
 }

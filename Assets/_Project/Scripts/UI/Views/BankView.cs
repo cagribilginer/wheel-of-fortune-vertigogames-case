@@ -14,8 +14,14 @@ namespace Vertigo.Wheel.UI.Views
         [SerializeField] private RectTransform _ui_content_bank;
         [SerializeField] private TextMeshProUGUI _ui_text_bank_empty_value;
 
-        public ScrollRect Scroll => _ui_scroll_bank;
-        public RectTransform Content => _ui_content_bank;
+        public ScrollRect Scroll
+        {
+            get { return _ui_scroll_bank; }
+        }
+        public RectTransform Content
+        {
+            get { return _ui_content_bank; }
+        }
 
         protected override void CacheReferences()
         {
@@ -24,6 +30,9 @@ namespace Vertigo.Wheel.UI.Views
             Bind(ref _ui_text_bank_empty_value, "ui_text_bank_empty_value");
         }
 
-        public void SetEmpty(bool empty) => _ui_text_bank_empty_value.gameObject.SetActive(empty);
+        public void SetEmpty(bool empty)
+        {
+            _ui_text_bank_empty_value.gameObject.SetActive(empty);
+        }
     }
 }

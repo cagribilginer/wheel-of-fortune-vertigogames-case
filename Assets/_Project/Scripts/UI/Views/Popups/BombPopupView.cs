@@ -32,10 +32,13 @@ namespace Vertigo.Wheel.UI.Views.Popups
 
         // Dark, but not opaque: the pre-bomb bank panel stays faintly visible behind it so a revive reads
         // as "you kept your haul", and the red vignette carries the defeat mood on top.
-        private const float BackdropAlpha = 0.86f;
+        private const float BACKDROP_ALPHA = 0.86f;
 
         /// <summary>Where the presenter pools the lost-haul preview tiles.</summary>
-        public RectTransform Content => _ui_content_popup_bomb_list;
+        public RectTransform Content
+        {
+            get { return _ui_content_popup_bomb_list; }
+        }
 
         public event Action GiveUpClicked;
         public event Action ContinueClicked;
@@ -71,9 +74,18 @@ namespace Vertigo.Wheel.UI.Views.Popups
             _ui_button_popup_bomb_advert.onClick.RemoveListener(RaiseAdContinue);
         }
 
-        private void RaiseGiveUp() => GiveUpClicked?.Invoke();
-        private void RaiseContinue() => ContinueClicked?.Invoke();
-        private void RaiseAdContinue() => AdContinueClicked?.Invoke();
+        private void RaiseGiveUp()
+        {
+            GiveUpClicked?.Invoke();
+        }
+        private void RaiseContinue()
+        {
+            ContinueClicked?.Invoke();
+        }
+        private void RaiseAdContinue()
+        {
+            AdContinueClicked?.Invoke();
+        }
 
         public void Show(
             int zoneReached, int lostRewardCount, int playerCash, int playerGold,
@@ -94,7 +106,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
             _ui_button_popup_bomb_advert.interactable = adReviveOffered;
 
             PlayVignette();
-            PlayOpen(_ui_image_popup_bomb_backdrop, _ui_transform_popup_bomb_anim, BackdropAlpha);
+            PlayOpen(_ui_image_popup_bomb_backdrop, _ui_transform_popup_bomb_anim, BACKDROP_ALPHA);
         }
 
         public void Hide()

@@ -23,8 +23,8 @@ namespace Vertigo.Wheel.Editor
     /// </summary>
     public static class BuildPipelineRunner
     {
-        private const string OutputDirectory = "Builds/Android";
-        private const string Version = "1.0.0";
+        private const string OUTPUT_DIRECTORY = "Builds/Android";
+        private const string VERSION = "1.0.0";
 
         private static readonly string[] ScenePaths = { "Assets/_Project/Scenes/Main.unity" };
 
@@ -33,8 +33,8 @@ namespace Vertigo.Wheel.Editor
         {
             ApplyAndroidPlayerSettings();
 
-            Directory.CreateDirectory(OutputDirectory);
-            string outputPath = $"{OutputDirectory}/WheelOfFortune-v{Version}.apk";
+            Directory.CreateDirectory(OUTPUT_DIRECTORY);
+            string outputPath = $"{OUTPUT_DIRECTORY}/WheelOfFortune-v{VERSION}.apk";
 
             var options = new BuildPlayerOptions
             {

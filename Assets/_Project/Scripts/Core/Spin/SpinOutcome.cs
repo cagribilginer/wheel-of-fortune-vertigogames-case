@@ -27,12 +27,19 @@ namespace Vertigo.Wheel.Core.Spin
             UnitValue = unitValue;
         }
 
-        public static SpinOutcome FromSlice(int slotIndex, WheelSlice slice) =>
-            new SpinOutcome(slotIndex, slice.Kind, slice.Reward, slice.Amount, slice.UnitValue);
+        public static SpinOutcome FromSlice(int slotIndex, WheelSlice slice)
+        {
+            return new SpinOutcome(slotIndex, slice.Kind, slice.Reward, slice.Amount, slice.UnitValue);
+        }
 
-        public bool IsBomb => Kind == SliceKind.Bomb;
+        public bool IsBomb
+        {
+            get { return Kind == SliceKind.Bomb; }
+        }
 
-        public override string ToString() =>
-            IsBomb ? $"Slot {SlotIndex}: BOMB" : $"Slot {SlotIndex}: {Reward} x{Amount}";
+        public override string ToString()
+        {
+            return IsBomb ? $"Slot {SlotIndex}: BOMB" : $"Slot {SlotIndex}: {Reward} x{Amount}";
+        }
     }
 }

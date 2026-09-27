@@ -14,9 +14,18 @@ namespace Vertigo.Wheel.UI.Views
         [SerializeField] private Image _ui_image_vfx_flash;
         [SerializeField] private Image _ui_image_vfx_reward_burst;
 
-        public RectTransform Shake => _ui_transform_vfx_screenshake;
-        public Image Flash => _ui_image_vfx_flash;
-        public Image Burst => _ui_image_vfx_reward_burst;
+        public RectTransform Shake
+        {
+            get { return _ui_transform_vfx_screenshake; }
+        }
+        public Image Flash
+        {
+            get { return _ui_image_vfx_flash; }
+        }
+        public Image Burst
+        {
+            get { return _ui_image_vfx_reward_burst; }
+        }
 
         protected override void CacheReferences()
         {

@@ -11,12 +11,17 @@ namespace Vertigo.Wheel.Core.States
     /// </summary>
     public abstract class GameStateBase : IGameState
     {
-        protected GameStateBase(GameContext context) =>
+        protected GameStateBase(GameContext context)
+        {
             Context = context ?? throw new ArgumentNullException(nameof(context));
+        }
 
         protected GameContext Context { get; }
 
-        protected GameStateMachine Machine => Context.Machine;
+        protected GameStateMachine Machine
+        {
+            get { return Context.Machine; }
+        }
 
         public virtual void Enter() { }
         public virtual void Exit() { }

@@ -32,7 +32,10 @@ namespace Vertigo.Wheel.Core.States
             _states[key] = state;
         }
 
-        public bool IsIn<TState>() where TState : IGameState => Current is TState;
+        public bool IsIn<TState>() where TState : IGameState
+        {
+            return Current is TState;
+        }
 
         public void Change<TState>() where TState : IGameState
         {
@@ -63,13 +66,37 @@ namespace Vertigo.Wheel.Core.States
         }
 
         // Input surface. Each call is forwarded to the current state, which ignores what it does not accept.
-        public void RequestSpin() => Current?.OnSpinRequested();
-        public void RequestLeave() => Current?.OnLeaveRequested();
-        public void RequestExit() => Current?.OnExitRequested();
-        public void Confirm() => Current?.OnConfirmed();
-        public void Cancel() => Current?.OnCancelled();
-        public void RequestRestart() => Current?.OnRestartRequested();
-        public void RequestContinue() => Current?.OnContinueRequested();
-        public void RequestAdContinue() => Current?.OnAdContinueRequested();
+        public void RequestSpin()
+        {
+            Current?.OnSpinRequested();
+        }
+        public void RequestLeave()
+        {
+            Current?.OnLeaveRequested();
+        }
+        public void RequestExit()
+        {
+            Current?.OnExitRequested();
+        }
+        public void Confirm()
+        {
+            Current?.OnConfirmed();
+        }
+        public void Cancel()
+        {
+            Current?.OnCancelled();
+        }
+        public void RequestRestart()
+        {
+            Current?.OnRestartRequested();
+        }
+        public void RequestContinue()
+        {
+            Current?.OnContinueRequested();
+        }
+        public void RequestAdContinue()
+        {
+            Current?.OnAdContinueRequested();
+        }
     }
 }

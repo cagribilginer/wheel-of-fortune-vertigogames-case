@@ -17,7 +17,9 @@ namespace Vertigo.Wheel.Data.Configs
         [Tooltip("Cap on the free ad revive only. The paid gold revive is unlimited (affordability aside).")]
         [Min(0)] [SerializeField] [FormerlySerializedAs("_maxContinuesPerRun")] private int _maxAdRevivesPerRun = 1;
 
-        public ContinueSettings ToSettings() =>
-            new ContinueSettings(_baseCost, _costPerZone, _maxAdRevivesPerRun);
+        public ContinueSettings ToSettings()
+        {
+            return new ContinueSettings(_baseCost, _costPerZone, _maxAdRevivesPerRun);
+        }
     }
 }

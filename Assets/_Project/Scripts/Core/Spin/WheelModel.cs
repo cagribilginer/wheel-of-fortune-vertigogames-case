@@ -9,7 +9,7 @@ namespace Vertigo.Wheel.Core.Spin
     /// </summary>
     public sealed class WheelModel
     {
-        public const int StandardSliceCount = 8;
+        public const int STANDARD_SLICE_COUNT = 8;
 
         private readonly WheelSlice[] _slices;
 
@@ -40,16 +40,28 @@ namespace Vertigo.Wheel.Core.Spin
 
         public WheelTier Tier { get; }
 
-        public IReadOnlyList<WheelSlice> Slices => _slices;
+        public IReadOnlyList<WheelSlice> Slices
+        {
+            get { return _slices; }
+        }
 
-        public int SliceCount => _slices.Length;
+        public int SliceCount
+        {
+            get { return _slices.Length; }
+        }
 
         public int TotalWeight { get; }
 
         public int BombCount { get; }
 
-        public bool HasBomb => BombCount > 0;
+        public bool HasBomb
+        {
+            get { return BombCount > 0; }
+        }
 
-        public WheelSlice this[int index] => _slices[index];
+        public WheelSlice this[int index]
+        {
+            get { return _slices[index]; }
+        }
     }
 }

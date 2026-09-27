@@ -7,12 +7,9 @@ using Vertigo.Wheel.Core.Zones;
 namespace Vertigo.Wheel.Core.States
 {
     /// <summary>
-    /// Everything the flow needs the screen to do, expressed without a single Unity type.
-    /// <para>
-    /// Each animating call takes a completion callback rather than returning: the state machine advances
-    /// when the presentation says it has finished, which lets a test substitute an implementation that
-    /// completes instantly and drive a sixty-zone run in microseconds with no scene and no frames.
-    /// </para>
+    /// Everything the flow needs the screen to do, expressed without a single Unity type. Each animating
+    /// call takes a completion callback rather than returning, so the state machine advances only when
+    /// the presentation says it has finished — and a test double can complete instantly with no scene.
     /// </summary>
     public interface IWheelPresentation
     {

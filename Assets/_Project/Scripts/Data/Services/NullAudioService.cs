@@ -17,10 +17,22 @@ namespace Vertigo.Wheel.Data.Services
         public void PlayMusicLoop(AudioClip clip) { }
         public void StopMusic() { }
 
-        public float MasterVolume => 1f;
-        public float SfxVolume => 1f;
-        public float MusicVolume => 1f;
-        public bool Muted => false;
+        public float MasterVolume
+        {
+            get { return 1f; }
+        }
+        public float SfxVolume
+        {
+            get { return 1f; }
+        }
+        public float MusicVolume
+        {
+            get { return 1f; }
+        }
+        public bool Muted
+        {
+            get { return false; }
+        }
 
         public void SetMasterVolume(float volume01) { }
         public void SetSfxVolume(float volume01) { }

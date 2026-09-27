@@ -17,19 +17,27 @@ namespace Vertigo.Wheel.Core.Run
     {
         private readonly ISaveService _save;
 
-        public Wallet(ISaveService save) =>
+        public Wallet(ISaveService save)
+        {
             _save = save ?? throw new ArgumentNullException(nameof(save));
+        }
 
         /// <summary>
         /// The PlayerPrefs key for a given currency's balance, exposed statically so editor tooling (the
         /// Reset Save menu item) can target a save slot without needing a live instance.
         /// </summary>
-        public static string SaveKeyFor(RewardId currency) => $"vertigo.wheel.wallet.{currency.Value}";
+        public static string SaveKeyFor(RewardId currency)
+        {
+            return $"vertigo.wheel.wallet.{currency.Value}";
+        }
 
         /// <summary>Raised on any change, with the currency that changed and its new balance.</summary>
         public event Action<RewardId, int> Changed;
 
-        public int BalanceOf(RewardId currency) => _save.GetInt(SaveKeyFor(currency));
+        public int BalanceOf(RewardId currency)
+        {
+            return _save.GetInt(SaveKeyFor(currency));
+        }
 
         public void Add(RewardId currency, int amount)
         {
@@ -40,7 +48,10 @@ namespace Vertigo.Wheel.Core.Run
             Commit(currency, BalanceOf(currency) + amount);
         }
 
-        public bool CanAfford(RewardId currency, int cost) => cost >= 0 && BalanceOf(currency) >= cost;
+        public bool CanAfford(RewardId currency, int cost)
+        {
+            return cost >= 0 && BalanceOf(currency) >= cost;
+        }
 
         public bool TrySpend(RewardId currency, int cost)
         {
@@ -53,7 +64,10 @@ namespace Vertigo.Wheel.Core.Run
         }
 
         /// <summary>Backs the Tools/Vertigo/Reset Save editor menu item.</summary>
-        public void Reset(RewardId currency) => Commit(currency, 0);
+        public void Reset(RewardId currency)
+        {
+            Commit(currency, 0);
+        }
 
         private void Commit(RewardId currency, int newBalance)
         {

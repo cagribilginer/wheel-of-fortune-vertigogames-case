@@ -5,8 +5,14 @@ namespace Vertigo.Wheel.Data.Services
     /// <summary>Player-side RNG. Tests swap in a seeded provider through the same interface.</summary>
     public sealed class UnityRandomProvider : IRandomProvider
     {
-        public int Next(int maxExclusive) => UnityEngine.Random.Range(0, maxExclusive);
+        public int Next(int maxExclusive)
+        {
+            return UnityEngine.Random.Range(0, maxExclusive);
+        }
 
-        public double NextDouble() => UnityEngine.Random.value;
+        public double NextDouble()
+        {
+            return UnityEngine.Random.value;
+        }
     }
 }

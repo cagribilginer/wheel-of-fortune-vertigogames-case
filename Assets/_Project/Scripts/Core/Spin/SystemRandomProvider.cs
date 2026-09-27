@@ -10,9 +10,15 @@ namespace Vertigo.Wheel.Core.Spin
     {
         private readonly Random _random;
 
-        public SystemRandomProvider() => _random = new Random();
+        public SystemRandomProvider()
+        {
+            _random = new Random();
+        }
 
-        public SystemRandomProvider(int seed) => _random = new Random(seed);
+        public SystemRandomProvider(int seed)
+        {
+            _random = new Random(seed);
+        }
 
         public int Next(int maxExclusive)
         {
@@ -22,6 +28,9 @@ namespace Vertigo.Wheel.Core.Spin
             return _random.Next(maxExclusive);
         }
 
-        public double NextDouble() => _random.NextDouble();
+        public double NextDouble()
+        {
+            return _random.NextDouble();
+        }
     }
 }

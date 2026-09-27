@@ -10,7 +10,13 @@ namespace Vertigo.Wheel.Data.Configs
         [Min(1)] [SerializeField] private int _fromZone = 10;
         [SerializeField] private ZoneWheelConfig _wheel;
 
-        public int FromZone => _fromZone;
-        public ZoneWheelConfig Wheel => _wheel;
+        public int FromZone
+        {
+            get { return _fromZone; }
+        }
+        public ZoneWheelConfig Wheel
+        {
+            get { return _wheel; }
+        }
     }
 }

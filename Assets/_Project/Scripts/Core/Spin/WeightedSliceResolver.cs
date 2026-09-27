@@ -16,8 +16,10 @@ namespace Vertigo.Wheel.Core.Spin
     {
         private readonly IRandomProvider _random;
 
-        public WeightedSliceResolver(IRandomProvider random) =>
+        public WeightedSliceResolver(IRandomProvider random)
+        {
             _random = random ?? throw new ArgumentNullException(nameof(random));
+        }
 
         public int Resolve(IReadOnlyList<WheelSlice> slices)
         {

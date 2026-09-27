@@ -15,8 +15,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     /// </summary>
     public sealed class DebugPresenter : IDisposable
     {
-        private const int GoldGrant = 1000;
-        private const int ItemGrantCount = 40;
+        private const int GOLD_GRANT = 1000;
+        private const int ITEM_GRANT_COUNT = 40;
 
         private readonly RunModel _run;
         private readonly GameStateMachine _machine;
@@ -61,9 +61,18 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _view.GrantItemsClicked -= GrantItems;
         }
 
-        private void JumpToZone5() => JumpToZone(5);
-        private void JumpToZone30() => JumpToZone(30);
-        private void GrantGold() => _wallet.Add(_goldCurrency, GoldGrant);
+        private void JumpToZone5()
+        {
+            JumpToZone(5);
+        }
+        private void JumpToZone30()
+        {
+            JumpToZone(30);
+        }
+        private void GrantGold()
+        {
+            _wallet.Add(_goldCurrency, GOLD_GRANT);
+        }
 
         // Warping only makes sense between spins; from anywhere else the wheel or a popup owns the screen.
         private void JumpToZone(int zone)
@@ -91,7 +100,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             int count = _catalog.All.Count;
             if (count == 0) return;
 
-            for (int i = 0; i < ItemGrantCount; i++)
+            for (int i = 0; i < ITEM_GRANT_COUNT; i++)
             {
                 RewardDefinition definition = _catalog.All[i % count];
                 if (definition == null) continue;

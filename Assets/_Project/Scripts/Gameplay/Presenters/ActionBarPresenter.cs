@@ -10,7 +10,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly ActionBarView _view;
         private GameStateMachine _machine;
 
-        public ActionBarPresenter(ActionBarView view) => _view = view;
+        public ActionBarPresenter(ActionBarView view)
+        {
+            _view = view;
+        }
 
         public void WireInput(GameStateMachine machine)
         {
@@ -27,6 +30,9 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         /// EXIT only ever cashes out, so it is interactable exactly when leaving is legal — an idle wheel
         /// with something banked.
         /// </summary>
-        public void SetInputState(bool canLeave) => _view.SetExitInteractable(canLeave);
+        public void SetInputState(bool canLeave)
+        {
+            _view.SetExitInteractable(canLeave);
+        }
     }
 }

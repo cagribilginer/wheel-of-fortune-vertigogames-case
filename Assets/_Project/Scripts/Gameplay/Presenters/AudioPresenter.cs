@@ -21,20 +21,44 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         }
 
         /// <summary>Reward revealed at the wheel stop.</summary>
-        public void PlayReward() => _audio.PlayOneShot(_library != null ? _library.RewardChime : null);
+        public void PlayReward()
+        {
+            _audio.PlayOneShot(_library != null ? _library.RewardChime : null);
+        }
 
         /// <summary>The reward tile landing in the bank panel — a quieter collect swoosh, not the reveal sting.</summary>
-        public void PlayBankCollect() => _audio.PlayOneShot(_library != null ? _library.BankCollect : null, 0.8f);
+        public void PlayBankCollect()
+        {
+            _audio.PlayOneShot(_library != null ? _library.BankCollect : null, 0.8f);
+        }
 
         /// <summary>The wheel sliding out/in between zones (covers tier swaps — every one rides a transition).</summary>
-        public void PlayWheelTransition() => _audio.PlayOneShot(_library != null ? _library.WheelTransition : null);
+        public void PlayWheelTransition()
+        {
+            _audio.PlayOneShot(_library != null ? _library.WheelTransition : null);
+        }
 
         /// <summary>The cash-out "rewards claimed" flourish. Reuses the reward chime — it is the game's one
         /// positive sting and there is no dedicated victory clip in the pack.</summary>
-        public void PlayClaim() => _audio.PlayOneShot(_library != null ? _library.RewardChime : null);
-        public void PlayBombImpact() => _audio.PlayOneShot(_library != null ? _library.BombExplosion : null);
-        public void PlayDefeatAmbience() => _audio.PlayOneShot(_library != null ? _library.DefeatAmbience : null);
-        public void PlayPopupOpen() => _audio.PlayOneShot(_library != null ? _library.PopupOpen : null);
-        public void PlayPopupClose() => _audio.PlayOneShot(_library != null ? _library.PopupClose : null);
+        public void PlayClaim()
+        {
+            _audio.PlayOneShot(_library != null ? _library.RewardChime : null);
+        }
+        public void PlayBombImpact()
+        {
+            _audio.PlayOneShot(_library != null ? _library.BombExplosion : null);
+        }
+        public void PlayDefeatAmbience()
+        {
+            _audio.PlayOneShot(_library != null ? _library.DefeatAmbience : null);
+        }
+        public void PlayPopupOpen()
+        {
+            _audio.PlayOneShot(_library != null ? _library.PopupOpen : null);
+        }
+        public void PlayPopupClose()
+        {
+            _audio.PlayOneShot(_library != null ? _library.PopupClose : null);
+        }
     }
 }

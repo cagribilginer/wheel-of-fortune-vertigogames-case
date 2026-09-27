@@ -29,19 +29,19 @@ namespace Vertigo.Wheel.Editor
     /// </summary>
     public static class AudioAutoWirer
     {
-        private const string LibraryProp_ButtonClick = "_buttonClick";
-        private const string LibraryProp_PopupOpen = "_popupOpen";
-        private const string LibraryProp_PopupClose = "_popupClose";
-        private const string LibraryProp_RewardChime = "_rewardChime";
-        private const string LibraryProp_BankCollect = "_bankCollect";
-        private const string LibraryProp_WheelTransition = "_wheelTransition";
-        private const string LibraryProp_BombExplosion = "_bombExplosion";
-        private const string LibraryProp_DefeatAmbience = "_defeatAmbience";
-        private const string ThemeProp_Tick = "_tick";
+        private const string LIBRARY_PROP_BUTTON_CLICK = "_buttonClick";
+        private const string LIBRARY_PROP_POPUP_OPEN = "_popupOpen";
+        private const string LIBRARY_PROP_POPUP_CLOSE = "_popupClose";
+        private const string LIBRARY_PROP_REWARD_CHIME = "_rewardChime";
+        private const string LIBRARY_PROP_BANK_COLLECT = "_bankCollect";
+        private const string LIBRARY_PROP_WHEEL_TRANSITION = "_wheelTransition";
+        private const string LIBRARY_PROP_BOMB_EXPLOSION = "_bombExplosion";
+        private const string LIBRARY_PROP_DEFEAT_AMBIENCE = "_defeatAmbience";
+        private const string THEME_PROP_TICK = "_tick";
 
         // Anything at or below this score is treated as "no real match" and the slot is left as it is
         // rather than forced onto a clip that does not fit.
-        private const float MinScore = 0.12f;
+        private const float MIN_SCORE = 0.12f;
 
         // Folders whose audio is decoration for the toolchain, never game SFX.
         private static readonly string[] ExcludedPathFragments =
@@ -50,23 +50,35 @@ namespace Vertigo.Wheel.Editor
         };
 
         [MenuItem("Tools/Vertigo/Audio/Auto Wire Audio")]
-        public static void WireFromMenu() => Run(apply: true, force: true, silentWhenIdle: false);
+        public static void WireFromMenu()
+        {
+            Run(apply: true, force: true, silentWhenIdle: false);
+        }
 
         [MenuItem("Tools/Vertigo/Audio/Auto Wire Audio (Preview)")]
-        public static void PreviewFromMenu() => Run(apply: false, force: true, silentWhenIdle: false);
+        public static void PreviewFromMenu()
+        {
+            Run(apply: false, force: true, silentWhenIdle: false);
+        }
 
         /// <summary>
         /// Fills only the audio slots that are currently empty, leaving every already-wired slot exactly as
         /// it is. Use this after adding a new slot so the existing assignments are not re-planned around it.
         /// </summary>
         [MenuItem("Tools/Vertigo/Audio/Wire Empty Audio Slots")]
-        public static void WireEmptySlotsFromMenu() => Run(apply: true, force: false, silentWhenIdle: false);
+        public static void WireEmptySlotsFromMenu()
+        {
+            Run(apply: true, force: false, silentWhenIdle: false);
+        }
 
         /// <summary>
         /// Gap-fill pass for the import hook: only touches slots that are currently empty, and does nothing
         /// (and says nothing) when every slot is already wired.
         /// </summary>
-        internal static void WireGapsAfterImport() => Run(apply: true, force: false, silentWhenIdle: true);
+        internal static void WireGapsAfterImport()
+        {
+            Run(apply: true, force: false, silentWhenIdle: true);
+        }
 
         private static void Run(bool apply, bool force, bool silentWhenIdle)
         {
@@ -127,7 +139,7 @@ namespace Vertigo.Wheel.Editor
             {
                 if (!plan.TryGetValue(slot, out ClipFeatures pick))
                 {
-                    report.AppendLine($"  {slot.Label,-16} -> (no clip scored above {MinScore:0.00}; left unchanged)");
+                    report.AppendLine($"  {slot.Label,-16} -> (no clip scored above {MIN_SCORE:0.00}; left unchanged)");
                     continue;
                 }
 
@@ -138,7 +150,7 @@ namespace Vertigo.Wheel.Editor
                 if (slot.Label == "Wheel Tick")
                 {
                     foreach (SerializedObject theme in themes)
-                        changed += SetClip(theme, ThemeProp_Tick, pick.Clip) ? 1 : 0;
+                        changed += SetClip(theme, THEME_PROP_TICK, pick.Clip) ? 1 : 0;
                 }
                 else
                 {
@@ -181,7 +193,7 @@ namespace Vertigo.Wheel.Editor
                 foreach (ClipFeatures clip in clips)
                 {
                     float score = slot.ScoreOf(clip);
-                    if (score > MinScore) pairs.Add((slot, clip, score));
+                    if (score > MIN_SCORE) pairs.Add((slot, clip, score));
                 }
 
             pairs.Sort((a, b) => b.score.CompareTo(a.score));
@@ -204,71 +216,91 @@ namespace Vertigo.Wheel.Editor
         // Every scorer returns roughly 0..1. Acoustic terms are weighted to sum to ~1; a matching name
         // keyword adds a flat bonus on top so a well-named clip beats an equally-fitting unnamed one.
 
-        private static float ScoreTick(ClipFeatures c) =>
-            0.45f * Band(c.Length, 0.02f, 0.14f, 0.12f) +
+        private static float ScoreTick(ClipFeatures c)
+        {
+            return 0.45f * Band(c.Length, 0.02f, 0.14f, 0.12f) +
             0.25f * AtLeast(c.Crest, 3.5f, 3f) +
             0.15f * AtMost(c.LowRatio, 0.35f, 0.3f) +
             0.15f * AtMost(c.AttackSeconds, 0.02f, 0.03f) +
             Keyword(c, 0.35f, "tick", "click", "tap", "blip", "select");
+        }
 
-        private static float ScoreButtonClick(ClipFeatures c) =>
-            0.40f * Band(c.Length, 0.05f, 0.40f, 0.2f) +
+        private static float ScoreButtonClick(ClipFeatures c)
+        {
+            return 0.40f * Band(c.Length, 0.05f, 0.40f, 0.2f) +
             0.20f * AtLeast(c.Crest, 3f, 3f) +
             0.15f * AtMost(c.LowRatio, 0.5f, 0.3f) +
             0.15f * Band(c.ZeroCrossingRate, 900f, 6000f, 3500f) +
             0.10f * AtMost(c.SustainRatio, 0.55f, 0.3f) +
             Keyword(c, 0.5f, "button", "click", "ui", "menu", "tap", "select", "press", "confirm");
+        }
 
-        private static float ScoreRewardChime(ClipFeatures c) =>
-            0.30f * Band(c.Length, 0.35f, 2.2f, 0.6f) +
+        private static float ScoreRewardChime(ClipFeatures c)
+        {
+            return 0.30f * Band(c.Length, 0.35f, 2.2f, 0.6f) +
             0.30f * AtMost(c.ZeroCrossingRate, 2600f, 2200f) +
             0.20f * AtMost(c.LowRatio, 0.42f, 0.3f) +
             0.20f * AtMost(c.SustainRatio, 0.72f, 0.3f) +
             Keyword(c, 0.5f, "reward", "win", "coin", "collect", "chime", "success", "pickup", "prize", "star", "bonus", "positive");
+        }
 
         // A short, soft, bright "into the bag" tick — like the reward chime but quicker and less bell-like,
         // so the two never collapse onto the same clip.
-        private static float ScoreBankCollect(ClipFeatures c) =>
-            0.35f * Band(c.Length, 0.05f, 0.5f, 0.25f) +
+        private static float ScoreBankCollect(ClipFeatures c)
+        {
+            return 0.35f * Band(c.Length, 0.05f, 0.5f, 0.25f) +
             0.25f * AtLeast(c.ZeroCrossingRate, 1800f, 2200f) +
             0.20f * AtMost(c.LowRatio, 0.4f, 0.3f) +
             0.20f * AtMost(c.SustainRatio, 0.5f, 0.3f) +
             Keyword(c, 0.5f, "collect", "coin", "pickup", "grab", "drop", "cash", "gem", "pop", "bag", "pouch");
+        }
 
         // The mechanical wheel slide between zones: a whoosh, a touch longer than the popup swooshes.
-        private static float ScoreWheelTransition(ClipFeatures c) =>
-            0.7f * Whoosh(c) +
+        private static float ScoreWheelTransition(ClipFeatures c)
+        {
+            return 0.7f * Whoosh(c) +
             0.3f * Band(c.Length, 0.25f, 1.1f, 0.4f) +
             Keyword(c, 0.45f, "swoosh", "whoosh", "slide", "transition", "swipe", "spin", "wheel", "move", "rotate");
+        }
 
-        private static float ScoreBombExplosion(ClipFeatures c) =>
-            0.38f * AtLeast(c.LowRatio, 0.45f, 0.3f) +
+        private static float ScoreBombExplosion(ClipFeatures c)
+        {
+            return 0.38f * AtLeast(c.LowRatio, 0.45f, 0.3f) +
             0.20f * Band(c.Length, 0.4f, 2.5f, 0.7f) +
             0.16f * AtLeast(c.Rms, 0.12f, 0.15f) +
             0.16f * AtLeast(c.ZeroCrossingRate, 1400f, 2000f) +
             0.10f * AtLeast(c.Length, 0.5f, 0.4f) +
             Keyword(c, 0.5f, "explos", "bomb", "blast", "boom", "hit", "impact", "fail", "damage", "hurt");
+        }
 
-        private static float ScorePopupOpen(ClipFeatures c) =>
-            0.8f * Whoosh(c) + 0.2f * Rise(c) +
+        private static float ScorePopupOpen(ClipFeatures c)
+        {
+            return 0.8f * Whoosh(c) + 0.2f * Rise(c) +
             Keyword(c, 0.4f, "open", "swoosh", "whoosh", "swipe", "transition", "appear", "reveal", "slide");
+        }
 
-        private static float ScorePopupClose(ClipFeatures c) =>
-            0.8f * Whoosh(c) + 0.2f * (1f - Rise(c)) +
+        private static float ScorePopupClose(ClipFeatures c)
+        {
+            return 0.8f * Whoosh(c) + 0.2f * (1f - Rise(c)) +
             Keyword(c, 0.4f, "close", "swoosh", "whoosh", "swipe", "transition", "hide", "dismiss");
+        }
 
-        private static float ScoreDefeatAmbience(ClipFeatures c) =>
-            0.35f * AtLeast(c.Length, 1.5f, 1.0f) +
+        private static float ScoreDefeatAmbience(ClipFeatures c)
+        {
+            return 0.35f * AtLeast(c.Length, 1.5f, 1.0f) +
             0.30f * AtLeast(c.SustainRatio, 0.55f, 0.3f) +
             0.20f * AtLeast(c.LowRatio, 0.35f, 0.3f) +
             0.15f * AtMost(c.Crest, 4f, 3f) +
             Keyword(c, 0.5f, "drone", "ambien", "tension", "defeat", "lose", "lost", "gameover", "dark", "negative", "ominous", "sad");
+        }
 
-        private static float Whoosh(ClipFeatures c) =>
-            0.35f * AtLeast(c.ZeroCrossingRate, 2000f, 2500f) +
+        private static float Whoosh(ClipFeatures c)
+        {
+            return 0.35f * AtLeast(c.ZeroCrossingRate, 2000f, 2500f) +
             0.25f * AtMost(c.Crest, 4.5f, 3f) +
             0.25f * Band(c.Length, 0.1f, 0.7f, 0.3f) +
             0.15f * Band(c.LowRatio, 0.12f, 0.6f, 0.3f);
+        }
 
         // 1 when the second half is brighter than the first (rising sweep), 0 when it is darker.
         private static float Rise(ClipFeatures c)
@@ -286,11 +318,15 @@ namespace Vertigo.Wheel.Editor
             return Mathf.Clamp01(1f - d / Mathf.Max(soft, 1e-4f));
         }
 
-        private static float AtMost(float x, float threshold, float soft) =>
-            x <= threshold ? 1f : Mathf.Clamp01(1f - (x - threshold) / Mathf.Max(soft, 1e-4f));
+        private static float AtMost(float x, float threshold, float soft)
+        {
+            return x <= threshold ? 1f : Mathf.Clamp01(1f - (x - threshold) / Mathf.Max(soft, 1e-4f));
+        }
 
-        private static float AtLeast(float x, float threshold, float soft) =>
-            x >= threshold ? 1f : Mathf.Clamp01(1f - (threshold - x) / Mathf.Max(soft, 1e-4f));
+        private static float AtLeast(float x, float threshold, float soft)
+        {
+            return x >= threshold ? 1f : Mathf.Clamp01(1f - (threshold - x) / Mathf.Max(soft, 1e-4f));
+        }
 
         private static float Keyword(ClipFeatures c, float bonus, params string[] needles)
         {
@@ -333,14 +369,14 @@ namespace Vertigo.Wheel.Editor
         {
             switch (slotLabel)
             {
-                case "Button Click": return LibraryProp_ButtonClick;
-                case "Reward Chime": return LibraryProp_RewardChime;
-                case "Bank Collect": return LibraryProp_BankCollect;
-                case "Wheel Transition": return LibraryProp_WheelTransition;
-                case "Bomb Explosion": return LibraryProp_BombExplosion;
-                case "Popup Open": return LibraryProp_PopupOpen;
-                case "Popup Close": return LibraryProp_PopupClose;
-                case "Defeat Ambience": return LibraryProp_DefeatAmbience;
+                case "Button Click": return LIBRARY_PROP_BUTTON_CLICK;
+                case "Reward Chime": return LIBRARY_PROP_REWARD_CHIME;
+                case "Bank Collect": return LIBRARY_PROP_BANK_COLLECT;
+                case "Wheel Transition": return LIBRARY_PROP_WHEEL_TRANSITION;
+                case "Bomb Explosion": return LIBRARY_PROP_BOMB_EXPLOSION;
+                case "Popup Open": return LIBRARY_PROP_POPUP_OPEN;
+                case "Popup Close": return LIBRARY_PROP_POPUP_CLOSE;
+                case "Defeat Ambience": return LIBRARY_PROP_DEFEAT_AMBIENCE;
                 default: throw new ArgumentOutOfRangeException(nameof(slotLabel), slotLabel, "Not a library slot.");
             }
         }
@@ -348,7 +384,7 @@ namespace Vertigo.Wheel.Editor
         private static AudioClip CurrentClipFor(string slotLabel, SerializedObject library, List<SerializedObject> themes)
         {
             if (slotLabel == "Wheel Tick")
-                return themes.Count == 0 ? null : themes[0].FindProperty(ThemeProp_Tick).objectReferenceValue as AudioClip;
+                return themes.Count == 0 ? null : themes[0].FindProperty(THEME_PROP_TICK).objectReferenceValue as AudioClip;
 
             return library.FindProperty(LibraryPropFor(slotLabel)).objectReferenceValue as AudioClip;
         }
@@ -508,7 +544,10 @@ namespace Vertigo.Wheel.Editor
                 _score = score;
             }
 
-            public float ScoreOf(ClipFeatures c) => _score(c);
+            public float ScoreOf(ClipFeatures c)
+            {
+                return _score(c);
+            }
         }
 
         private sealed class ClipFeatures
@@ -529,8 +568,10 @@ namespace Vertigo.Wheel.Editor
             public float ZcrSecondHalf;
             public float SustainRatio;   // fraction of the body that stays loud
 
-            public string Summary() =>
-                $"{Length:0.00}s, crest {Crest:0.0}, low {LowRatio:0.00}, zcr {ZeroCrossingRate:0}, sustain {SustainRatio:0.00}";
+            public string Summary()
+            {
+                return $"{Length:0.00}s, crest {Crest:0.0}, low {LowRatio:0.00}, zcr {ZeroCrossingRate:0}, sustain {SustainRatio:0.00}";
+            }
 
             public static ClipFeatures Analyse(AudioClip clip, string path, float[] x, int sampleRate)
             {
@@ -595,7 +636,10 @@ namespace Vertigo.Wheel.Editor
                 };
             }
 
-            private static float Seconds(int samples, int sampleRate) => samples / (float)sampleRate;
+            private static float Seconds(int samples, int sampleRate)
+            {
+                return samples / (float)sampleRate;
+            }
 
             private static int ZeroCrossings(float[] x, int from, int to)
             {

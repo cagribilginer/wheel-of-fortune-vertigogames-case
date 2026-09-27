@@ -27,8 +27,14 @@ namespace Vertigo.Wheel.UI.Views
         [SerializeField] private Button _ui_card_zonemap_milestone_super;
         [SerializeField] private Button _ui_card_zonemap_milestone_safe;
 
-        public ScrollRect Scroll => _ui_scroll_zonemap;
-        public RectTransform Content => _ui_content_zonemap;
+        public ScrollRect Scroll
+        {
+            get { return _ui_scroll_zonemap; }
+        }
+        public RectTransform Content
+        {
+            get { return _ui_content_zonemap; }
+        }
 
         /// <summary>Raised when the player taps a milestone badge — opens the preview teaser.</summary>
         public event Action SafeMilestoneClicked;
@@ -62,8 +68,14 @@ namespace Vertigo.Wheel.UI.Views
                 _ui_card_zonemap_milestone_super.onClick.RemoveListener(RaiseSuper);
         }
 
-        private void RaiseSafe() => SafeMilestoneClicked?.Invoke();
-        private void RaiseSuper() => SuperMilestoneClicked?.Invoke();
+        private void RaiseSafe()
+        {
+            SafeMilestoneClicked?.Invoke();
+        }
+        private void RaiseSuper()
+        {
+            SuperMilestoneClicked?.Invoke();
+        }
 
         /// <summary>
         /// <paramref name="nextSafeZone"/> / <paramref name="nextSuperZone"/> are absolute zone numbers, not

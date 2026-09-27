@@ -24,22 +24,49 @@ namespace Vertigo.Wheel.Core.Rewards
         }
 
         /// <summary>The absent id, carried by bomb slices.</summary>
-        public static RewardId None => default;
+        public static RewardId None
+        {
+            get { return default; }
+        }
 
-        public string Value => _value ?? string.Empty;
+        public string Value
+        {
+            get { return _value ?? string.Empty; }
+        }
 
-        public bool IsEmpty => string.IsNullOrEmpty(_value);
+        public bool IsEmpty
+        {
+            get { return string.IsNullOrEmpty(_value); }
+        }
 
-        public bool Equals(RewardId other) => string.Equals(_value, other._value, StringComparison.Ordinal);
+        public bool Equals(RewardId other)
+        {
+            return string.Equals(_value, other._value, StringComparison.Ordinal);
+        }
 
-        public override bool Equals(object obj) => obj is RewardId other && Equals(other);
+        public override bool Equals(object obj)
+        {
+            return obj is RewardId other && Equals(other);
+        }
 
-        public override int GetHashCode() => _value == null ? 0 : StringComparer.Ordinal.GetHashCode(_value);
+        public override int GetHashCode()
+        {
+            return _value == null ? 0 : StringComparer.Ordinal.GetHashCode(_value);
+        }
 
-        public static bool operator ==(RewardId left, RewardId right) => left.Equals(right);
+        public static bool operator ==(RewardId left, RewardId right)
+        {
+            return left.Equals(right);
+        }
 
-        public static bool operator !=(RewardId left, RewardId right) => !left.Equals(right);
+        public static bool operator !=(RewardId left, RewardId right)
+        {
+            return !left.Equals(right);
+        }
 
-        public override string ToString() => IsEmpty ? "<none>" : _value;
+        public override string ToString()
+        {
+            return IsEmpty ? "<none>" : _value;
+        }
     }
 }

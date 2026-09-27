@@ -13,7 +13,10 @@ namespace Vertigo.Wheel.UI.Views
         [SerializeField] private Image _ui_image_slot_icon_value;
         [SerializeField] private TextMeshProUGUI _ui_text_slot_amount_value;
 
-        public RectTransform Rect => (RectTransform)transform;
+        public RectTransform Rect
+        {
+            get { return (RectTransform)transform; }
+        }
 
         protected override void CacheReferences()
         {

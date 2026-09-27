@@ -27,6 +27,9 @@ namespace Vertigo.Wheel.Data.Configs
             return _cached.Scale(baseAmount, zone);
         }
 
-        private void OnDisable() => _cached = null;
+        private void OnDisable()
+        {
+            _cached = null;
+        }
     }
 }

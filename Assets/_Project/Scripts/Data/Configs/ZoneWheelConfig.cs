@@ -23,10 +23,22 @@ namespace Vertigo.Wheel.Data.Configs
         [Tooltip("Off by default: a fixed slot order makes this list a literal picture of the wheel.")]
         [SerializeField] private bool _shuffleSliceOrder;
 
-        public WheelTier Tier => _tier;
-        public WheelThemeConfig Theme => _theme;
-        public IReadOnlyList<WheelSliceEntry> Slices => _slices;
-        public bool ShuffleSliceOrder => _shuffleSliceOrder;
+        public WheelTier Tier
+        {
+            get { return _tier; }
+        }
+        public WheelThemeConfig Theme
+        {
+            get { return _theme; }
+        }
+        public IReadOnlyList<WheelSliceEntry> Slices
+        {
+            get { return _slices; }
+        }
+        public bool ShuffleSliceOrder
+        {
+            get { return _shuffleSliceOrder; }
+        }
 
         public WheelBlueprint ToBlueprint()
         {
@@ -47,10 +59,10 @@ namespace Vertigo.Wheel.Data.Configs
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            if (_slices.Count != WheelModel.StandardSliceCount)
+            if (_slices.Count != WheelModel.STANDARD_SLICE_COUNT)
                 Debug.LogError(
                     $"[Vertigo] Wheel '{name}' has {_slices.Count} slices; the artwork has " +
-                    $"{WheelModel.StandardSliceCount} slots.", this);
+                    $"{WheelModel.STANDARD_SLICE_COUNT} slots.", this);
 
             int bombs = 0;
             int totalWeight = 0;

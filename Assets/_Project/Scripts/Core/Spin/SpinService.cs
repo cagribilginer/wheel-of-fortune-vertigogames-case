@@ -10,8 +10,10 @@ namespace Vertigo.Wheel.Core.Spin
     {
         private readonly ISliceResolver _resolver;
 
-        public SpinService(ISliceResolver resolver) =>
+        public SpinService(ISliceResolver resolver)
+        {
             _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
+        }
 
         public SpinOutcome Spin(WheelModel wheel)
         {

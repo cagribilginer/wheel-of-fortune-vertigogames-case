@@ -8,11 +8,8 @@ namespace Vertigo.Wheel.Core.Run
 {
     /// <summary>
     /// The state of one playthrough: which zone the player is on, what phase they are in, and what they
-    /// are holding. Everything the presenters render is derived from here.
-    /// <para>
-    /// Restarting is a <see cref="ResetRun"/> call rather than a scene reload — no transition bugs, no
-    /// reallocation, no loading hitch, and nothing that depends on scene-instance lifetime.
-    /// </para>
+    /// are holding — everything the presenters render is derived from here. Restarting is a
+    /// <see cref="ResetRun"/> call, not a scene reload, so nothing depends on scene-instance lifetime.
     /// </summary>
     public sealed class RunModel
     {
@@ -22,9 +19,7 @@ namespace Vertigo.Wheel.Core.Run
         // The currency GoldBalance reports and ContinueService prices revives in.
         private readonly RewardId _goldCurrency;
 
-        // The currency CashBalance reports. Every "cash"/"gold" number shown anywhere in the UI is one of
-        // these two wallet balances — never a run-local haul total or a different score wearing the same
-        // label, so a currency always means the same number wherever it appears.
+        // The currency CashBalance reports — the same wallet balance shown everywhere as "cash".
         private readonly RewardId _cashCurrency;
 
         private int _currentZone = 1;
@@ -32,9 +27,8 @@ namespace Vertigo.Wheel.Core.Run
         private int _goldRevivesUsed;
         private int _adRevivesUsed;
 
-        // The haul the last bomb took, snapshotted the instant before the bank was cleared. A revive
-        // (paid or ad) pours it back in; a restart or a fresh run discards it. Null whenever no bomb is
-        // currently pending an answer.
+        // The haul the last bomb took, snapshotted before the bank was cleared; a revive restores it, a
+        // restart discards it. Null when no bomb is pending an answer.
         private List<BankEntry> _lostHaul;
 
         public RunModel(IZoneClassifier classifier, Wallet wallet, RewardId goldCurrency, RewardId cashCurrency)
@@ -53,34 +47,58 @@ namespace Vertigo.Wheel.Core.Run
 
         public RewardBank Bank { get; }
 
-        public int CurrentZone => _currentZone;
+        public int CurrentZone
+        {
+            get { return _currentZone; }
+        }
 
         /// <summary>Paid gold revives taken this run. Drives the doubling price of the next one.</summary>
-        public int GoldRevivesUsedThisRun => _goldRevivesUsed;
+        public int GoldRevivesUsedThisRun
+        {
+            get { return _goldRevivesUsed; }
+        }
 
         /// <summary>Free ad revives taken this run. Capped by <see cref="ContinueService"/>.</summary>
-        public int AdRevivesUsedThisRun => _adRevivesUsed;
+        public int AdRevivesUsedThisRun
+        {
+            get { return _adRevivesUsed; }
+        }
 
         /// <summary>Total revives (gold + ad) taken this run.</summary>
-        public int ContinuesUsedThisRun => _goldRevivesUsed + _adRevivesUsed;
+        public int ContinuesUsedThisRun
+        {
+            get { return _goldRevivesUsed + _adRevivesUsed; }
+        }
 
         /// <summary>
         /// What the pending bomb took, for the game-over screen to show as "what you stand to lose".
         /// Empty unless a bomb is currently waiting on a revive-or-restart decision.
         /// </summary>
-        public IReadOnlyList<BankEntry> LostHaul => _lostHaul ?? (IReadOnlyList<BankEntry>)Array.Empty<BankEntry>();
+        public IReadOnlyList<BankEntry> LostHaul
+        {
+            get { return _lostHaul ?? (IReadOnlyList<BankEntry>)Array.Empty<BankEntry>(); }
+        }
 
         /// <summary>The persistent gold balance, surfaced here so a state can hand it to the presentation.</summary>
-        public int GoldBalance => _wallet.BalanceOf(_goldCurrency);
+        public int GoldBalance
+        {
+            get { return _wallet.BalanceOf(_goldCurrency); }
+        }
 
         /// <summary>The persistent cash balance — same wallet, same rules, just a different id.</summary>
-        public int CashBalance => _wallet.BalanceOf(_cashCurrency);
+        public int CashBalance
+        {
+            get { return _wallet.BalanceOf(_cashCurrency); }
+        }
 
-        public ZoneType CurrentZoneType => _classifier.Classify(_currentZone);
+        public ZoneType CurrentZoneType
+        {
+            get { return _classifier.Classify(_currentZone); }
+        }
 
         public RunPhase Phase
         {
-            get => _phase;
+            get { return _phase; }
             set
             {
                 if (_phase == value) return;
@@ -90,9 +108,15 @@ namespace Vertigo.Wheel.Core.Run
             }
         }
 
-        public bool CanSpin => CashOutPolicy.CanSpin(_phase);
+        public bool CanSpin
+        {
+            get { return CashOutPolicy.CanSpin(_phase); }
+        }
 
-        public bool CanLeave => CashOutPolicy.CanLeave(_phase, !Bank.IsEmpty, CurrentZoneType);
+        public bool CanLeave
+        {
+            get { return CashOutPolicy.CanLeave(_phase, !Bank.IsEmpty, CurrentZoneType); }
+        }
 
         /// <summary>Banks a non-bomb spin result.</summary>
         public void Grant(SpinOutcome outcome, int unitValue = 1)

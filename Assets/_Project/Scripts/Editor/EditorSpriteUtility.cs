@@ -16,13 +16,13 @@ namespace Vertigo.Wheel.Editor
     /// </summary>
     public static class EditorSpriteUtility
     {
-        public const string SpriteRoot = "Assets/_Project/Art/Sprites";
+        public const string SPRITE_ROOT = "Assets/_Project/Art/Sprites";
 
         public static Sprite FindSprite(string spriteName)
         {
             if (string.IsNullOrEmpty(spriteName)) return null;
 
-            string[] guids = AssetDatabase.FindAssets($"{spriteName} t:Sprite", new[] { SpriteRoot });
+            string[] guids = AssetDatabase.FindAssets($"{spriteName} t:Sprite", new[] { SPRITE_ROOT });
 
             foreach (string guid in guids)
             {

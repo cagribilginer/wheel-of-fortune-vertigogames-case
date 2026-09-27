@@ -33,9 +33,12 @@ namespace Vertigo.Wheel.UI.Views.Popups
 
         // How long the celebration holds before the run resets — long enough for the chest punch and the
         // cash/gold count-up to read, short enough not to stall the loop.
-        private const float ClaimHoldSeconds = 0.8f;
+        private const float CLAIM_HOLD_SECONDS = 0.8f;
 
-        public RectTransform Content => _ui_content_popup_collect_list;
+        public RectTransform Content
+        {
+            get { return _ui_content_popup_collect_list; }
+        }
 
         public event Action ConfirmClicked;
         public event Action CancelClicked;
@@ -65,10 +68,19 @@ namespace Vertigo.Wheel.UI.Views.Popups
             _ui_button_popup_collect_cancel.onClick.RemoveListener(RaiseCancel);
         }
 
-        private void RaiseConfirm() => ConfirmClicked?.Invoke();
-        private void RaiseCancel() => CancelClicked?.Invoke();
+        private void RaiseConfirm()
+        {
+            ConfirmClicked?.Invoke();
+        }
+        private void RaiseCancel()
+        {
+            CancelClicked?.Invoke();
+        }
 
-        public void SetChest(Sprite chest) => _ui_image_popup_collect_chest_value.sprite = chest;
+        public void SetChest(Sprite chest)
+        {
+            _ui_image_popup_collect_chest_value.sprite = chest;
+        }
 
         /// <summary>
         /// <paramref name="cash"/> and <paramref name="gold"/> are the wallet balances as they stand before
@@ -107,14 +119,17 @@ namespace Vertigo.Wheel.UI.Views.Popups
             _cash.SetTarget(newCash, _ui_text_popup_collect_cash_value, gameObject);
             _gold.SetTarget(newGold, _ui_text_popup_collect_gold_value, gameObject);
 
-            DOVirtual.DelayedCall(ClaimHoldSeconds, () =>
+            DOVirtual.DelayedCall(CLAIM_HOLD_SECONDS, () =>
             {
                 onComplete?.Invoke();
                 Hide();
             }).SetLink(gameObject);
         }
 
-        public void Hide() => PlayClose(_ui_image_popup_collect_backdrop, _ui_transform_popup_collect_anim);
+        public void Hide()
+        {
+            PlayClose(_ui_image_popup_collect_backdrop, _ui_transform_popup_collect_anim);
+        }
 
         /// <summary>
         /// One label's count-up state. The first value is shown outright; every later one counts up/down

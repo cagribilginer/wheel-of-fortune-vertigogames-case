@@ -112,10 +112,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void HideGameOver()
         {
-            // No dismiss sting here: every route out of this screen is an action button (Give Up / Gold
-            // Revive / Ad Revive), and each already fires the shared button-click cue via UIButtonPunch —
-            // the same single cue the EXIT button plays. Layering PlayPopupClose on top made these buttons
-            // sound different from every other button in the game.
+            // No dismiss sting here: every route out is an action button, and each already fires the
+            // shared button-click cue via UIButtonPunch — layering PlayPopupClose on top would double it.
             _bomb.Hide();
         }
 

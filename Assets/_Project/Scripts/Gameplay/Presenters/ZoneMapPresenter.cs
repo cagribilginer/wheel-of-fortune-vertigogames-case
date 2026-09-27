@@ -26,8 +26,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     /// </summary>
     public sealed class ZoneMapPresenter
     {
-        private const int LookaheadZones = 15;
-        private const int MinimumWindow = 30;
+        private const int LOOKAHEAD_ZONES = 15;
+        private const int MINIMUM_WINDOW = 30;
 
         // Colour is driven by zone type only, never by whether a zone is passed or upcoming: green is
         // reserved strictly for safe zones (5, 10, 15…), gold for super zones, muted grey for everything
@@ -60,7 +60,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 _classifier.NextZoneOfType(zone, ZoneType.Safe),
                 _classifier.NextZoneOfType(zone, ZoneType.Super));
 
-            int horizon = Mathf.Max(MinimumWindow, zone + LookaheadZones);
+            int horizon = Mathf.Max(MINIMUM_WINDOW, zone + LOOKAHEAD_ZONES);
             while (_active.Count < horizon) BuildTile(_active.Count + 1);
 
             for (int i = 0; i < _active.Count; i++)

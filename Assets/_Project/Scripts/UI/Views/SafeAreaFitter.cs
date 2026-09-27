@@ -31,7 +31,10 @@ namespace Vertigo.Wheel.UI.Views
 
         // A screen-size int compare is negligible next to the correctness risk of a stale inset after a
         // rotation event that fires between frames.
-        private void Update() => Apply(force: false);
+        private void Update()
+        {
+            Apply(force: false);
+        }
 
         private void Apply(bool force)
         {

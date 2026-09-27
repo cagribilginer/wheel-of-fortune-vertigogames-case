@@ -17,9 +17,9 @@ namespace Vertigo.Wheel.Editor
     [CustomEditor(typeof(ZoneWheelConfig))]
     public sealed class ZoneWheelConfigEditor : UnityEditor.Editor
     {
-        private const float PreviewSize = 260f;
-        private const float SlotRadiusFactor = 0.34f;
-        private const float SlotSize = 54f;
+        private const float PREVIEW_SIZE = 260f;
+        private const float SLOT_RADIUS_FACTOR = 0.34f;
+        private const float SLOT_SIZE = 54f;
 
         public override void OnInspectorGUI()
         {
@@ -30,7 +30,7 @@ namespace Vertigo.Wheel.Editor
             EditorGUILayout.Space(8f);
             EditorGUILayout.LabelField("Wheel Preview", EditorStyles.boldLabel);
 
-            Rect area = GUILayoutUtility.GetRect(PreviewSize, PreviewSize);
+            Rect area = GUILayoutUtility.GetRect(PREVIEW_SIZE, PREVIEW_SIZE);
             DrawRing(area, config);
 
             DrawSummary(config);
@@ -39,7 +39,7 @@ namespace Vertigo.Wheel.Editor
         private static void DrawRing(Rect area, ZoneWheelConfig config)
         {
             Vector2 centre = area.center;
-            float radius = Mathf.Min(area.width, area.height) * SlotRadiusFactor;
+            float radius = Mathf.Min(area.width, area.height) * SLOT_RADIUS_FACTOR;
 
             Sprite baseSprite = config.Theme != null ? config.Theme.BaseSprite : null;
             if (baseSprite != null && baseSprite.texture != null)
@@ -70,7 +70,7 @@ namespace Vertigo.Wheel.Editor
                     centre.y - Mathf.Cos(angle) * radius);
 
                 var slotRect = new Rect(
-                    slotCentre.x - SlotSize / 2f, slotCentre.y - SlotSize / 2f, SlotSize, SlotSize);
+                    slotCentre.x - SLOT_SIZE / 2f, slotCentre.y - SLOT_SIZE / 2f, SLOT_SIZE, SLOT_SIZE);
 
                 DrawSlot(slotRect, config.Slices[i], i);
             }
@@ -127,10 +127,10 @@ namespace Vertigo.Wheel.Editor
                 $"{config.Slices.Count} slices · {bombs} bomb(s) · total weight {weight}",
                 EditorStyles.miniLabel);
 
-            if (config.Slices.Count != WheelModel.StandardSliceCount)
+            if (config.Slices.Count != WheelModel.STANDARD_SLICE_COUNT)
             {
                 EditorGUILayout.HelpBox(
-                    $"The artwork has {WheelModel.StandardSliceCount} slots but this wheel authors " +
+                    $"The artwork has {WheelModel.STANDARD_SLICE_COUNT} slots but this wheel authors " +
                     $"{config.Slices.Count}.", MessageType.Error);
             }
 

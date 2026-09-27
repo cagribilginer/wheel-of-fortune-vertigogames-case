@@ -28,12 +28,27 @@ namespace Vertigo.Wheel.UI.Views
         /// The panel root. Nothing else repositions it, so the zone-advance transition is free to slide it
         /// off-screen and back — unlike <see cref="Rotor"/>, which owns the spin rotation.
         /// </summary>
-        public RectTransform Root => (RectTransform)transform;
+        public RectTransform Root
+        {
+            get { return (RectTransform)transform; }
+        }
 
-        public RectTransform Rotor => _ui_transform_wheel_rotor;
-        public RectTransform Indicator => _ui_transform_wheel_indicator;
-        public RectTransform SpinButtonRect => (RectTransform)_ui_button_wheel_spin.transform;
-        public IReadOnlyList<WheelSlotView> Slots => _slots;
+        public RectTransform Rotor
+        {
+            get { return _ui_transform_wheel_rotor; }
+        }
+        public RectTransform Indicator
+        {
+            get { return _ui_transform_wheel_indicator; }
+        }
+        public RectTransform SpinButtonRect
+        {
+            get { return (RectTransform)_ui_button_wheel_spin.transform; }
+        }
+        public IReadOnlyList<WheelSlotView> Slots
+        {
+            get { return _slots; }
+        }
 
         public event Action SpinClicked;
 
@@ -52,9 +67,18 @@ namespace Vertigo.Wheel.UI.Views
                 : _ui_group_wheel_slots.GetComponentsInChildren<WheelSlotView>(includeInactive: true);
         }
 
-        private void OnEnable() => _ui_button_wheel_spin.onClick.AddListener(RaiseSpinClicked);
-        private void OnDisable() => _ui_button_wheel_spin.onClick.RemoveListener(RaiseSpinClicked);
-        private void RaiseSpinClicked() => SpinClicked?.Invoke();
+        private void OnEnable()
+        {
+            _ui_button_wheel_spin.onClick.AddListener(RaiseSpinClicked);
+        }
+        private void OnDisable()
+        {
+            _ui_button_wheel_spin.onClick.RemoveListener(RaiseSpinClicked);
+        }
+        private void RaiseSpinClicked()
+        {
+            SpinClicked?.Invoke();
+        }
 
         public void SetTheme(Sprite baseSprite, Sprite indicatorSprite, Color accent, Color glow)
         {
@@ -64,7 +88,10 @@ namespace Vertigo.Wheel.UI.Views
             _ui_button_wheel_spin.image.color = accent;
         }
 
-        public void SetSpinInteractable(bool interactable) => _ui_button_wheel_spin.interactable = interactable;
+        public void SetSpinInteractable(bool interactable)
+        {
+            _ui_button_wheel_spin.interactable = interactable;
+        }
 
 #if UNITY_EDITOR
         /// <summary>

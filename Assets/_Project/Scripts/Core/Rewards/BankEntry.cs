@@ -15,8 +15,14 @@ namespace Vertigo.Wheel.Core.Rewards
         }
 
         /// <summary>Used only to pick which chest sprite the cash-out popup shows.</summary>
-        public long TotalValue => (long)Amount * UnitValue;
+        public long TotalValue
+        {
+            get { return (long)Amount * UnitValue; }
+        }
 
-        public override string ToString() => $"{Reward} x{Amount}";
+        public override string ToString()
+        {
+            return $"{Reward} x{Amount}";
+        }
     }
 }

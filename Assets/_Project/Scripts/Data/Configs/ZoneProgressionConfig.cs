@@ -35,12 +35,27 @@ namespace Vertigo.Wheel.Data.Configs
         [Tooltip("0 = endless, which is what ships. Only set this to shorten a recording.")]
         [Min(0)] [SerializeField] private int _demoMaxZone;
 
-        public int SafeZoneInterval => _safeZoneInterval;
-        public int SuperZoneInterval => _superZoneInterval;
-        public ScalingStrategySO Scaling => _scaling;
-        public int DemoMaxZone => _demoMaxZone;
+        public int SafeZoneInterval
+        {
+            get { return _safeZoneInterval; }
+        }
+        public int SuperZoneInterval
+        {
+            get { return _superZoneInterval; }
+        }
+        public ScalingStrategySO Scaling
+        {
+            get { return _scaling; }
+        }
+        public int DemoMaxZone
+        {
+            get { return _demoMaxZone; }
+        }
 
-        public ZoneClassifier CreateClassifier() => new ZoneClassifier(_safeZoneInterval, _superZoneInterval);
+        public ZoneClassifier CreateClassifier()
+        {
+            return new ZoneClassifier(_safeZoneInterval, _superZoneInterval);
+        }
 
         public WheelBlueprint GetBlueprint(int zone, ZoneType zoneType)
         {

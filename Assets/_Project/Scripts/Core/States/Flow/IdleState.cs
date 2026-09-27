@@ -22,8 +22,10 @@ namespace Vertigo.Wheel.Core.States.Flow
                 canLeave: Context.Run.CanLeave);
         }
 
-        public override void Exit() =>
+        public override void Exit()
+        {
             Context.Presentation.SetInputState(canSpin: false, canLeave: false);
+        }
 
         public override void OnSpinRequested()
         {

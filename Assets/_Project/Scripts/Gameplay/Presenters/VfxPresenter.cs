@@ -13,7 +13,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     {
         private readonly VfxView _view;
 
-        public VfxPresenter(VfxView view) => _view = view;
+        public VfxPresenter(VfxView view)
+        {
+            _view = view;
+        }
 
         public void PlayBombImpact()
         {
@@ -26,7 +29,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             Flash(_view.Flash, new Color(1f, 0.2f, 0.2f, 1f));
         }
 
-        public void PlayRewardBurst() => Flash(_view.Burst, Color.white);
+        public void PlayRewardBurst()
+        {
+            Flash(_view.Burst, Color.white);
+        }
 
         // A quick spike in then a slower fade out, on whichever image is passed — the flash and the reward
         // burst are the exact same shape, just different tint and target image.

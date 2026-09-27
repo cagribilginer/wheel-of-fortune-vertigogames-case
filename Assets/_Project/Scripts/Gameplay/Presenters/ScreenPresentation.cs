@@ -31,7 +31,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         // Fixed, zone-independent per-unit worth (RewardDefinition.EstimatedValue) — the same scale
         // PopupPresenter's chest tiers use — at or above which a landed reward earns the glow burst on top
         // of any safe/super zone clear it might also be.
-        private const int BigRewardUnitValue = 60;
+        private const int BIG_REWARD_UNIT_VALUE = 60;
 
         public ScreenPresentation(
             WheelPresenter wheel, ZoneMapPresenter zoneMap, BankPresenter bank,
@@ -66,7 +66,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _actionBar.SetInputState(canLeave);
         }
 
-        public void PlaySpin(int slotIndex, Action onComplete) => _wheel.PlaySpin(slotIndex, onComplete);
+        public void PlaySpin(int slotIndex, Action onComplete)
+        {
+            _wheel.PlaySpin(slotIndex, onComplete);
+        }
 
         public void PlayReveal(SpinOutcome outcome, ZoneType zoneType, Action onComplete)
         {
@@ -76,15 +79,17 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             if (!outcome.IsBomb)
             {
                 _audio.PlayReward();
-                if (zoneType != ZoneType.Normal || outcome.UnitValue >= BigRewardUnitValue)
+                if (zoneType != ZoneType.Normal || outcome.UnitValue >= BIG_REWARD_UNIT_VALUE)
                     _vfx.PlayRewardBurst();
             }
 
             _wheel.HighlightSlot(outcome.SlotIndex, onComplete);
         }
 
-        public void PlayRewardGranted(SpinOutcome outcome, Action onComplete) =>
+        public void PlayRewardGranted(SpinOutcome outcome, Action onComplete)
+        {
             _bank.FlyIn(outcome, _wheel.SlotWorldPosition(outcome.SlotIndex), onComplete);
+        }
 
         public void PlayBomb(Action onComplete)
         {
@@ -113,14 +118,24 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _popups.HideGameOver();
         }
 
-        public void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared, int playerGold, int playerCash) =>
+        public void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared, int playerGold, int playerCash)
+        {
             _popups.ShowCashOut(haul, zonesCleared, playerGold, playerCash);
+        }
 
-        public void HideCashOut() => _popups.HideCashOut();
+        public void HideCashOut()
+        {
+            _popups.HideCashOut();
+        }
 
-        public void ClaimCashOut(int playerGold, int playerCash, Action onComplete) =>
+        public void ClaimCashOut(int playerGold, int playerCash, Action onComplete)
+        {
             _popups.ClaimCashOut(playerGold, playerCash, onComplete);
+        }
 
-        public void Dispose() => _bombDelay?.Kill();
+        public void Dispose()
+        {
+            _bombDelay?.Kill();
+        }
     }
 }

@@ -54,10 +54,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _homeY = _view.Root.anchoredPosition.y;
             _hiddenY = _homeY - 900f; // a 720px panel plus margin: clears the bottom of the safe area entirely
 
-            // Slot placement is deliberately NOT done here. The constructor runs inside GameInstaller.Awake,
-            // before the Canvas has completed its first layout pass, so the rotor's rect still reads 0 wide.
-            // It is done instead on the first SetTheme (the zone-setup cinematic), by which point the layout
-            // has settled — see LayoutSlots.
+            // Slot placement isn't done here: the Canvas hasn't laid out yet at construction time, so the
+            // rotor's rect still reads 0 wide. It happens on the first SetTheme instead — see LayoutSlots.
 
             // Built once and restarted per tick rather than fired fresh each time: ~45 ticks happen over one
             // spin, and a prebuilt, paused, non-autokilled tween is the zero-alloc way to replay that.
@@ -67,10 +65,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 .SetLink(_view.Indicator.gameObject, LinkBehaviour.KillOnDestroy)
                 .Pause();
 
-            // Targets the spin button's own rect, not its "_anim" child — that child is UIButtonPunch's
-            // target, so the idle-breathe loop and a click's punch tween never fight over one transform's
-            // localScale. Same prebuilt/restarted shape as the tick tween above, for the same reason: this
-            // plays continuously while idle rather than firing once.
+            // Targets the spin button's own rect, not its "_anim" child (UIButtonPunch's target), so the
+            // idle-breathe loop and a click's punch tween never fight over one transform's localScale.
             _breatheTween = _view.SpinButtonRect
                 .DOScale(1.04f, 1.1f)
                 .SetLoops(-1, LoopType.Yoyo)
@@ -140,7 +136,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         // The wheel panel's authored, fixed design size (see MainSceneBuilder.BuildWheel) — the fallback
         // LayoutSlots reaches for if the rotor's rect ever reads back degenerate.
-        private const float DesignWheelSize = 720f;
+        private const float DESIGN_WHEEL_SIZE = 720f;
 
         private void LayoutSlots()
         {
@@ -159,10 +155,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             if (wheelSize < 50f)
             {
                 // Still degenerate: fall back to the authored fixed size (MainSceneBuilder.BuildWheel pins
-                // the panel to 720x720). A degenerate rect would otherwise collapse every slot's radius to
-                // ~0 and stack all eight on the rotor centre. Silent because the fallback value is the
-                // correct one; a stacked-slot bug would show up in the Game view immediately anyway.
-                wheelSize = DesignWheelSize;
+                // the panel to 720x720) rather than collapse every slot's radius to ~0 at the rotor centre.
+                wheelSize = DESIGN_WHEEL_SIZE;
             }
             else
             {
@@ -184,10 +178,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 RectTransform slot = _view.Slots[i].Rect;
                 slot.anchoredPosition = new Vector2(x, y);
 
-                // Cancels the slot's own position angle so its local "up" always points radially outward —
-                // i.e. the bottom of the icon/text faces the hub. This holds throughout any later rotor
-                // spin too: rotating the rotor is a rigid transform, so a slot correct at rest stays
-                // correct at every intermediate angle, not just when the wheel is standing still.
+                // Cancels the slot's own position angle so its local "up" points radially outward — the
+                // bottom of the icon/text faces the hub, and stays correct through any later rotor spin.
                 slot.localEulerAngles = new Vector3(0f, 0f, -angleDeg);
             }
         }
@@ -231,16 +223,17 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             }
         }
 
-        public Vector3 SlotWorldPosition(int slotIndex) => _view.Slots[slotIndex].Rect.position;
+        public Vector3 SlotWorldPosition(int slotIndex)
+        {
+            return _view.Slots[slotIndex].Rect.position;
+        }
 
         public void PlaySpin(int slotIndex, Action onComplete)
         {
             _lastTickIndex = int.MinValue;
 
-            // Unity's positive Z rotation is counter-clockwise on screen, but slot index increases
-            // clockwise (LayoutSlots' x = R*sin, y = R*cos). Rotating the rotor CCW by a slot's own
-            // clockwise angle is exactly what cancels that angle out and brings it to the top — the
-            // negated form previously here rotated the wrong way and landed the mirror-image slot instead.
+            // Unity's positive Z rotation is CCW on screen, but slot index increases clockwise (LayoutSlots'
+            // x = R*sin, y = R*cos), so rotating the rotor CCW by a slot's own clockwise angle brings it to the top.
             float targetLocal = slotIndex * _slotAngle;
             float current = _view.Rotor.localEulerAngles.z;
             float delta = Mathf.Repeat(targetLocal - current, 360f);

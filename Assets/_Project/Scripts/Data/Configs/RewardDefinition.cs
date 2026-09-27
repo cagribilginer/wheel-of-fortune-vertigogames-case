@@ -28,13 +28,34 @@ namespace Vertigo.Wheel.Data.Configs
         [Min(0)]
         [SerializeField] private int _estimatedValue = 1;
 
-        public string Id => string.IsNullOrEmpty(_id) ? name : _id;
-        public RewardId RewardId => new RewardId(Id);
-        public string DisplayName => string.IsNullOrEmpty(_displayName) ? name : _displayName;
-        public Sprite Icon => _icon;
-        public RewardCategory Category => _category;
-        public int DefaultBaseAmount => _defaultBaseAmount;
-        public int EstimatedValue => _estimatedValue;
+        public string Id
+        {
+            get { return string.IsNullOrEmpty(_id) ? name : _id; }
+        }
+        public RewardId RewardId
+        {
+            get { return new RewardId(Id); }
+        }
+        public string DisplayName
+        {
+            get { return string.IsNullOrEmpty(_displayName) ? name : _displayName; }
+        }
+        public Sprite Icon
+        {
+            get { return _icon; }
+        }
+        public RewardCategory Category
+        {
+            get { return _category; }
+        }
+        public int DefaultBaseAmount
+        {
+            get { return _defaultBaseAmount; }
+        }
+        public int EstimatedValue
+        {
+            get { return _estimatedValue; }
+        }
 
         /// <summary>
         /// Whether more than one of this reward can be granted at once. Consumables, currencies and craft
@@ -42,20 +63,28 @@ namespace Vertigo.Wheel.Data.Configs
         /// weapon, a cosmetic or a chest is a single unique drop: its count is always 1 and zone scaling
         /// never touches it.
         /// </summary>
-        public bool IsStackable =>
-            _category == RewardCategory.Consumable ||
-            _category == RewardCategory.Currency ||
-            _category == RewardCategory.Points;
+        public bool IsStackable
+        {
+            get
+            {
+                return _category == RewardCategory.Consumable ||
+                    _category == RewardCategory.Currency ||
+                    _category == RewardCategory.Points;
+            }
+        }
 
         /// <summary>
         /// Hard ceiling on a single drop's count after zone scaling, or 0 for no ceiling. Craft shards
         /// (the "Points" rewards) top out at 5 however deep the run goes; consumables and currencies are
         /// left uncapped so a deep run still feels rewarding.
         /// </summary>
-        public int MaxAmountPerDrop => _category == RewardCategory.Points ? PointsCeiling : 0;
+        public int MaxAmountPerDrop
+        {
+            get { return _category == RewardCategory.Points ? POINTS_CEILING : 0; }
+        }
 
         /// <summary>The shard ceiling from the design brief: Points rewards never exceed this.</summary>
-        public const int PointsCeiling = 5;
+        public const int POINTS_CEILING = 5;
 
 #if UNITY_EDITOR
         private void OnValidate()

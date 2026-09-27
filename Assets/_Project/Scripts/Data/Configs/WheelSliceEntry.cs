@@ -27,11 +27,23 @@ namespace Vertigo.Wheel.Data.Configs
         [Min(0)]
         [SerializeField] private int _weight = 1;
 
-        public SliceKind Kind => _kind;
-        public RewardDefinition Reward => _reward;
-        public int Weight => _weight;
+        public SliceKind Kind
+        {
+            get { return _kind; }
+        }
+        public RewardDefinition Reward
+        {
+            get { return _reward; }
+        }
+        public int Weight
+        {
+            get { return _weight; }
+        }
 
-        public bool IsBomb => _kind == SliceKind.Bomb;
+        public bool IsBomb
+        {
+            get { return _kind == SliceKind.Bomb; }
+        }
 
         public int ResolveBaseAmount()
         {

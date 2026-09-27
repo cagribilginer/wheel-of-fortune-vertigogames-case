@@ -23,8 +23,8 @@ namespace Vertigo.Wheel.Editor
     /// </summary>
     public sealed class WheelSpriteImportPostprocessor : AssetPostprocessor
     {
-        private const string SpriteRoot = "Assets/_Project/Art/Sprites/";
-        private const float PixelsPerUnit = 100f;
+        private const string SPRITE_ROOT = "Assets/_Project/Art/Sprites/";
+        private const float PIXELS_PER_UNIT = 100f;
 
         /// <summary>
         /// Border is (left, bottom, right, top).
@@ -58,12 +58,12 @@ namespace Vertigo.Wheel.Editor
 
         private void OnPreprocessTexture()
         {
-            if (!assetPath.StartsWith(SpriteRoot, StringComparison.Ordinal)) return;
+            if (!assetPath.StartsWith(SPRITE_ROOT, StringComparison.Ordinal)) return;
             if (!(assetImporter is TextureImporter importer)) return;
 
             importer.textureType = TextureImporterType.Sprite;
             importer.spriteImportMode = SpriteImportMode.Single;
-            importer.spritePixelsPerUnit = PixelsPerUnit;
+            importer.spritePixelsPerUnit = PIXELS_PER_UNIT;
             importer.mipmapEnabled = false;          // UI is drawn 1:1; mips only cost memory and blur it
             importer.alphaIsTransparency = true;
             importer.wrapMode = TextureWrapMode.Clamp;
@@ -93,7 +93,7 @@ namespace Vertigo.Wheel.Editor
         [MenuItem("Tools/Vertigo/Reimport Sprite Conventions")]
         private static void ReimportAllSprites()
         {
-            string[] guids = AssetDatabase.FindAssets("t:Texture2D", new[] { SpriteRoot.TrimEnd('/') });
+            string[] guids = AssetDatabase.FindAssets("t:Texture2D", new[] { SPRITE_ROOT.TrimEnd('/') });
 
             try
             {

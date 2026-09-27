@@ -31,7 +31,13 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _popup.CloseClicked -= _popup.Hide;
         }
 
-        private void ShowSafePreview() => _popup.Show(isSuper: false);
-        private void ShowSuperPreview() => _popup.Show(isSuper: true);
+        private void ShowSafePreview()
+        {
+            _popup.Show(isSuper: false);
+        }
+        private void ShowSuperPreview()
+        {
+            _popup.Show(isSuper: true);
+        }
     }
 }

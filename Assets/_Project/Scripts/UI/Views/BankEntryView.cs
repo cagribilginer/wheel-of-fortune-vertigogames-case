@@ -15,7 +15,10 @@ namespace Vertigo.Wheel.UI.Views
         [SerializeField] private Image _ui_image_bank_entry_icon_value;
         [SerializeField] private TextMeshProUGUI _ui_text_bank_entry_amount_value;
 
-        public RectTransform Rect => (RectTransform)transform;
+        public RectTransform Rect
+        {
+            get { return (RectTransform)transform; }
+        }
 
         protected override void CacheReferences()
         {
@@ -31,6 +34,9 @@ namespace Vertigo.Wheel.UI.Views
         }
 
         /// <summary>Just the count — the fly-in tween drives this every frame while the number climbs.</summary>
-        public void SetAmount(int amount) => _ui_text_bank_entry_amount_value.SetText("x{0}", amount);
+        public void SetAmount(int amount)
+        {
+            _ui_text_bank_entry_amount_value.SetText("x{0}", amount);
+        }
     }
 }

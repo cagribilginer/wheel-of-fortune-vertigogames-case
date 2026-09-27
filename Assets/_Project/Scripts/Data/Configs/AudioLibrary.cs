@@ -25,22 +25,46 @@ namespace Vertigo.Wheel.Data.Configs
         [SerializeField] private AudioClip _bombExplosion;
         [SerializeField] private AudioClip _defeatAmbience;
 
-        public AudioClip ButtonClick => _buttonClick;
-        public AudioClip PopupOpen => _popupOpen;
-        public AudioClip PopupClose => _popupClose;
+        public AudioClip ButtonClick
+        {
+            get { return _buttonClick; }
+        }
+        public AudioClip PopupOpen
+        {
+            get { return _popupOpen; }
+        }
+        public AudioClip PopupClose
+        {
+            get { return _popupClose; }
+        }
 
         /// <summary>The bright sting when a reward is revealed at the wheel stop.</summary>
-        public AudioClip RewardChime => _rewardChime;
+        public AudioClip RewardChime
+        {
+            get { return _rewardChime; }
+        }
 
         /// <summary>The softer swoosh / coin-drop as a won reward flies into the bank panel.</summary>
-        public AudioClip BankCollect => _bankCollect;
+        public AudioClip BankCollect
+        {
+            get { return _bankCollect; }
+        }
 
         /// <summary>The mechanical slide as the wheel exits, re-themes and rides back in for the next zone.</summary>
-        public AudioClip WheelTransition => _wheelTransition;
+        public AudioClip WheelTransition
+        {
+            get { return _wheelTransition; }
+        }
 
-        public AudioClip BombExplosion => _bombExplosion;
+        public AudioClip BombExplosion
+        {
+            get { return _bombExplosion; }
+        }
 
         /// <summary>The tense drone that stings in under the bomb defeat / revive screen.</summary>
-        public AudioClip DefeatAmbience => _defeatAmbience;
+        public AudioClip DefeatAmbience
+        {
+            get { return _defeatAmbience; }
+        }
     }
 }

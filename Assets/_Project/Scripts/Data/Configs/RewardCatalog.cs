@@ -18,9 +18,15 @@ namespace Vertigo.Wheel.Data.Configs
 
         private Dictionary<string, RewardDefinition> _byId;
 
-        public IReadOnlyList<RewardDefinition> All => _all;
+        public IReadOnlyList<RewardDefinition> All
+        {
+            get { return _all; }
+        }
 
-        public RewardDefinition Find(RewardId id) => Find(id.Value);
+        public RewardDefinition Find(RewardId id)
+        {
+            return Find(id.Value);
+        }
 
         public RewardDefinition Find(string id)
         {
@@ -54,7 +60,10 @@ namespace Vertigo.Wheel.Data.Configs
 
         // Domain reload and asset edits both invalidate the cache; rebuilding lazily is cheaper than
         // keeping it correct eagerly.
-        private void OnEnable() => _byId = null;
+        private void OnEnable()
+        {
+            _byId = null;
+        }
 
 #if UNITY_EDITOR
         private void OnValidate()

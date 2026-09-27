@@ -29,7 +29,10 @@ namespace Vertigo.Wheel.UI.Views
             if (_animTarget == null) _animTarget = FindAnimChild();
         }
 
-        private void OnEnable() => _button.onClick.AddListener(Punch);
+        private void OnEnable()
+        {
+            _button.onClick.AddListener(Punch);
+        }
 
         private void OnDisable()
         {

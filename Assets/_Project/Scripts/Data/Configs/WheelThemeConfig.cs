@@ -15,12 +15,30 @@ namespace Vertigo.Wheel.Data.Configs
         [SerializeField] private AudioClip _spinLoop;
         [SerializeField] private AudioClip _tick;
 
-        public Sprite BaseSprite => _baseSprite;
-        public Sprite IndicatorSprite => _indicatorSprite;
-        public Color AccentColor => _accentColor;
-        public Color GlowColor => _glowColor;
-        public AudioClip SpinLoop => _spinLoop;
-        public AudioClip Tick => _tick;
+        public Sprite BaseSprite
+        {
+            get { return _baseSprite; }
+        }
+        public Sprite IndicatorSprite
+        {
+            get { return _indicatorSprite; }
+        }
+        public Color AccentColor
+        {
+            get { return _accentColor; }
+        }
+        public Color GlowColor
+        {
+            get { return _glowColor; }
+        }
+        public AudioClip SpinLoop
+        {
+            get { return _spinLoop; }
+        }
+        public AudioClip Tick
+        {
+            get { return _tick; }
+        }
 
 #if UNITY_EDITOR
         private void OnValidate()

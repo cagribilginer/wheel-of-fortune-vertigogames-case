@@ -9,11 +9,11 @@ namespace Vertigo.Wheel.Core.Rewards
     /// </summary>
     public sealed class LinearRewardScaling : IRewardScaling
     {
-        public const double DefaultGrowthPerZone = 0.25d;
+        public const double DEFAULT_GROWTH_PER_ZONE = 0.25d;
 
         private readonly double _growthPerZone;
 
-        public LinearRewardScaling(double growthPerZone = DefaultGrowthPerZone)
+        public LinearRewardScaling(double growthPerZone = DEFAULT_GROWTH_PER_ZONE)
         {
             if (growthPerZone < 0d)
                 throw new ArgumentOutOfRangeException(nameof(growthPerZone), growthPerZone, "Growth cannot be negative.");
@@ -21,7 +21,9 @@ namespace Vertigo.Wheel.Core.Rewards
             _growthPerZone = growthPerZone;
         }
 
-        public int Scale(int baseAmount, int zone) =>
-            RewardScalingMath.Apply(baseAmount, zone, 1d + _growthPerZone * (zone - 1));
+        public int Scale(int baseAmount, int zone)
+        {
+            return RewardScalingMath.Apply(baseAmount, zone, 1d + _growthPerZone * (zone - 1));
+        }
     }
 }

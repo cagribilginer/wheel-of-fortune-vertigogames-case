@@ -14,14 +14,14 @@ namespace Vertigo.Wheel.UI.Views
     /// </para>
     /// <para>
     /// Even in the editor / a dev build it starts <em>hidden</em> so it never sits in a gameplay recording.
-    /// Press <see cref="ToggleKey"/> to reveal the DEBUG bar; press it again to hide the whole thing. The
+    /// Press <see cref="TOGGLE_KEY"/> to reveal the DEBUG bar; press it again to hide the whole thing. The
     /// root GameObject stays active while hidden so this component keeps polling for that key.
     /// </para>
     /// </summary>
     public sealed class DebugOverlayView : UIViewBase
     {
         // Tap-only landscape game — nothing else reads the keyboard, so a plain letter is safe here.
-        private const KeyCode ToggleKey = KeyCode.D;
+        private const KeyCode TOGGLE_KEY = KeyCode.D;
 
         [SerializeField] private Button _ui_button_debug_toggle;
         [SerializeField] private RectTransform _ui_panel_debug_body;
@@ -67,7 +67,7 @@ namespace Vertigo.Wheel.UI.Views
 
         private void Update()
         {
-            if (_available && Input.GetKeyDown(ToggleKey))
+            if (_available && Input.GetKeyDown(TOGGLE_KEY))
                 SetShown(!_shown);
         }
 
@@ -99,7 +99,10 @@ namespace Vertigo.Wheel.UI.Views
             if (!shown) SetExpanded(false);
         }
 
-        private void ToggleBody() => SetExpanded(!_expanded);
+        private void ToggleBody()
+        {
+            SetExpanded(!_expanded);
+        }
 
         private void SetExpanded(bool expanded)
         {
@@ -107,10 +110,25 @@ namespace Vertigo.Wheel.UI.Views
             if (_ui_panel_debug_body != null) _ui_panel_debug_body.gameObject.SetActive(expanded);
         }
 
-        private void RaiseZone5() => JumpToZone5Clicked?.Invoke();
-        private void RaiseZone30() => JumpToZone30Clicked?.Invoke();
-        private void RaiseBomb() => TriggerBombClicked?.Invoke();
-        private void RaiseGold() => GrantGoldClicked?.Invoke();
-        private void RaiseItems() => GrantItemsClicked?.Invoke();
+        private void RaiseZone5()
+        {
+            JumpToZone5Clicked?.Invoke();
+        }
+        private void RaiseZone30()
+        {
+            JumpToZone30Clicked?.Invoke();
+        }
+        private void RaiseBomb()
+        {
+            TriggerBombClicked?.Invoke();
+        }
+        private void RaiseGold()
+        {
+            GrantGoldClicked?.Invoke();
+        }
+        private void RaiseItems()
+        {
+            GrantItemsClicked?.Invoke();
+        }
     }
 }

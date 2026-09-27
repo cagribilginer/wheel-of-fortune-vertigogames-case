@@ -23,8 +23,8 @@ namespace Vertigo.Wheel.UI.Views.Popups
         [SerializeField] private RectTransform _ui_row_popup_milestone_super;
         [SerializeField] private Button _ui_button_popup_milestone_close;
 
-        private const string SafeDescription = "Win special rewards in bomb-free Safe Zones!";
-        private const string SuperDescription = "Win super rewards in bomb-free Super Zones!";
+        private const string SAFE_DESCRIPTION = "Win special rewards in bomb-free Safe Zones!";
+        private const string SUPER_DESCRIPTION = "Win super rewards in bomb-free Super Zones!";
 
         public event Action CloseClicked;
 
@@ -52,7 +52,10 @@ namespace Vertigo.Wheel.UI.Views.Popups
             _ui_button_popup_milestone_close.onClick.RemoveListener(RaiseClose);
         }
 
-        private void RaiseClose() => CloseClicked?.Invoke();
+        private void RaiseClose()
+        {
+            CloseClicked?.Invoke();
+        }
 
         public void Show(bool isSuper)
         {
@@ -60,11 +63,14 @@ namespace Vertigo.Wheel.UI.Views.Popups
             _ui_row_popup_milestone_super.gameObject.SetActive(isSuper);
 
             _ui_text_popup_milestone_title_value.text = isSuper ? "SUPER ZONE" : "SAFE ZONE";
-            _ui_text_popup_milestone_desc_value.text = isSuper ? SuperDescription : SafeDescription;
+            _ui_text_popup_milestone_desc_value.text = isSuper ? SUPER_DESCRIPTION : SAFE_DESCRIPTION;
 
             PlayOpen(_ui_image_popup_milestone_backdrop, _ui_transform_popup_milestone_anim);
         }
 
-        public void Hide() => PlayClose(_ui_image_popup_milestone_backdrop, _ui_transform_popup_milestone_anim);
+        public void Hide()
+        {
+            PlayClose(_ui_image_popup_milestone_backdrop, _ui_transform_popup_milestone_anim);
+        }
     }
 }

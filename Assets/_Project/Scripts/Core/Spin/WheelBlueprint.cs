@@ -32,7 +32,10 @@ namespace Vertigo.Wheel.Core.Spin
 
         public WheelTier Tier { get; }
 
-        public IReadOnlyList<SliceBlueprint> Slices => _slices;
+        public IReadOnlyList<SliceBlueprint> Slices
+        {
+            get { return _slices; }
+        }
 
         public int BombCount { get; }
 

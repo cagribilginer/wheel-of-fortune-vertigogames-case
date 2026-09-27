@@ -28,12 +28,24 @@ namespace Vertigo.Wheel.UI.Views
             Bind(ref _ui_text_action_exit_value, "ui_text_action_exit_value");
         }
 
-        private void OnEnable() => _ui_button_action_exit.onClick.AddListener(RaiseExit);
+        private void OnEnable()
+        {
+            _ui_button_action_exit.onClick.AddListener(RaiseExit);
+        }
 
-        private void OnDisable() => _ui_button_action_exit.onClick.RemoveListener(RaiseExit);
+        private void OnDisable()
+        {
+            _ui_button_action_exit.onClick.RemoveListener(RaiseExit);
+        }
 
-        private void RaiseExit() => ExitClicked?.Invoke();
+        private void RaiseExit()
+        {
+            ExitClicked?.Invoke();
+        }
 
-        public void SetExitInteractable(bool interactable) => _ui_button_action_exit.interactable = interactable;
+        public void SetExitInteractable(bool interactable)
+        {
+            _ui_button_action_exit.interactable = interactable;
+        }
     }
 }

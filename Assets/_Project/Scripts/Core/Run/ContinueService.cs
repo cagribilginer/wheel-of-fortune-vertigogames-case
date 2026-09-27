@@ -15,7 +15,7 @@ namespace Vertigo.Wheel.Core.Run
     public sealed class ContinueService
     {
         // Guards the doubling shift from overflowing a long before the int clamp in CostFor catches it.
-        private const int MaxDoublingShift = 40;
+        private const int MAX_DOUBLING_SHIFT = 40;
 
         private readonly Wallet _wallet;
         private readonly RewardId _currency;
@@ -41,7 +41,7 @@ namespace Vertigo.Wheel.Core.Run
                     nameof(goldRevivesUsedThisRun), goldRevivesUsedThisRun, "Revive count cannot be negative.");
 
             long depthCost = (long)_settings.BaseCost + (long)_settings.CostPerZone * zoneReached;
-            long cost = depthCost << Math.Min(goldRevivesUsedThisRun, MaxDoublingShift);
+            long cost = depthCost << Math.Min(goldRevivesUsedThisRun, MAX_DOUBLING_SHIFT);
             return cost >= int.MaxValue ? int.MaxValue : (int)cost;
         }
 
@@ -49,15 +49,19 @@ namespace Vertigo.Wheel.Core.Run
         /// The paid revive is offered for as long as the player can afford the (doubling) price — there is
         /// no per-run limit on it.
         /// </summary>
-        public bool IsGoldReviveOffered(int zoneReached, int goldRevivesUsedThisRun) =>
-            _wallet.CanAfford(_currency, CostFor(zoneReached, goldRevivesUsedThisRun));
+        public bool IsGoldReviveOffered(int zoneReached, int goldRevivesUsedThisRun)
+        {
+            return _wallet.CanAfford(_currency, CostFor(zoneReached, goldRevivesUsedThisRun));
+        }
 
         /// <summary>
         /// The ad revive is the one free escape, capped per run (default once). No wallet check — watching
         /// the video is the price.
         /// </summary>
-        public bool IsAdReviveOffered(int adRevivesUsedThisRun) =>
-            adRevivesUsedThisRun < _settings.MaxAdRevivesPerRun;
+        public bool IsAdReviveOffered(int adRevivesUsedThisRun)
+        {
+            return adRevivesUsedThisRun < _settings.MaxAdRevivesPerRun;
+        }
 
         /// <summary>Debits the wallet for a gold revive. Returns false and changes nothing when not allowed.</summary>
         public bool TryPurchase(int zoneReached, int goldRevivesUsedThisRun)

@@ -18,17 +18,29 @@ namespace Vertigo.Wheel.Core.Rewards
         private readonly ReadOnlyCollection<BankEntry> _entriesView;
         private readonly Dictionary<RewardId, int> _indexByReward = new Dictionary<RewardId, int>();
 
-        public RewardBank() => _entriesView = new ReadOnlyCollection<BankEntry>(_entries);
+        public RewardBank()
+        {
+            _entriesView = new ReadOnlyCollection<BankEntry>(_entries);
+        }
 
         /// <summary>Raised on any change to the bank's contents, including <see cref="Clear"/>.</summary>
         public event Action Changed;
 
         /// <summary>A genuine read-only view: casting it back to a List and mutating it is not possible.</summary>
-        public IReadOnlyList<BankEntry> Entries => _entriesView;
+        public IReadOnlyList<BankEntry> Entries
+        {
+            get { return _entriesView; }
+        }
 
-        public int DistinctRewardCount => _entries.Count;
+        public int DistinctRewardCount
+        {
+            get { return _entries.Count; }
+        }
 
-        public bool IsEmpty => _entries.Count == 0;
+        public bool IsEmpty
+        {
+            get { return _entries.Count == 0; }
+        }
 
         public long TotalValue
         {
@@ -63,8 +75,10 @@ namespace Vertigo.Wheel.Core.Rewards
             Changed?.Invoke();
         }
 
-        public int AmountOf(RewardId reward) =>
-            _indexByReward.TryGetValue(reward, out int index) ? _entries[index].Amount : 0;
+        public int AmountOf(RewardId reward)
+        {
+            return _indexByReward.TryGetValue(reward, out int index) ? _entries[index].Amount : 0;
+        }
 
         /// <summary>Wipes the run's holdings. This is what a bomb does.</summary>
         public void Clear()

@@ -17,7 +17,10 @@ namespace Vertigo.Wheel.UI.Views
         protected abstract void CacheReferences();
 
         /// <summary>Covers "Add Component" in the editor, where OnValidate does not fire.</summary>
-        protected virtual void Reset() => CacheReferences();
+        protected virtual void Reset()
+        {
+            CacheReferences();
+        }
 
 #if UNITY_EDITOR
         protected virtual void OnValidate()
@@ -50,7 +53,10 @@ namespace Vertigo.Wheel.UI.Views
         /// editor tool that calls <c>AddComponent</c> and needs the refs bound in the same call should not
         /// depend on exactly when the editor decides to invoke either of those.
         /// </summary>
-        public void RebindReferences() => CacheReferences();
+        public void RebindReferences()
+        {
+            CacheReferences();
+        }
 
         /// <summary>
         /// Binds by GameObject name among this view's children. Early-outs when the field already points at

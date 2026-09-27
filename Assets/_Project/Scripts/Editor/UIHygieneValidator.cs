@@ -29,7 +29,7 @@ namespace Vertigo.Wheel.Editor
     /// </summary>
     public sealed class UIHygieneValidator : EditorWindow
     {
-        private const string PrefabRoot = "Assets/_Project/Prefabs";
+        private const string PREFAB_ROOT = "Assets/_Project/Prefabs";
 
         private readonly List<Finding> _findings = new List<Finding>();
         private Vector2 _scroll;
@@ -49,7 +49,10 @@ namespace Vertigo.Wheel.Editor
         }
 
         [MenuItem("Tools/Vertigo/Validate UI Hygiene")]
-        private static void Open() => GetWindow<UIHygieneValidator>("UI Hygiene");
+        private static void Open()
+        {
+            GetWindow<UIHygieneValidator>("UI Hygiene");
+        }
 
         /// <summary>
         /// Headless entry point for batchmode / CI (<c>-executeMethod
@@ -85,7 +88,10 @@ namespace Vertigo.Wheel.Editor
             }
         }
 
-        private void OnEnable() => Scan();
+        private void OnEnable()
+        {
+            Scan();
+        }
 
         private void OnGUI()
         {
@@ -127,7 +133,7 @@ namespace Vertigo.Wheel.Editor
                     CollectFindings(root.transform, checkMaskAncestor: true);
             }
 
-            foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { PrefabRoot }))
+            foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { PREFAB_ROOT }))
             {
                 var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(guid));
                 if (prefab != null) CollectFindings(prefab.transform, checkMaskAncestor: false);
@@ -208,7 +214,7 @@ namespace Vertigo.Wheel.Editor
                     FixHierarchy(root.transform, checkMaskAncestor: true);
             }
 
-            foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { PrefabRoot }))
+            foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { PREFAB_ROOT }))
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 GameObject contents = PrefabUtility.LoadPrefabContents(path);
@@ -269,15 +275,20 @@ namespace Vertigo.Wheel.Editor
 
         // ------------------------------------------------------------------ helpers
 
-        private static bool HasSelfSelectable(Graphic graphic) => graphic.GetComponent<Selectable>() != null;
+        private static bool HasSelfSelectable(Graphic graphic)
+        {
+            return graphic.GetComponent<Selectable>() != null;
+        }
 
         /// <summary>
         /// The third legitimate reason a Graphic keeps RaycastTarget ON: a full-screen popup backdrop that
         /// exists specifically to swallow clicks behind the popup. Recognised by the naming convention
         /// itself, the same way <see cref="UIViewBase.Bind{T}"/> treats the name as the contract.
         /// </summary>
-        private static bool IsBackdrop(Graphic graphic) =>
-            graphic.gameObject.name.EndsWith("_backdrop", StringComparison.Ordinal);
+        private static bool IsBackdrop(Graphic graphic)
+        {
+            return graphic.gameObject.name.EndsWith("_backdrop", StringComparison.Ordinal);
+        }
 
         // includeInactive: true throughout. The scan walks inactive graphics (GetComponentsInChildren(true)),
         // and the popups it cares about most — the bomb-defeat and cash-out scroll lists — are built

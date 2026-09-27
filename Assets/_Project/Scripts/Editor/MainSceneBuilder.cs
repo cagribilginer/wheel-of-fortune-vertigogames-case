@@ -32,14 +32,14 @@ namespace Vertigo.Wheel.Editor
     /// </summary>
     public static class MainSceneBuilder
     {
-        private const string ScenePath = "Assets/_Project/Scenes/Main.unity";
-        private const string PrefabFolder = "Assets/_Project/Prefabs/UI";
+        private const string SCENE_PATH = "Assets/_Project/Scenes/Main.unity";
+        private const string PREFAB_FOLDER = "Assets/_Project/Prefabs/UI";
 
         private static readonly Vector2 ReferenceResolution = new Vector2(1920f, 1080f);
 
         // 9 tiles (76px) + 8 gaps (12px) + layout padding (20px), plus a little breathing room so a
         // fractional 10th tile peeks in at each edge — reads as "scrolling", not "cut off".
-        private const float ZoneMapViewportWidth = 860f;
+        private const float ZONE_MAP_VIEWPORT_WIDTH = 860f;
 
         [MenuItem("Tools/Vertigo/Build Main Scene UI")]
         public static void Build()
@@ -81,12 +81,12 @@ namespace Vertigo.Wheel.Editor
             BuildGameInstaller(canvasRoot, wheelView, zoneMapView, bankView, actionBarView,
                 bombView, collectView, milestoneView, vfxView, debugView, tilePrefab, bankEntryPrefab);
 
-            EnsureFolder(Path.GetDirectoryName(ScenePath).Replace('\\', '/'));
-            EditorSceneManager.SaveScene(scene, ScenePath);
+            EnsureFolder(Path.GetDirectoryName(SCENE_PATH).Replace('\\', '/'));
+            EditorSceneManager.SaveScene(scene, SCENE_PATH);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log($"[Vertigo] Built {ScenePath} with GameInstaller wired and the flow live. " +
+            Debug.Log($"[Vertigo] Built {SCENE_PATH} with GameInstaller wired and the flow live. " +
                        "Run Tools/Vertigo/Validate UI Hygiene next, then check the three landscape Game view presets.");
         }
 
@@ -197,8 +197,8 @@ namespace Vertigo.Wheel.Editor
 
         private static T SaveAsPrefab<T>(GameObject root, T view) where T : Component
         {
-            EnsureFolder(PrefabFolder);
-            string path = $"{PrefabFolder}/{root.name}.prefab";
+            EnsureFolder(PREFAB_FOLDER);
+            string path = $"{PREFAB_FOLDER}/{root.name}.prefab";
 
             PrefabUtility.SaveAsPrefabAsset(root, path);
             Object.DestroyImmediate(root);
@@ -289,7 +289,7 @@ namespace Vertigo.Wheel.Editor
             barRect.anchorMin = new Vector2(0.5f, 0f);
             barRect.anchorMax = new Vector2(0.5f, 1f);
             barRect.pivot = new Vector2(0.5f, 0.5f);
-            barRect.sizeDelta = new Vector2(ZoneMapViewportWidth, -16f);
+            barRect.sizeDelta = new Vector2(ZONE_MAP_VIEWPORT_WIDTH, -16f);
             barRect.anchoredPosition = Vector2.zero;
             Image bar = barRect.gameObject.AddComponent<Image>();
             // Opaque panel sprite for the fill (ui_card_frame_12px_neutral has a transparent centre and only
@@ -307,14 +307,14 @@ namespace Vertigo.Wheel.Editor
             barStrokeRect.anchorMin = new Vector2(0.5f, 0f);
             barStrokeRect.anchorMax = new Vector2(0.5f, 1f);
             barStrokeRect.pivot = new Vector2(0.5f, 0.5f);
-            barStrokeRect.sizeDelta = new Vector2(ZoneMapViewportWidth, -16f);
+            barStrokeRect.sizeDelta = new Vector2(ZONE_MAP_VIEWPORT_WIDTH, -16f);
             barStrokeRect.anchoredPosition = Vector2.zero;
 
             RectTransform scrollRect = NewNode("ui_scroll_zonemap", zoneMap);
             scrollRect.anchorMin = new Vector2(0.5f, 0f);
             scrollRect.anchorMax = new Vector2(0.5f, 1f);
             scrollRect.pivot = new Vector2(0.5f, 0.5f);
-            scrollRect.sizeDelta = new Vector2(ZoneMapViewportWidth, 0f);
+            scrollRect.sizeDelta = new Vector2(ZONE_MAP_VIEWPORT_WIDTH, 0f);
             scrollRect.anchoredPosition = Vector2.zero;
             var scroll = scrollRect.gameObject.AddComponent<ScrollRect>();
             scroll.horizontal = true;
@@ -371,8 +371,8 @@ namespace Vertigo.Wheel.Editor
         // shrink relative to "SAFE ZONE 10"), same padding, same icon slot. Compact, with a thin 4px
         // stroke rather than the chunky bevelled 12px frame.
         private static readonly Vector2 MilestoneCardSize = new Vector2(224f, 50f);
-        private const float MilestoneFontSize = 16f;
-        private const float MilestoneIconSize = 30f;
+        private const float MILESTONE_FONT_SIZE = 16f;
+        private const float MILESTONE_ICON_SIZE = 30f;
 
         /// <summary>
         /// One top-right milestone card ("SAFE ZONE 10", "SUPER ZONE 30"): an opaque, high-contrast pill
@@ -409,16 +409,16 @@ namespace Vertigo.Wheel.Editor
 
             Image icon = AddImage(NewNode(cardName + "_icon", card), iconSpriteName);
             icon.preserveAspect = true;
-            RightMiddle((RectTransform)icon.transform, -8f, new Vector2(MilestoneIconSize, MilestoneIconSize));
+            RightMiddle((RectTransform)icon.transform, -8f, new Vector2(MILESTONE_ICON_SIZE, MILESTONE_ICON_SIZE));
 
-            TextMeshProUGUI text = AddText(NewNode(textName, card), placeholder, MilestoneFontSize);
+            TextMeshProUGUI text = AddText(NewNode(textName, card), placeholder, MILESTONE_FONT_SIZE);
             text.alignment = TextAlignmentOptions.MidlineLeft;
             text.color = new Color(strokeColor.r, strokeColor.g, strokeColor.b, 1f);
             text.fontStyle = FontStyles.Bold;
             text.enableAutoSizing = false;
             text.enableWordWrapping = false;
             text.overflowMode = TextOverflowModes.Overflow;
-            Stretch((RectTransform)text.transform, 14f, 2f, 14f + MilestoneIconSize + 8f, 2f);
+            Stretch((RectTransform)text.transform, 14f, 2f, 14f + MILESTONE_ICON_SIZE + 8f, 2f);
         }
 
         // ------------------------------------------------------------------ wheel
@@ -797,7 +797,7 @@ namespace Vertigo.Wheel.Editor
             element.minHeight = height;
         }
 
-        private const string VideoIconPath = "Assets/_Project/Art/Sprites/Icons/UI/ui_icon_video.png";
+        private const string VIDEO_ICON_PATH = "Assets/_Project/Art/Sprites/Icons/UI/ui_icon_video.png";
 
         /// <summary>
         /// Generates a crisp "watch video" glyph once into the art folder: a white rounded card with a play
@@ -810,7 +810,7 @@ namespace Vertigo.Wheel.Editor
             Sprite existing = EditorSpriteUtility.FindSprite("ui_icon_video");
             if (existing != null) return existing;
 
-            EnsureFolder(Path.GetDirectoryName(VideoIconPath).Replace('\\', '/'));
+            EnsureFolder(Path.GetDirectoryName(VIDEO_ICON_PATH).Replace('\\', '/'));
 
             const int size = 144;
             const int ss = 4; // supersamples per axis, for anti-aliased edges when scaled down to 40px
@@ -840,11 +840,11 @@ namespace Vertigo.Wheel.Editor
             var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
             tex.SetPixels(pixels);
             tex.Apply();
-            File.WriteAllBytes(VideoIconPath, tex.EncodeToPNG());
+            File.WriteAllBytes(VIDEO_ICON_PATH, tex.EncodeToPNG());
             UnityEngine.Object.DestroyImmediate(tex);
 
-            AssetDatabase.ImportAsset(VideoIconPath, ImportAssetOptions.ForceSynchronousImport);
-            var importer = (TextureImporter)AssetImporter.GetAtPath(VideoIconPath);
+            AssetDatabase.ImportAsset(VIDEO_ICON_PATH, ImportAssetOptions.ForceSynchronousImport);
+            var importer = (TextureImporter)AssetImporter.GetAtPath(VIDEO_ICON_PATH);
             importer.textureType = TextureImporterType.Sprite;
             importer.spriteImportMode = SpriteImportMode.Single;
             importer.alphaIsTransparency = true;

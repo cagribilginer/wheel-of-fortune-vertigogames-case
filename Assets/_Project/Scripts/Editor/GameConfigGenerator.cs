@@ -30,20 +30,20 @@ namespace Vertigo.Wheel.Editor
     /// </summary>
     public static class GameConfigGenerator
     {
-        private const string ConfigRoot = "Assets/Resources/Configs";
-        private const string SpriteRoot = EditorSpriteUtility.SpriteRoot;
+        private const string CONFIG_ROOT = "Assets/Resources/Configs";
+        private const string SPRITE_ROOT = EditorSpriteUtility.SPRITE_ROOT;
 
-        private const string RewardsFolder = ConfigRoot + "/Rewards";
-        private const string ThemesFolder = ConfigRoot + "/Themes";
-        private const string WheelsFolder = ConfigRoot + "/Wheels";
-        private const string ScalingFolder = ConfigRoot + "/Scaling";
-        private const string SettingsFolder = ConfigRoot + "/Settings";
+        private const string REWARDS_FOLDER = CONFIG_ROOT + "/Rewards";
+        private const string THEMES_FOLDER = CONFIG_ROOT + "/Themes";
+        private const string WHEELS_FOLDER = CONFIG_ROOT + "/Wheels";
+        private const string SCALING_FOLDER = CONFIG_ROOT + "/Scaling";
+        private const string SETTINGS_FOLDER = CONFIG_ROOT + "/Settings";
 
         /// <summary>
         /// The currency the run bank converts into the persistent wallet on cash-out. The composition root
         /// must use this same id, so it lives in one place.
         /// </summary>
-        public const string GoldRewardId = "Reward_Gold";
+        public const string GOLD_REWARD_ID = "Reward_Gold";
 
         // ------------------------------------------------------------------ authoring tables
 
@@ -93,7 +93,7 @@ namespace Vertigo.Wheel.Editor
             new RewardSpec("Reward_Tier3Sniper",      "Sniper Rifle",     "UI_Icon_Renders_tier3_sniper", RewardCategory.Weapon,     1, 80),
             new RewardSpec("Reward_Tier3Smg",         "Submachine Gun",   "UI_Icon_Renders_tier3_smg",   RewardCategory.Weapon,      1, 80),
             new RewardSpec("Reward_Molotov",          "Molotov",          "ui_icon_render_t_cons_molotov", RewardCategory.Consumable, 4, 10),
-            new RewardSpec(GoldRewardId,              "Gold",             "UI_icon_gold",                RewardCategory.Currency,   40, 3),
+            new RewardSpec(GOLD_REWARD_ID,              "Gold",             "UI_icon_gold",                RewardCategory.Currency,   40, 3),
 
             // --- safe zone extras -------------------------------------------------------
             new RewardSpec("Reward_ChestSilver",      "Silver Chest",     "UI_icon_chest_silver_nolight", RewardCategory.Chest,      1, 60),
@@ -128,19 +128,19 @@ namespace Vertigo.Wheel.Editor
         private static readonly string[] Band3Pool =
         {
             "Reward_SniperPoints", "Reward_SubmachinePoints", "Reward_Tier3Sniper", "Reward_Tier3Smg",
-            "Reward_Molotov", GoldRewardId, "Reward_Cash",
+            "Reward_Molotov", GOLD_REWARD_ID, "Reward_Cash",
         };
 
         private static readonly string[] SafePool =
         {
             "Reward_ChestSilver", "Reward_ChestStandard", "Reward_SniperPoints", "Reward_SubmachinePoints",
-            "Reward_Tier3Smg", "Reward_Molotov", GoldRewardId, "Reward_Cash",
+            "Reward_Tier3Smg", "Reward_Molotov", GOLD_REWARD_ID, "Reward_Cash",
         };
 
         private static readonly string[] SuperPool =
         {
             "Reward_ChestSuper", "Reward_ChestGold", "Reward_ChestBig", "Reward_BayonetSummer",
-            "Reward_BayonetEaster", "Reward_AviatorGlasses", "Reward_PumpkinHelmet", GoldRewardId,
+            "Reward_BayonetEaster", "Reward_AviatorGlasses", "Reward_PumpkinHelmet", GOLD_REWARD_ID,
         };
 
         // ------------------------------------------------------------------ entry point
@@ -184,10 +184,10 @@ namespace Vertigo.Wheel.Editor
             }
 
             Debug.Log(
-                $"[Vertigo] Game configs generated in {ConfigRoot}: {created} created, {updated} updated. " +
+                $"[Vertigo] Game configs generated in {CONFIG_ROOT}: {created} created, {updated} updated. " +
                 $"Re-running is safe — existing assets keep their GUIDs, so scene references survive.");
 
-            ZoneProgressionConfig progression = Load<ZoneProgressionConfig>($"{SettingsFolder}/ZoneProgression_Default.asset");
+            ZoneProgressionConfig progression = Load<ZoneProgressionConfig>($"{SETTINGS_FOLDER}/ZoneProgression_Default.asset");
             if (progression != null) Selection.activeObject = progression;
         }
 
@@ -201,7 +201,7 @@ namespace Vertigo.Wheel.Editor
             foreach (RewardSpec spec in Rewards)
             {
                 RewardDefinition asset = LoadOrCreate<RewardDefinition>(
-                    $"{RewardsFolder}/{spec.AssetName}.asset", ref created, ref updated);
+                    $"{REWARDS_FOLDER}/{spec.AssetName}.asset", ref created, ref updated);
 
                 Sprite icon = EditorSpriteUtility.FindSprite(spec.SpriteName);
                 if (icon == null) missingSprites.Add(spec.SpriteName);
@@ -221,7 +221,7 @@ namespace Vertigo.Wheel.Editor
             if (missingSprites.Count > 0)
             {
                 Debug.LogWarning(
-                    $"[Vertigo] {missingSprites.Count} reward sprite(s) not found under {SpriteRoot} and left " +
+                    $"[Vertigo] {missingSprites.Count} reward sprite(s) not found under {SPRITE_ROOT} and left " +
                     $"unassigned: {string.Join(", ", missingSprites)}");
             }
 
@@ -247,7 +247,7 @@ namespace Vertigo.Wheel.Editor
             Dictionary<WheelTier, WheelThemeConfig> themes, ref int created, ref int updated)
         {
             WheelThemeConfig asset = LoadOrCreate<WheelThemeConfig>(
-                $"{ThemesFolder}/{assetName}.asset", ref created, ref updated);
+                $"{THEMES_FOLDER}/{assetName}.asset", ref created, ref updated);
 
             var so = new SerializedObject(asset);
             so.FindProperty("_baseSprite").objectReferenceValue = EditorSpriteUtility.FindSprite(baseSprite);
@@ -262,7 +262,7 @@ namespace Vertigo.Wheel.Editor
         private static LinearScalingSO GenerateScaling(ref int created, ref int updated)
         {
             LinearScalingSO asset = LoadOrCreate<LinearScalingSO>(
-                $"{ScalingFolder}/Scaling_Linear_Default.asset", ref created, ref updated);
+                $"{SCALING_FOLDER}/Scaling_Linear_Default.asset", ref created, ref updated);
 
             var so = new SerializedObject(asset);
             so.FindProperty("_growthPerZone").floatValue = 0.25f;
@@ -277,9 +277,9 @@ namespace Vertigo.Wheel.Editor
             ref int created, ref int updated)
         {
             ZoneWheelConfig asset = LoadOrCreate<ZoneWheelConfig>(
-                $"{WheelsFolder}/{assetName}.asset", ref created, ref updated);
+                $"{WHEELS_FOLDER}/{assetName}.asset", ref created, ref updated);
 
-            int expectedRewards = withBomb ? WheelModel.StandardSliceCount - 1 : WheelModel.StandardSliceCount;
+            int expectedRewards = withBomb ? WheelModel.STANDARD_SLICE_COUNT - 1 : WheelModel.STANDARD_SLICE_COUNT;
             if (pool.Count != expectedRewards)
             {
                 Debug.LogError(
@@ -295,9 +295,9 @@ namespace Vertigo.Wheel.Editor
             so.FindProperty("_shuffleSliceOrder").boolValue = true;
 
             SerializedProperty slices = so.FindProperty("_slices");
-            slices.arraySize = WheelModel.StandardSliceCount;
+            slices.arraySize = WheelModel.STANDARD_SLICE_COUNT;
 
-            for (int i = 0; i < WheelModel.StandardSliceCount; i++)
+            for (int i = 0; i < WheelModel.STANDARD_SLICE_COUNT; i++)
             {
                 SerializedProperty element = slices.GetArrayElementAtIndex(i);
 
@@ -330,7 +330,7 @@ namespace Vertigo.Wheel.Editor
             ref int created, ref int updated)
         {
             ZoneProgressionConfig asset = LoadOrCreate<ZoneProgressionConfig>(
-                $"{SettingsFolder}/ZoneProgression_Default.asset", ref created, ref updated);
+                $"{SETTINGS_FOLDER}/ZoneProgression_Default.asset", ref created, ref updated);
 
             var so = new SerializedObject(asset);
             so.FindProperty("_safeZoneInterval").intValue = 5;
@@ -360,7 +360,7 @@ namespace Vertigo.Wheel.Editor
         private static void GenerateSpinConfig(ref int created, ref int updated)
         {
             WheelSpinConfig asset = LoadOrCreate<WheelSpinConfig>(
-                $"{SettingsFolder}/WheelSpin_Default.asset", ref created, ref updated);
+                $"{SETTINGS_FOLDER}/WheelSpin_Default.asset", ref created, ref updated);
 
             var so = new SerializedObject(asset);
             so.FindProperty("_duration").floatValue = 3.2f;
@@ -384,7 +384,7 @@ namespace Vertigo.Wheel.Editor
         private static void GenerateContinueConfig(ref int created, ref int updated)
         {
             ContinueConfig asset = LoadOrCreate<ContinueConfig>(
-                $"{SettingsFolder}/Continue_Default.asset", ref created, ref updated);
+                $"{SETTINGS_FOLDER}/Continue_Default.asset", ref created, ref updated);
 
             var so = new SerializedObject(asset);
             so.FindProperty("_baseCost").intValue = 50;
@@ -397,7 +397,7 @@ namespace Vertigo.Wheel.Editor
             IReadOnlyDictionary<string, RewardDefinition> rewards, ref int created, ref int updated)
         {
             RewardCatalog asset = LoadOrCreate<RewardCatalog>(
-                $"{SettingsFolder}/RewardCatalog.asset", ref created, ref updated);
+                $"{SETTINGS_FOLDER}/RewardCatalog.asset", ref created, ref updated);
 
             var so = new SerializedObject(asset);
             SerializedProperty all = so.FindProperty("_all");
@@ -418,20 +418,22 @@ namespace Vertigo.Wheel.Editor
         /// asset <c>GameInstaller</c>'s <c>Resources.Load</c> expects actually exists. Whoever sources SFX
         /// later drags clips onto this same asset; nothing about the loading path changes.
         /// </summary>
-        private static void GenerateAudioLibrary(ref int created, ref int updated) =>
-            LoadOrCreate<AudioLibrary>($"{SettingsFolder}/AudioLibrary.asset", ref created, ref updated);
+        private static void GenerateAudioLibrary(ref int created, ref int updated)
+        {
+            LoadOrCreate<AudioLibrary>($"{SETTINGS_FOLDER}/AudioLibrary.asset", ref created, ref updated);
+        }
 
         // ------------------------------------------------------------------ helpers
 
         private static void EnsureFolders()
         {
             EnsureFolder("Assets/Resources");
-            EnsureFolder(ConfigRoot);
-            EnsureFolder(RewardsFolder);
-            EnsureFolder(ThemesFolder);
-            EnsureFolder(WheelsFolder);
-            EnsureFolder(ScalingFolder);
-            EnsureFolder(SettingsFolder);
+            EnsureFolder(CONFIG_ROOT);
+            EnsureFolder(REWARDS_FOLDER);
+            EnsureFolder(THEMES_FOLDER);
+            EnsureFolder(WHEELS_FOLDER);
+            EnsureFolder(SCALING_FOLDER);
+            EnsureFolder(SETTINGS_FOLDER);
         }
 
         private static void EnsureFolder(string path)
@@ -466,8 +468,10 @@ namespace Vertigo.Wheel.Editor
             return asset;
         }
 
-        private static T Load<T>(string path) where T : ScriptableObject =>
-            AssetDatabase.LoadAssetAtPath<T>(path);
+        private static T Load<T>(string path) where T : ScriptableObject
+        {
+            return AssetDatabase.LoadAssetAtPath<T>(path);
+        }
 
         /// <summary>
         /// Reads the generated data back through the same code path the game uses and reports what it found.
@@ -476,7 +480,7 @@ namespace Vertigo.Wheel.Editor
         [MenuItem("Tools/Vertigo/Validate Game Configs")]
         public static void Validate()
         {
-            var progression = Load<ZoneProgressionConfig>($"{SettingsFolder}/ZoneProgression_Default.asset");
+            var progression = Load<ZoneProgressionConfig>($"{SETTINGS_FOLDER}/ZoneProgression_Default.asset");
             if (progression == null)
             {
                 Debug.LogError("[Vertigo] No progression asset found. Run Tools/Vertigo/Generate Game Configs first.");
@@ -496,9 +500,9 @@ namespace Vertigo.Wheel.Editor
                     WheelModel wheel = factory.Build(zone);
                     var type = classifier.Classify(zone);
 
-                    if (wheel.SliceCount != WheelModel.StandardSliceCount)
+                    if (wheel.SliceCount != WheelModel.STANDARD_SLICE_COUNT)
                     {
-                        Debug.LogError($"[Vertigo] Zone {zone}: {wheel.SliceCount} slices, expected {WheelModel.StandardSliceCount}.");
+                        Debug.LogError($"[Vertigo] Zone {zone}: {wheel.SliceCount} slices, expected {WheelModel.STANDARD_SLICE_COUNT}.");
                         problems++;
                     }
 
@@ -516,7 +520,7 @@ namespace Vertigo.Wheel.Editor
                 }
             }
 
-            var catalog = Load<RewardCatalog>($"{SettingsFolder}/RewardCatalog.asset");
+            var catalog = Load<RewardCatalog>($"{SETTINGS_FOLDER}/RewardCatalog.asset");
             if (catalog == null)
             {
                 Debug.LogError("[Vertigo] Reward catalog is missing.");
@@ -530,10 +534,10 @@ namespace Vertigo.Wheel.Editor
                     Debug.LogWarning($"[Vertigo] {withoutIcon} catalog entr(ies) have no icon assigned.");
                 }
 
-                if (catalog.Find(GoldRewardId) == null)
+                if (catalog.Find(GOLD_REWARD_ID) == null)
                 {
                     Debug.LogError(
-                        $"[Vertigo] The catalog has no '{GoldRewardId}'. Cash-out could not convert gold " +
+                        $"[Vertigo] The catalog has no '{GOLD_REWARD_ID}'. Cash-out could not convert gold " +
                         "into the persistent wallet.");
                     problems++;
                 }

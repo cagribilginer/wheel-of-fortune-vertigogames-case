@@ -24,13 +24,34 @@ namespace Vertigo.Wheel.Data.Configs
         [SerializeField] private float _tickPunchDegrees = 10f;
         [SerializeField] private float _revealDelay = 0.35f;
 
-        public float Duration => _duration;
-        public int MinTurns => _minTurns;
-        public int MaxTurns => _maxTurns;
-        public AnimationCurve SpinEase => _spinEase;
-        public float SettlePunchDegrees => _settlePunchDegrees;
-        public float TickPunchDegrees => _tickPunchDegrees;
-        public float RevealDelay => _revealDelay;
+        public float Duration
+        {
+            get { return _duration; }
+        }
+        public int MinTurns
+        {
+            get { return _minTurns; }
+        }
+        public int MaxTurns
+        {
+            get { return _maxTurns; }
+        }
+        public AnimationCurve SpinEase
+        {
+            get { return _spinEase; }
+        }
+        public float SettlePunchDegrees
+        {
+            get { return _settlePunchDegrees; }
+        }
+        public float TickPunchDegrees
+        {
+            get { return _tickPunchDegrees; }
+        }
+        public float RevealDelay
+        {
+            get { return _revealDelay; }
+        }
 
 #if UNITY_EDITOR
         private void OnValidate()

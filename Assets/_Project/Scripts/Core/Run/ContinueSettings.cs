@@ -30,6 +30,9 @@ namespace Vertigo.Wheel.Core.Run
             MaxAdRevivesPerRun = maxAdRevivesPerRun;
         }
 
-        public static ContinueSettings Default => new ContinueSettings(50, 10, 1);
+        public static ContinueSettings Default
+        {
+            get { return new ContinueSettings(50, 10, 1); }
+        }
     }
 }
