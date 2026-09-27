@@ -47,7 +47,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             image.color = new Color(tint.r, tint.g, tint.b, 0f);
 
             Sequence sequence = DOTween.Sequence().SetLink(image.gameObject, LinkBehaviour.KillOnDestroy);
-            sequence.Append(image.DOFade(0.85f, _juice.FlashInDuration));
+            sequence.Append(image.DOFade(_juice.FlashPeakAlpha, _juice.FlashInDuration));
             sequence.Append(image.DOFade(0f, _juice.FlashOutDuration));
         }
     }

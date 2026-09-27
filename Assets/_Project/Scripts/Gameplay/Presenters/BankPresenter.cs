@@ -128,6 +128,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             });
         }
 
+        // Matches BankEntryView's own icon box closely enough that the ghost doesn't visibly resize when
+        // it lands (that box is 88x88, but the ghost also needs headroom to fly over other UI unclipped).
+        private static readonly Vector2 GHOST_SIZE = new Vector2(72f, 72f);
+
         private void EnsureGhost()
         {
             if (_ghostRect != null) return;
@@ -135,7 +139,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             var ghostGo = new GameObject("bank_fly_ghost", typeof(RectTransform), typeof(Image));
             _ghostRect = (RectTransform)ghostGo.transform;
             _ghostRect.SetParent(_flightLayer, false);
-            _ghostRect.sizeDelta = new Vector2(72f, 72f);
+            _ghostRect.sizeDelta = GHOST_SIZE;
 
             _ghostImage = ghostGo.GetComponent<Image>();
             _ghostImage.preserveAspect = true;

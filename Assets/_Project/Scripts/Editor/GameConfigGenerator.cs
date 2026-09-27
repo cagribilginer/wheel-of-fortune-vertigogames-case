@@ -458,12 +458,14 @@ namespace Vertigo.Wheel.Editor
             so.FindProperty("_bombShakeRandomness").floatValue = 90f;
             so.FindProperty("_flashInDuration").floatValue = 0.06f;
             so.FindProperty("_flashOutDuration").floatValue = 0.45f;
+            so.FindProperty("_flashPeakAlpha").floatValue = 0.85f;
             so.FindProperty("_bombImpactHoldDuration").floatValue = 0.4f;
             so.FindProperty("_bankFlyDuration").floatValue = 0.5f;
             so.FindProperty("_bankPunchScale").floatValue = 0.2f;
             so.FindProperty("_bankPunchDuration").floatValue = 0.2f;
             so.FindProperty("_bankCounterDuration").floatValue = 0.4f;
             so.FindProperty("_zoneScrollDuration").floatValue = 0.45f;
+            so.FindProperty("_currentZoneTileScale").floatValue = 1.12f;
             so.FindProperty("_bigRewardUnitValue").intValue = 60;
             so.ApplyModifiedPropertiesWithoutUndo();
         }

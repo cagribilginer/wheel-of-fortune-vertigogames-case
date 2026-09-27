@@ -109,10 +109,16 @@ namespace Vertigo.Wheel.UI.Views.Popups
             PlayOpen(_ui_image_popup_bomb_backdrop, _ui_transform_popup_bomb_anim, BACKDROP_ALPHA);
         }
 
+        // The breathing red vignette's own alpha range and half-cycle duration — distinct from
+        // BACKDROP_ALPHA, which is the separate darkening layer behind the card.
+        private const float VIGNETTE_MIN_ALPHA = 0.5f;
+        private const float VIGNETTE_PEAK_ALPHA = 0.9f;
+        private const float VIGNETTE_BREATHE_DURATION = 0.85f;
+
         public void Hide()
         {
             _ui_image_popup_bomb_vignette.DOKill();
-            _ui_image_popup_bomb_vignette.DOFade(0f, 0.2f)
+            _ui_image_popup_bomb_vignette.DOFade(0f, FADE_DURATION)
                 .SetLink(_ui_image_popup_bomb_vignette.gameObject, LinkBehaviour.KillOnDestroy);
             PlayClose(_ui_image_popup_bomb_backdrop, _ui_transform_popup_bomb_anim);
         }
@@ -124,8 +130,8 @@ namespace Vertigo.Wheel.UI.Views.Popups
             vignette.DOKill();
 
             Color c = vignette.color;
-            vignette.color = new Color(c.r, c.g, c.b, 0.5f);
-            vignette.DOFade(0.9f, 0.85f)
+            vignette.color = new Color(c.r, c.g, c.b, VIGNETTE_MIN_ALPHA);
+            vignette.DOFade(VIGNETTE_PEAK_ALPHA, VIGNETTE_BREATHE_DURATION)
                 .SetEase(Ease.InOutSine)
                 .SetLoops(-1, LoopType.Yoyo)
                 .SetLink(vignette.gameObject, LinkBehaviour.KillOnDestroy);

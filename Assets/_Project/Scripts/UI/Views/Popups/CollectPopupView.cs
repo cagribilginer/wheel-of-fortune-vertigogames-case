@@ -35,6 +35,12 @@ namespace Vertigo.Wheel.UI.Views.Popups
         // cash/gold count-up to read, short enough not to stall the loop.
         private const float CLAIM_HOLD_SECONDS = 0.8f;
 
+        private const float CHEST_PUNCH_SCALE = 0.25f;
+        private const float CHEST_PUNCH_DURATION = 0.35f;
+
+        // Also used by the nested CountingLabel below for its own DOVirtual.Int tween.
+        private const float COUNT_UP_DURATION = 0.5f;
+
         public RectTransform Content
         {
             get { return _ui_content_popup_collect_list; }
@@ -114,7 +120,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
             var chest = (RectTransform)_ui_image_popup_collect_chest_value.transform;
             chest.DOKill();
             chest.localScale = Vector3.one;
-            chest.DOPunchScale(Vector3.one * 0.25f, 0.35f).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
+            chest.DOPunchScale(Vector3.one * CHEST_PUNCH_SCALE, CHEST_PUNCH_DURATION).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
 
             _cash.SetTarget(newCash, _ui_text_popup_collect_cash_value, gameObject);
             _gold.SetTarget(newGold, _ui_text_popup_collect_gold_value, gameObject);
@@ -159,7 +165,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
                     return;
                 }
 
-                _tween = DOVirtual.Int(_shown, target, 0.5f, value =>
+                _tween = DOVirtual.Int(_shown, target, COUNT_UP_DURATION, value =>
                     {
                         _shown = value;
                         label.text = value.ToString("N0");

@@ -32,6 +32,7 @@ namespace Vertigo.Wheel.Data.Configs
         [Range(0f, 180f)] [SerializeField] private float _bombShakeRandomness = 90f;
         [Range(0f, 1f)] [SerializeField] private float _flashInDuration = 0.06f;
         [Range(0f, 1f)] [SerializeField] private float _flashOutDuration = 0.45f;
+        [Range(0f, 1f)] [SerializeField] private float _flashPeakAlpha = 0.85f;
         [Range(0f, 1f)] [SerializeField] private float _bombImpactHoldDuration = 0.4f;
 
         [Header("Bank")]
@@ -42,6 +43,7 @@ namespace Vertigo.Wheel.Data.Configs
 
         [Header("Zone map")]
         [Range(0f, 1f)] [SerializeField] private float _zoneScrollDuration = 0.45f;
+        [Range(1f, 2f)] [SerializeField] private float _currentZoneTileScale = 1.12f;
 
         [Header("Rewards")]
         [Tooltip(
@@ -117,6 +119,10 @@ namespace Vertigo.Wheel.Data.Configs
         {
             get { return _flashOutDuration; }
         }
+        public float FlashPeakAlpha
+        {
+            get { return _flashPeakAlpha; }
+        }
         public float BombImpactHoldDuration
         {
             get { return _bombImpactHoldDuration; }
@@ -140,6 +146,10 @@ namespace Vertigo.Wheel.Data.Configs
         public float ZoneScrollDuration
         {
             get { return _zoneScrollDuration; }
+        }
+        public float CurrentZoneTileScale
+        {
+            get { return _currentZoneTileScale; }
         }
         public int BigRewardUnitValue
         {

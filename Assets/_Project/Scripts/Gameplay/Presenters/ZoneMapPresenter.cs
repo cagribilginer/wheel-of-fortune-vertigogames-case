@@ -86,7 +86,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             if (zoneNumber == currentZone)
             {
                 tile.SetCurrent(CurrentTextColor);
-                tile.Rect.localScale = Vector3.one * 1.12f;
+                tile.Rect.localScale = Vector3.one * _juice.CurrentZoneTileScale;
                 return;
             }
 
