@@ -15,7 +15,10 @@ namespace Vertigo.Wheel.Tests.EditMode
         private RewardBank _bank;
 
         [SetUp]
-        public void SetUp() => _bank = new RewardBank();
+        public void SetUp()
+        {
+            _bank = new RewardBank();
+        }
 
         [Test]
         public void NewBank_IsEmpty()
@@ -90,9 +93,11 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void Entries_CannotBeMutatedByCaller() =>
+        public void Entries_CannotBeMutatedByCaller()
+        {
             Assert.That(_bank.Entries, Is.Not.InstanceOf<List<BankEntry>>(),
                 "Entries must be a read-only view, not the live backing list.");
+        }
 
         [Test]
         public void TotalValue_SumsAmountTimesUnitValue()
@@ -114,15 +119,21 @@ namespace Vertigo.Wheel.Tests.EditMode
 
         [TestCase(0)]
         [TestCase(-5)]
-        public void NonPositiveAmount_Throws(int amount) =>
+        public void NonPositiveAmount_Throws(int amount)
+        {
             Assert.Throws<ArgumentOutOfRangeException>(() => _bank.Add(Pistol, amount));
+        }
 
         [Test]
-        public void EmptyRewardId_Throws() =>
+        public void EmptyRewardId_Throws()
+        {
             Assert.Throws<ArgumentException>(() => _bank.Add(RewardId.None, 1));
+        }
 
         [Test]
-        public void NegativeUnitValue_Throws() =>
+        public void NegativeUnitValue_Throws()
+        {
             Assert.Throws<ArgumentOutOfRangeException>(() => _bank.Add(Pistol, 1, unitValue: -1));
+        }
     }
 }

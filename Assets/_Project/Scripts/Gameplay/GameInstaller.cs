@@ -1,5 +1,6 @@
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using Vertigo.Wheel.Core.Rewards;
 using Vertigo.Wheel.Core.Run;
 using Vertigo.Wheel.Core.Spin;
@@ -87,10 +88,14 @@ namespace Vertigo.Wheel.Gameplay
             DOTween.Init(recycleAllByDefault: true, useSafeMode: true, logBehaviour: LogBehaviour.ErrorsOnly)
                    .SetCapacity(tweenersCapacity: 120, sequencesCapacity: 40);
 
-            var catalog = Resources.Load<RewardCatalog>("Configs/Settings/RewardCatalog");
-            var spinConfig = Resources.Load<WheelSpinConfig>("Configs/Settings/WheelSpin_Default");
-            var progression = Resources.Load<ZoneProgressionConfig>("Configs/Settings/ZoneProgression_Default");
-            var continueConfig = Resources.Load<ContinueConfig>("Configs/Settings/Continue_Default");
+            // .WaitForCompletion() keeps this load synchronous, same as the Resources.Load it replaces —
+            // Awake stays a plain method (no coroutine/async restructure) and the Play Mode smoke test's
+            // boot-to-Idle budget is unaffected. Addressables.LoadAssetAsync internally caches by address,
+            // so this pays the disk read once no matter how many times Awake happens to run.
+            var catalog = Addressables.LoadAssetAsync<RewardCatalog>("Configs/Settings/RewardCatalog").WaitForCompletion();
+            var spinConfig = Addressables.LoadAssetAsync<WheelSpinConfig>("Configs/Settings/WheelSpin_Default").WaitForCompletion();
+            var progression = Addressables.LoadAssetAsync<ZoneProgressionConfig>("Configs/Settings/ZoneProgression_Default").WaitForCompletion();
+            var continueConfig = Addressables.LoadAssetAsync<ContinueConfig>("Configs/Settings/Continue_Default").WaitForCompletion();
 
             IZoneClassifier classifier = progression.CreateClassifier();
             // The wheel factory gets its own RNG so a zone's slices are dealt onto different wedges each
@@ -104,7 +109,7 @@ namespace Vertigo.Wheel.Gameplay
             var continueService = new ContinueService(wallet, goldRewardId, continueConfig.ToSettings());
             var runModel = new RunModel(classifier, wallet, goldRewardId, cashRewardId);
 
-            var audioLibrary = Resources.Load<AudioLibrary>("Configs/Settings/AudioLibrary");
+            var audioLibrary = Addressables.LoadAssetAsync<AudioLibrary>("Configs/Settings/AudioLibrary").WaitForCompletion();
             IAudioService audioService = new AudioService(new PlayerPrefsSaveService(), transform);
             AudioHub.Initialize(audioService, audioLibrary);
             var audioPresenter = new AudioPresenter(audioService, audioLibrary);

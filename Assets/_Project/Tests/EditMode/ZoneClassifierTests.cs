@@ -10,28 +10,37 @@ namespace Vertigo.Wheel.Tests.EditMode
         private ZoneClassifier _classifier;
 
         [SetUp]
-        public void SetUp() => _classifier = new ZoneClassifier();
+        public void SetUp()
+        {
+            _classifier = new ZoneClassifier();
+        }
 
         [TestCase(2)]
         [TestCase(4)]
         [TestCase(6)]
         [TestCase(29)]
         [TestCase(31)]
-        public void RiskyZones_AreNormal(int zone) =>
+        public void RiskyZones_AreNormal(int zone)
+        {
             Assert.That(_classifier.Classify(zone), Is.EqualTo(ZoneType.Normal));
+        }
 
         /// <summary>The opening zone is always safe, so a run can never end on the very first spin.</summary>
         [Test]
-        public void FirstZone_IsSafe() =>
+        public void FirstZone_IsSafe()
+        {
             Assert.That(_classifier.Classify(1), Is.EqualTo(ZoneType.Safe));
+        }
 
         [TestCase(5)]
         [TestCase(10)]
         [TestCase(25)]
         [TestCase(35)]
         [TestCase(55)]
-        public void EveryFifthZone_IsSafe(int zone) =>
+        public void EveryFifthZone_IsSafe(int zone)
+        {
             Assert.That(_classifier.Classify(zone), Is.EqualTo(ZoneType.Safe));
+        }
 
         /// <summary>
         /// The precedence rule. Zone 30 satisfies both intervals; Super must win, because it is a strict
@@ -41,14 +50,18 @@ namespace Vertigo.Wheel.Tests.EditMode
         [TestCase(60)]
         [TestCase(90)]
         [TestCase(300)]
-        public void EveryThirtiethZone_IsSuper_NotSafe(int zone) =>
+        public void EveryThirtiethZone_IsSuper_NotSafe(int zone)
+        {
             Assert.That(_classifier.Classify(zone), Is.EqualTo(ZoneType.Super));
+        }
 
         [TestCase(0)]
         [TestCase(-1)]
         [TestCase(int.MinValue)]
-        public void NonPositiveZone_Throws(int zone) =>
+        public void NonPositiveZone_Throws(int zone)
+        {
             Assert.Throws<ArgumentOutOfRangeException>(() => _classifier.Classify(zone));
+        }
 
         /// <summary>
         /// The milestone-badge bug: once past zone 25, the "next safe zone" badge was showing 30 — but 30
@@ -71,8 +84,10 @@ namespace Vertigo.Wheel.Tests.EditMode
         [TestCase(31, 35)]
         [TestCase(35, 40)]
         [TestCase(55, 65)]   // 60 is Super
-        public void NextZoneOfType_Safe_StepsOverSuperZones(int fromZone, int expected) =>
+        public void NextZoneOfType_Safe_StepsOverSuperZones(int fromZone, int expected)
+        {
             Assert.That(_classifier.NextZoneOfType(fromZone, ZoneType.Safe), Is.EqualTo(expected));
+        }
 
         [TestCase(1, 30)]
         [TestCase(26, 30)]
@@ -81,24 +96,34 @@ namespace Vertigo.Wheel.Tests.EditMode
         [TestCase(31, 60)]
         [TestCase(59, 60)]
         [TestCase(60, 90)]
-        public void NextZoneOfType_Super_IsTheNextSuperInterval(int fromZone, int expected) =>
+        public void NextZoneOfType_Super_IsTheNextSuperInterval(int fromZone, int expected)
+        {
             Assert.That(_classifier.NextZoneOfType(fromZone, ZoneType.Super), Is.EqualTo(expected));
+        }
 
         [Test]
-        public void NextZoneOfType_Normal_IsTheImmediateNextRiskyZone() =>
+        public void NextZoneOfType_Normal_IsTheImmediateNextRiskyZone()
+        {
             Assert.That(_classifier.NextZoneOfType(5, ZoneType.Normal), Is.EqualTo(6));
+        }
 
         [Test]
-        public void NextZoneOfType_ClampsANonPositiveStart_ThenZoneOneIsTheFirstSafe() =>
+        public void NextZoneOfType_ClampsANonPositiveStart_ThenZoneOneIsTheFirstSafe()
+        {
             Assert.That(_classifier.NextZoneOfType(-4, ZoneType.Safe), Is.EqualTo(1));
+        }
 
         [Test]
-        public void DefaultIntervals_AreConsistent() =>
+        public void DefaultIntervals_AreConsistent()
+        {
             Assert.That(_classifier.IntervalsAreConsistent, Is.True);
+        }
 
         [Test]
-        public void SuperIntervalNotMultipleOfSafe_IsReportedInconsistent() =>
+        public void SuperIntervalNotMultipleOfSafe_IsReportedInconsistent()
+        {
             Assert.That(new ZoneClassifier(4, 30).IntervalsAreConsistent, Is.False);
+        }
 
         [TestCase(0)]
         [TestCase(-3)]

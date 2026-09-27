@@ -9,10 +9,12 @@ namespace Vertigo.Wheel.Tests.EditMode
     [TestFixture]
     public sealed class WeightedSliceResolverTests
     {
-        private const int SampleCount = 100_000;
+        private const int SAMPLE_COUNT = 100_000;
 
-        private static WeightedSliceResolver Seeded(int seed) =>
-            new WeightedSliceResolver(new SystemRandomProvider(seed));
+        private static WeightedSliceResolver Seeded(int seed)
+        {
+            return new WeightedSliceResolver(new SystemRandomProvider(seed));
+        }
 
         [Test]
         public void SingleNonZeroWeight_AlwaysWins()
@@ -47,11 +49,11 @@ namespace Vertigo.Wheel.Tests.EditMode
         public void UniformWeights_ProduceUniformDistribution()
         {
             var slices = TestWheels.WeightedSlices(1, 1, 1, 1, 1, 1, 1, 1);
-            var counts = Sample(slices, SampleCount, seed: 2024);
+            var counts = Sample(slices, SAMPLE_COUNT, seed: 2024);
 
             for (int i = 0; i < counts.Length; i++)
             {
-                double share = counts[i] / (double)SampleCount;
+                double share = counts[i] / (double)SAMPLE_COUNT;
                 Assert.That(share, Is.EqualTo(0.125d).Within(0.02d),
                     $"Slot {i} drew {share:P2}, expected ~12.5%.");
             }
@@ -65,10 +67,10 @@ namespace Vertigo.Wheel.Tests.EditMode
             var service = new SpinService(Seeded(7));
 
             int bombs = 0;
-            for (int i = 0; i < SampleCount; i++)
+            for (int i = 0; i < SAMPLE_COUNT; i++)
                 if (service.Spin(wheel).IsBomb) bombs++;
 
-            Assert.That(bombs / (double)SampleCount, Is.EqualTo(0.125d).Within(0.02d));
+            Assert.That(bombs / (double)SAMPLE_COUNT, Is.EqualTo(0.125d).Within(0.02d));
         }
 
         /// <summary>
@@ -106,10 +108,10 @@ namespace Vertigo.Wheel.Tests.EditMode
         public void HeavilyWeightedSlot_SkewsProportionally()
         {
             var slices = TestWheels.WeightedSlices(1, 1, 1, 10, 1, 1, 1, 1);
-            var counts = Sample(slices, SampleCount, seed: 99);
+            var counts = Sample(slices, SAMPLE_COUNT, seed: 99);
 
             double expected = 10d / 17d;
-            Assert.That(counts[3] / (double)SampleCount, Is.EqualTo(expected).Within(0.01d));
+            Assert.That(counts[3] / (double)SAMPLE_COUNT, Is.EqualTo(expected).Within(0.01d));
         }
 
         [Test]
@@ -120,16 +122,22 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void EmptySliceList_Throws() =>
+        public void EmptySliceList_Throws()
+        {
             Assert.Throws<ArgumentException>(() => Seeded(1).Resolve(new List<WheelSlice>()));
+        }
 
         [Test]
-        public void NullSliceList_Throws() =>
+        public void NullSliceList_Throws()
+        {
             Assert.Throws<ArgumentNullException>(() => Seeded(1).Resolve(null));
+        }
 
         [Test]
-        public void NullRandomProvider_Throws() =>
+        public void NullRandomProvider_Throws()
+        {
             Assert.Throws<ArgumentNullException>(() => new WeightedSliceResolver(null));
+        }
 
         private static int[] Sample(IReadOnlyList<WheelSlice> slices, int draws, int seed)
         {

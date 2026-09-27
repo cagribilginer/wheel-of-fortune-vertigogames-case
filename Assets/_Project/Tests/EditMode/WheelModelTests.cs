@@ -10,9 +10,11 @@ namespace Vertigo.Wheel.Tests.EditMode
     public sealed class WheelModelTests
     {
         [Test]
-        public void StandardSliceCount_MatchesTheRevolverArt() =>
-            Assert.That(WheelModel.StandardSliceCount, Is.EqualTo(8),
+        public void StandardSliceCount_MatchesTheRevolverArt()
+        {
+            Assert.That(WheelModel.STANDARD_SLICE_COUNT, Is.EqualTo(8),
                 "The provided wheel sprite is a cylinder with exactly eight slots.");
+        }
 
         [Test]
         public void NormalWheel_HasExactlyOneBomb()
@@ -46,37 +48,51 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void TotalWeight_SumsSliceWeights() =>
+        public void TotalWeight_SumsSliceWeights()
+        {
             Assert.That(TestWheels.NormalWheel().TotalWeight, Is.EqualTo(8));
+        }
 
         [Test]
-        public void EmptySliceList_Throws() =>
+        public void EmptySliceList_Throws()
+        {
             Assert.Throws<ArgumentException>(() => new WheelModel(WheelTier.Bronze, new List<WheelSlice>()));
+        }
 
         [Test]
-        public void NullSliceList_Throws() =>
+        public void NullSliceList_Throws()
+        {
             Assert.Throws<ArgumentNullException>(() => new WheelModel(WheelTier.Bronze, null));
+        }
 
         [Test]
-        public void AllZeroWeights_Throws() =>
+        public void AllZeroWeights_Throws()
+        {
             Assert.Throws<ArgumentException>(() =>
                 new WheelModel(WheelTier.Bronze, TestWheels.WeightedSlices(0, 0, 0)));
+        }
 
         [Test]
-        public void RewardSlice_RequiresANonEmptyRewardId() =>
+        public void RewardSlice_RequiresANonEmptyRewardId()
+        {
             Assert.Throws<ArgumentException>(() =>
                 WheelSlice.CreateReward(Vertigo.Wheel.Core.Rewards.RewardId.None, 5));
+        }
 
         [TestCase(0)]
         [TestCase(-1)]
-        public void RewardSlice_RequiresAPositiveAmount(int amount) =>
+        public void RewardSlice_RequiresAPositiveAmount(int amount)
+        {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
                 WheelSlice.CreateReward(TestWheels.Pistol, amount));
+        }
 
         [Test]
-        public void RewardSlice_RejectsNegativeWeight() =>
+        public void RewardSlice_RejectsNegativeWeight()
+        {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
                 WheelSlice.CreateReward(TestWheels.Pistol, 1, weight: -1));
+        }
 
         [Test]
         public void BombSlice_CarriesNoReward()
@@ -112,7 +128,9 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void SpinService_RejectsANullWheel() =>
+        public void SpinService_RejectsANullWheel()
+        {
             Assert.Throws<ArgumentNullException>(() => new SpinService(new FixedSliceResolver(0)).Spin(null));
+        }
     }
 }

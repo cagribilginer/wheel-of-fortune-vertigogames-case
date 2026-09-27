@@ -69,7 +69,10 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             onComplete?.Invoke();
         }
 
-        public virtual void PlayReveal(SpinOutcome outcome, ZoneType zoneType, Action onComplete) => onComplete?.Invoke();
+        public virtual void PlayReveal(SpinOutcome outcome, ZoneType zoneType, Action onComplete)
+        {
+            onComplete?.Invoke();
+        }
 
         public virtual void PlayRewardGranted(SpinOutcome outcome, Action onComplete)
         {
@@ -99,7 +102,10 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             for (int i = 0; i < lostHaul.Count; i++) LostHaulShown.Add(lostHaul[i]);
         }
 
-        public virtual void HideGameOver() => GameOverVisible = false;
+        public virtual void HideGameOver()
+        {
+            GameOverVisible = false;
+        }
 
         public virtual void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared, int playerGold, int playerCash)
         {
@@ -111,7 +117,10 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             for (int i = 0; i < haul.Count; i++) CashOutHaul.Add(haul[i]);
         }
 
-        public virtual void HideCashOut() => CashOutVisible = false;
+        public virtual void HideCashOut()
+        {
+            CashOutVisible = false;
+        }
 
         public virtual void ClaimCashOut(int playerGold, int playerCash, Action onComplete)
         {

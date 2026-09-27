@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Default Local Group
+  m_EditorClassIdentifier: 
+  m_GroupName: Default Local Group
+  m_Data:
+    m_SerializedData: []
+  m_GUID: c174fa6673308415b9af0d61986f5810
+  m_SerializeEntries:
+  - m_GUID: 684b20205c7ae41719eec18e32293bfe
+    m_Address: Configs/Settings/RewardCatalog
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7197baa28691a4720af9c9ed0356176b
+    m_Address: Configs/Settings/WheelSpin_Default
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f05ca65d94eb046828bab066ddb550af
+    m_Address: Configs/Settings/ZoneProgression_Default
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0bad9dca53af8463aabf036d7fd4d05e
+    m_Address: Configs/Settings/Continue_Default
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4aaabc23ef5a4aeb8d39b655d292d394
+    m_Address: Configs/Settings/AudioLibrary
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: e2cdacff1ac7b459b93370f03c4b9f77, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 86cad54a632cc4d83873ea35ad3e0880, type: 2}
+    - {fileID: 11400000, guid: c7407361601dd4256b60d1b92a91845c, type: 2}

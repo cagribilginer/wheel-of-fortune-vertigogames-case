@@ -27,6 +27,9 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             return roll % maxExclusive;
         }
 
-        public double NextDouble() => Next(1000) / 1000d;
+        public double NextDouble()
+        {
+            return Next(1000) / 1000d;
+        }
     }
 }

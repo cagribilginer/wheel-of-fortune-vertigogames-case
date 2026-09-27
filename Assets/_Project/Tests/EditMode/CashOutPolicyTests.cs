@@ -16,25 +16,33 @@ namespace Vertigo.Wheel.Tests.EditMode
         [TestCase(RunPhase.Idle, true, ZoneType.Super, true)]
         [TestCase(RunPhase.Idle, false, ZoneType.Safe, false)]
         public void LeavingNeedsAnIdleWheelWithAHaulOnASafeOrSuperZone(
-            RunPhase phase, bool bankHasRewards, ZoneType zoneType, bool expected) =>
+            RunPhase phase, bool bankHasRewards, ZoneType zoneType, bool expected)
+        {
             Assert.That(CashOutPolicy.CanLeave(phase, bankHasRewards, zoneType), Is.EqualTo(expected));
+        }
 
         [Test]
-        public void NormalZone_BlocksLeavingEvenIdleWithAHaul() =>
+        public void NormalZone_BlocksLeavingEvenIdleWithAHaul()
+        {
             Assert.That(CashOutPolicy.CanLeave(RunPhase.Idle, bankHasRewards: true, ZoneType.Normal), Is.False);
+        }
 
         [TestCase(RunPhase.Spinning)]
         [TestCase(RunPhase.Resolving)]
         [TestCase(RunPhase.GameOver)]
         [TestCase(RunPhase.CashOut)]
-        public void NonIdlePhase_BlocksLeavingEvenWithAHaulOnASafeZone(RunPhase phase) =>
+        public void NonIdlePhase_BlocksLeavingEvenWithAHaulOnASafeZone(RunPhase phase)
+        {
             Assert.That(CashOutPolicy.CanLeave(phase, bankHasRewards: true, ZoneType.Safe), Is.False);
+        }
 
         [TestCase(RunPhase.Idle, true)]
         [TestCase(RunPhase.Spinning, false)]
         [TestCase(RunPhase.Resolving, false)]
         [TestCase(RunPhase.GameOver, false)]
-        public void Spinning_IsOnlyAllowedWhenIdle(RunPhase phase, bool expected) =>
+        public void Spinning_IsOnlyAllowedWhenIdle(RunPhase phase, bool expected)
+        {
             Assert.That(CashOutPolicy.CanSpin(phase), Is.EqualTo(expected));
+        }
     }
 }

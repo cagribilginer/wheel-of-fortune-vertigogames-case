@@ -15,8 +15,8 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
         /// <summary>Seven reward slices plus one bomb at <paramref name="bombIndex"/>, all weight 1.</summary>
         public static WheelModel NormalWheel(int bombIndex = 0, int amount = 10)
         {
-            var slices = new List<WheelSlice>(WheelModel.StandardSliceCount);
-            for (int i = 0; i < WheelModel.StandardSliceCount; i++)
+            var slices = new List<WheelSlice>(WheelModel.STANDARD_SLICE_COUNT);
+            for (int i = 0; i < WheelModel.STANDARD_SLICE_COUNT; i++)
             {
                 slices.Add(i == bombIndex
                     ? WheelSlice.CreateBomb()
@@ -29,8 +29,8 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
         /// <summary>Eight reward slices, no bomb.</summary>
         public static WheelModel SafeWheel(int amount = 15)
         {
-            var slices = new List<WheelSlice>(WheelModel.StandardSliceCount);
-            for (int i = 0; i < WheelModel.StandardSliceCount; i++)
+            var slices = new List<WheelSlice>(WheelModel.STANDARD_SLICE_COUNT);
+            for (int i = 0; i < WheelModel.STANDARD_SLICE_COUNT; i++)
                 slices.Add(WheelSlice.CreateReward(Rifle, amount));
 
             return new WheelModel(WheelTier.Silver, slices);

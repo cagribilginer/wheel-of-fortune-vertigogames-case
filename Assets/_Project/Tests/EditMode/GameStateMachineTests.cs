@@ -16,8 +16,8 @@ namespace Vertigo.Wheel.Tests.EditMode
     [TestFixture]
     public sealed class GameStateMachineTests
     {
-        private const int BombSlot = 0;
-        private const int RewardSlot = 3;
+        private const int BOMB_SLOT = 0;
+        private const int REWARD_SLOT = 3;
 
         private InMemorySaveService _save;
         private Wallet _wallet;
@@ -33,10 +33,10 @@ namespace Vertigo.Wheel.Tests.EditMode
             _wallet = new Wallet(_save);
             _run = new RunModel(new ZoneClassifier(), _wallet, TestWheels.Gold, TestWheels.Cash);
 
-            var blueprints = new StubBlueprintProvider(BombSlot);
+            var blueprints = new StubBlueprintProvider(BOMB_SLOT);
             var factory = new ZoneWheelFactory(new ZoneClassifier(), blueprints, new LinearRewardScaling());
 
-            _resolver = new FixedSliceResolver(RewardSlot);
+            _resolver = new FixedSliceResolver(REWARD_SLOT);
             _view = new InstantPresentation();
 
             var context = new GameContext(
@@ -71,14 +71,14 @@ namespace Vertigo.Wheel.Tests.EditMode
         public void TheAnimationIsToldTheSlotTheLogicChose()
         {
             _machine.RequestSpin();
-            Assert.That(_view.LastSlotIndex, Is.EqualTo(RewardSlot));
+            Assert.That(_view.LastSlotIndex, Is.EqualTo(REWARD_SLOT));
         }
 
         [Test]
         public void BombOutcome_ClearsTheBankAndOpensGameOver()
         {
             _machine.RequestSpin();               // bank a reward first
-            _resolver.LandOn(BombSlot);
+            _resolver.LandOn(BOMB_SLOT);
             _machine.RequestSpin();
 
             Assert.That(_run.Bank.IsEmpty, Is.True);
@@ -91,7 +91,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         public void RestartAfterBomb_ReturnsToZoneOneWithAnEmptyBank()
         {
             AdvanceToZone(2);                             // zone 1 is safe; the bomb only bites from zone 2
-            _resolver.LandOn(BombSlot);
+            _resolver.LandOn(BOMB_SLOT);
             _machine.RequestSpin();
             _machine.RequestRestart();
 
@@ -184,7 +184,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         public void ContinueIsNotOfferedWithAnEmptyWallet()
         {
             AdvanceToZone(2);                             // zone 1 is safe; the bomb only bites from zone 2
-            _resolver.LandOn(BombSlot);
+            _resolver.LandOn(BOMB_SLOT);
             _machine.RequestSpin();
 
             Assert.That(_machine.IsIn<GameOverState>(), Is.True);
@@ -200,7 +200,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             int zoneBefore = _run.CurrentZone;
             long bankedBefore = _run.Bank.TotalValue;
 
-            _resolver.LandOn(BombSlot);
+            _resolver.LandOn(BOMB_SLOT);
             _machine.RequestSpin();                       // bomb clears the bank
 
             Assert.That(_view.ContinueOffered, Is.True);
@@ -222,7 +222,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             _wallet.Add(TestWheels.Gold, 100_000);
             AdvanceToZone(2);
 
-            _resolver.LandOn(BombSlot);
+            _resolver.LandOn(BOMB_SLOT);
             _machine.RequestSpin();                       // bomb -> game over
             Assert.That(_view.ContinueOffered, Is.True);
             int firstCost = _view.ContinueCostShown;
@@ -245,7 +245,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         {
             AdvanceToZone(2);
 
-            _resolver.LandOn(BombSlot);
+            _resolver.LandOn(BOMB_SLOT);
             _machine.RequestSpin();                       // bomb -> game over
             Assert.That(_view.AdReviveOffered, Is.True);
 
@@ -276,8 +276,8 @@ namespace Vertigo.Wheel.Tests.EditMode
             var blocking = new BlockingPresentation();
             var context = new GameContext(
                 new RunModel(new ZoneClassifier(), _wallet, TestWheels.Gold, TestWheels.Cash),
-                new ZoneWheelFactory(new ZoneClassifier(), new StubBlueprintProvider(BombSlot), new LinearRewardScaling()),
-                new SpinService(new FixedSliceResolver(RewardSlot)),
+                new ZoneWheelFactory(new ZoneClassifier(), new StubBlueprintProvider(BOMB_SLOT), new LinearRewardScaling()),
+                new SpinService(new FixedSliceResolver(REWARD_SLOT)),
                 new ContinueService(_wallet, TestWheels.Gold, ContinueSettings.Default),
                 blocking);
 
@@ -296,7 +296,7 @@ namespace Vertigo.Wheel.Tests.EditMode
 
         private void AdvanceToZone(int target)
         {
-            _resolver.LandOn(RewardSlot);
+            _resolver.LandOn(REWARD_SLOT);
             while (_run.CurrentZone < target) _machine.RequestSpin();
         }
 
@@ -305,7 +305,10 @@ namespace Vertigo.Wheel.Tests.EditMode
         {
             public int SpinCalls { get; private set; }
 
-            public override void PlaySpin(int slotIndex, System.Action onComplete) => SpinCalls++;
+            public override void PlaySpin(int slotIndex, System.Action onComplete)
+            {
+                SpinCalls++;
+            }
         }
     }
 }

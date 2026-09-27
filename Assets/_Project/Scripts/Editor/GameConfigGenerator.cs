@@ -415,8 +415,8 @@ namespace Vertigo.Wheel.Editor
 
         /// <summary>
         /// Just the drop target — no <c>demo_content</c> clips exist to assign, so this only ensures the
-        /// asset <c>GameInstaller</c>'s <c>Resources.Load</c> expects actually exists. Whoever sources SFX
-        /// later drags clips onto this same asset; nothing about the loading path changes.
+        /// asset <c>GameInstaller</c> loads via Addressables actually exists. Whoever sources SFX later
+        /// drags clips onto this same asset; nothing about the loading path changes.
         /// </summary>
         private static void GenerateAudioLibrary(ref int created, ref int updated)
         {

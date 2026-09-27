@@ -25,9 +25,9 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
 
         public WheelBlueprint GetBlueprint(int zone, ZoneType zoneType)
         {
-            var slices = new List<SliceBlueprint>(WheelModel.StandardSliceCount);
+            var slices = new List<SliceBlueprint>(WheelModel.STANDARD_SLICE_COUNT);
 
-            for (int i = 0; i < WheelModel.StandardSliceCount; i++)
+            for (int i = 0; i < WheelModel.STANDARD_SLICE_COUNT; i++)
             {
                 bool isBomb = zoneType == ZoneType.Normal && i == _bombIndex;
 
@@ -39,19 +39,25 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             return new WheelBlueprint(TierFor(zoneType), slices, _shuffle);
         }
 
-        private static RewardId RewardFor(ZoneType zoneType) =>
-            zoneType == ZoneType.Super ? TestWheels.Gold
-            : zoneType == ZoneType.Safe ? TestWheels.Rifle
-            : TestWheels.Pistol;
+        private static RewardId RewardFor(ZoneType zoneType)
+        {
+            return zoneType == ZoneType.Super ? TestWheels.Gold
+                : zoneType == ZoneType.Safe ? TestWheels.Rifle
+                : TestWheels.Pistol;
+        }
 
-        private static int BaseAmountFor(ZoneType zoneType) =>
-            zoneType == ZoneType.Super ? 100
-            : zoneType == ZoneType.Safe ? 20
-            : 10;
+        private static int BaseAmountFor(ZoneType zoneType)
+        {
+            return zoneType == ZoneType.Super ? 100
+                : zoneType == ZoneType.Safe ? 20
+                : 10;
+        }
 
-        private static WheelTier TierFor(ZoneType zoneType) =>
-            zoneType == ZoneType.Super ? WheelTier.Golden
-            : zoneType == ZoneType.Safe ? WheelTier.Silver
-            : WheelTier.Bronze;
+        private static WheelTier TierFor(ZoneType zoneType)
+        {
+            return zoneType == ZoneType.Super ? WheelTier.Golden
+                : zoneType == ZoneType.Safe ? WheelTier.Silver
+                : WheelTier.Bronze;
+        }
     }
 }

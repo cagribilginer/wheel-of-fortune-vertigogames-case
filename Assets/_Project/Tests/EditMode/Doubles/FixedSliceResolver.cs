@@ -8,10 +8,19 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
     {
         private int _index;
 
-        public FixedSliceResolver(int index) => _index = index;
+        public FixedSliceResolver(int index)
+        {
+            _index = index;
+        }
 
-        public void LandOn(int index) => _index = index;
+        public void LandOn(int index)
+        {
+            _index = index;
+        }
 
-        public int Resolve(IReadOnlyList<WheelSlice> slices) => _index;
+        public int Resolve(IReadOnlyList<WheelSlice> slices)
+        {
+            return _index;
+        }
     }
 }

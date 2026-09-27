@@ -10,16 +10,23 @@ namespace Vertigo.Wheel.Tests.EditMode
         private LinearRewardScaling _linear;
 
         [SetUp]
-        public void SetUp() => _linear = new LinearRewardScaling();
+        public void SetUp()
+        {
+            _linear = new LinearRewardScaling();
+        }
 
         [Test]
-        public void Linear_Zone1_PaysTheAuthoredAmount() =>
+        public void Linear_Zone1_PaysTheAuthoredAmount()
+        {
             Assert.That(_linear.Scale(100, 1), Is.EqualTo(100));
+        }
 
         [TestCase(10, 3.25d)]  // 1 + 0.25 * 9
         [TestCase(29, 8.00d)]  // 1 + 0.25 * 28
-        public void Linear_GrowsAsDocumented(int zone, double expectedMultiplier) =>
+        public void Linear_GrowsAsDocumented(int zone, double expectedMultiplier)
+        {
             Assert.That(_linear.Scale(100, zone), Is.EqualTo((int)Math.Ceiling(100 * expectedMultiplier)));
+        }
 
         [Test]
         public void Linear_IsMonotonicOverALongRun()
@@ -42,8 +49,10 @@ namespace Vertigo.Wheel.Tests.EditMode
 
         /// <summary>Endless progression means deep zones are reachable; the cast must clamp, never wrap.</summary>
         [Test]
-        public void Linear_ClampsInsteadOfOverflowing() =>
+        public void Linear_ClampsInsteadOfOverflowing()
+        {
             Assert.That(_linear.Scale(int.MaxValue, 500), Is.EqualTo(int.MaxValue));
+        }
 
         [Test]
         public void Linear_ZeroGrowth_IsFlat()
@@ -54,8 +63,10 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void Linear_NegativeGrowth_Throws() =>
+        public void Linear_NegativeGrowth_Throws()
+        {
             Assert.Throws<ArgumentOutOfRangeException>(() => new LinearRewardScaling(-0.1d));
+        }
 
         [Test]
         public void Step_ChangesOnlyAtStepBoundaries()
@@ -72,12 +83,16 @@ namespace Vertigo.Wheel.Tests.EditMode
 
         [TestCase(0)]
         [TestCase(-2)]
-        public void NonPositiveZone_Throws(int zone) =>
+        public void NonPositiveZone_Throws(int zone)
+        {
             Assert.Throws<ArgumentOutOfRangeException>(() => _linear.Scale(10, zone));
+        }
 
         [TestCase(0)]
         [TestCase(-1)]
-        public void NonPositiveBaseAmount_Throws(int baseAmount) =>
+        public void NonPositiveBaseAmount_Throws(int baseAmount)
+        {
             Assert.Throws<ArgumentOutOfRangeException>(() => _linear.Scale(baseAmount, 1));
+        }
     }
 }

@@ -23,32 +23,42 @@ namespace Vertigo.Wheel.Tests.EditMode
         [TestCase(2)]
         [TestCase(4)]
         [TestCase(29)]
-        public void NormalZone_HasExactlyOneBomb(int zone) =>
+        public void NormalZone_HasExactlyOneBomb(int zone)
+        {
             Assert.That(_factory.Build(zone).BombCount, Is.EqualTo(1));
+        }
 
         [TestCase(5)]
         [TestCase(25)]
-        public void SafeZone_HasNoBomb(int zone) =>
+        public void SafeZone_HasNoBomb(int zone)
+        {
             Assert.That(_factory.Build(zone).BombCount, Is.Zero);
+        }
 
         [TestCase(30)]
         [TestCase(60)]
-        public void SuperZone_HasNoBomb(int zone) =>
+        public void SuperZone_HasNoBomb(int zone)
+        {
             Assert.That(_factory.Build(zone).BombCount, Is.Zero);
+        }
 
         [TestCase(1, WheelTier.Silver)]
         [TestCase(2, WheelTier.Bronze)]
         [TestCase(5, WheelTier.Silver)]
         [TestCase(30, WheelTier.Golden)]
-        public void TierFollowsZoneType(int zone, WheelTier expected) =>
+        public void TierFollowsZoneType(int zone, WheelTier expected)
+        {
             Assert.That(_factory.Build(zone).Tier, Is.EqualTo(expected));
+        }
 
         [TestCase(1)]
         [TestCase(5)]
         [TestCase(30)]
         [TestCase(147)]
-        public void EveryWheelHasEightSlices(int zone) =>
+        public void EveryWheelHasEightSlices(int zone)
+        {
             Assert.That(_factory.Build(zone).SliceCount, Is.EqualTo(8));
+        }
 
         [Test]
         public void SliceAmounts_AreScaledForTheZone()
@@ -189,13 +199,18 @@ namespace Vertigo.Wheel.Tests.EditMode
 
         private sealed class AlwaysBombedProvider : IWheelBlueprintProvider
         {
-            public WheelBlueprint GetBlueprint(int zone, ZoneType zoneType) =>
-                new WheelBlueprint(WheelTier.Silver, new[] { SliceBlueprint.CreateBomb(), SliceBlueprint.CreateReward(TestWheels.Pistol, 1) });
+            public WheelBlueprint GetBlueprint(int zone, ZoneType zoneType)
+            {
+                return new WheelBlueprint(WheelTier.Silver, new[] { SliceBlueprint.CreateBomb(), SliceBlueprint.CreateReward(TestWheels.Pistol, 1) });
+            }
         }
 
         private sealed class NullProvider : IWheelBlueprintProvider
         {
-            public WheelBlueprint GetBlueprint(int zone, ZoneType zoneType) => null;
+            public WheelBlueprint GetBlueprint(int zone, ZoneType zoneType)
+            {
+                return null;
+            }
         }
     }
 }

@@ -39,9 +39,11 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void Grant_WithABombOutcome_Throws() =>
+        public void Grant_WithABombOutcome_Throws()
+        {
             Assert.Throws<InvalidOperationException>(() =>
                 _run.Grant(new SpinOutcome(0, SliceKind.Bomb, Vertigo.Wheel.Core.Rewards.RewardId.None, 0)));
+        }
 
         [Test]
         public void AdvanceZone_IncrementsAndNotifies()

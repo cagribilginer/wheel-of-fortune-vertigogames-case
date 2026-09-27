@@ -45,16 +45,16 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _audio = audio;
 
             _listPool = new ObjectPool<BankEntryView>(
-                () => Object.Instantiate(entryPrefab, _collect.Content),
+                () => UnityEngine.Object.Instantiate(entryPrefab, _collect.Content),
                 e => e.gameObject.SetActive(true),
                 e => e.gameObject.SetActive(false),
-                e => Object.Destroy(e.gameObject));
+                e => UnityEngine.Object.Destroy(e.gameObject));
 
             _bombListPool = new ObjectPool<BankEntryView>(
-                () => Object.Instantiate(entryPrefab, _bomb.Content),
+                () => UnityEngine.Object.Instantiate(entryPrefab, _bomb.Content),
                 e => e.gameObject.SetActive(true),
                 e => e.gameObject.SetActive(false),
-                e => Object.Destroy(e.gameObject));
+                e => UnityEngine.Object.Destroy(e.gameObject));
         }
 
         public void WireInput(GameStateMachine machine)

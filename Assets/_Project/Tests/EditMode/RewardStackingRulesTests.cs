@@ -73,7 +73,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.That(entry.ToBlueprint().Scalable, Is.True);
         }
 
-        [TestCase(RewardCategory.Points, RewardDefinition.PointsCeiling)]
+        [TestCase(RewardCategory.Points, RewardDefinition.POINTS_CEILING)]
         [TestCase(RewardCategory.Currency, 0)]
         [TestCase(RewardCategory.Consumable, 0)]
         [TestCase(RewardCategory.Weapon, 0)]
@@ -89,9 +89,9 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             SliceBlueprint blueprint = entry.ToBlueprint();
             Assert.That(blueprint.Scalable, Is.True);
-            Assert.That(blueprint.MaxAmount, Is.EqualTo(RewardDefinition.PointsCeiling));
+            Assert.That(blueprint.MaxAmount, Is.EqualTo(RewardDefinition.POINTS_CEILING));
             Assert.That(blueprint.ToSlice(99, new LinearRewardScaling()).Amount,
-                Is.EqualTo(RewardDefinition.PointsCeiling));
+                Is.EqualTo(RewardDefinition.POINTS_CEILING));
         }
 
         private RewardDefinition Make(RewardCategory category, int baseAmount)
@@ -117,14 +117,18 @@ namespace Vertigo.Wheel.Tests.EditMode
             return entry;
         }
 
-        private static void SetField(object target, string name, object value) =>
+        private static void SetField(object target, string name, object value)
+        {
             target.GetType()
                 .GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)
                 .SetValue(target, value);
+        }
 
-        private static void Invoke(object target, string name) =>
+        private static void Invoke(object target, string name)
+        {
             target.GetType()
                 .GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic)
                 .Invoke(target, null);
+        }
     }
 }

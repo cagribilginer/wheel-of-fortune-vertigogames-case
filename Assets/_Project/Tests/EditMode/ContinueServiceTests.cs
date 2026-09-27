@@ -25,12 +25,16 @@ namespace Vertigo.Wheel.Tests.EditMode
         [TestCase(30, 0, 350)]
         [TestCase(17, 1, 440)]   // one gold revive already taken this run -> doubled
         [TestCase(17, 2, 880)]   // -> quadrupled
-        public void Cost_RisesWithDepthAndDoublesPerGoldRevive(int zone, int goldRevivesUsed, int expected) =>
+        public void Cost_RisesWithDepthAndDoublesPerGoldRevive(int zone, int goldRevivesUsed, int expected)
+        {
             Assert.That(_service.CostFor(zone, goldRevivesUsed), Is.EqualTo(expected));
+        }
 
         [Test]
-        public void Cost_OnNonPositiveZone_Throws() =>
+        public void Cost_OnNonPositiveZone_Throws()
+        {
             Assert.Throws<ArgumentOutOfRangeException>(() => _service.CostFor(0, 0));
+        }
 
         [Test]
         public void UnaffordableGoldRevive_IsNotOffered()
@@ -133,7 +137,9 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void Wallet_RejectsNegativeCredit() =>
+        public void Wallet_RejectsNegativeCredit()
+        {
             Assert.Throws<ArgumentOutOfRangeException>(() => _wallet.Add(TestWheels.Gold, -1));
+        }
     }
 }
