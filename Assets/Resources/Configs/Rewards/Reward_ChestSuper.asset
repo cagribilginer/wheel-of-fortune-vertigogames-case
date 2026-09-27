@@ -15,6 +15,7 @@ MonoBehaviour:
   _id: Reward_ChestSuper
   _displayName: Super Chest
   _icon: {fileID: 21300000, guid: 2018683ad08c74b098137e95188c5269, type: 3}
+  _iconScale: 0.99
   _category: 5
   _defaultBaseAmount: 1
   _estimatedValue: 200

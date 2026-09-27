@@ -27,9 +27,10 @@ namespace Vertigo.Wheel.UI.Views
             Bind(ref _ui_text_bank_entry_amount_value, "ui_text_bank_entry_amount_value");
         }
 
-        public void SetEntry(Sprite icon, int amount)
+        public void SetEntry(Sprite icon, int amount, float iconScale = 1f)
         {
             _ui_image_bank_entry_icon_value.sprite = icon;
+            _ui_image_bank_entry_icon_value.rectTransform.localScale = Vector3.one * iconScale;
             SetAmount(amount);
         }
 

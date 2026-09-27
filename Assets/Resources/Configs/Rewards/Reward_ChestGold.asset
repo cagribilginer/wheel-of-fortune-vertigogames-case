@@ -15,6 +15,7 @@ MonoBehaviour:
   _id: Reward_ChestGold
   _displayName: Gold Chest
   _icon: {fileID: 21300000, guid: 347e38d2be7a34c84bca00ebd764f12c, type: 3}
+  _iconScale: 0.99
   _category: 5
   _defaultBaseAmount: 1
   _estimatedValue: 150

@@ -15,6 +15,7 @@ MonoBehaviour:
   _id: Reward_BayonetEaster
   _displayName: Easter Bayonet
   _icon: {fileID: 21300000, guid: 05641e3b7e982489589d6fbcdb2e9b34, type: 3}
+  _iconScale: 1.017
   _category: 3
   _defaultBaseAmount: 1
   _estimatedValue: 150

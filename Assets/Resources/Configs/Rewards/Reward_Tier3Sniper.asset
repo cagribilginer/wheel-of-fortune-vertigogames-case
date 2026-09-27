@@ -15,6 +15,7 @@ MonoBehaviour:
   _id: Reward_Tier3Sniper
   _displayName: Sniper Rifle
   _icon: {fileID: 21300000, guid: 76cab429f27b64592be97bce124ce76b, type: 3}
+  _iconScale: 0.999
   _category: 1
   _defaultBaseAmount: 1
   _estimatedValue: 80

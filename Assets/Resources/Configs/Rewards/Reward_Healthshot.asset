@@ -15,6 +15,7 @@ MonoBehaviour:
   _id: Reward_Healthshot
   _displayName: Regenerator
   _icon: {fileID: 21300000, guid: 645c619477e884a77adc04e09a4d0d81, type: 3}
+  _iconScale: 1.056
   _category: 2
   _defaultBaseAmount: 3
   _estimatedValue: 8

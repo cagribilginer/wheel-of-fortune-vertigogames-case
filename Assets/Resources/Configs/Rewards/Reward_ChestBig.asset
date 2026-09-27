@@ -15,6 +15,7 @@ MonoBehaviour:
   _id: Reward_ChestBig
   _displayName: Big Chest
   _icon: {fileID: 21300000, guid: c6a8ba308f98b41eeb4e623bf0ddf22d, type: 3}
+  _iconScale: 0.99
   _category: 5
   _defaultBaseAmount: 1
   _estimatedValue: 120

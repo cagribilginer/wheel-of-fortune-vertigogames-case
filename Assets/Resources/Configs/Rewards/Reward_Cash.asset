@@ -15,6 +15,7 @@ MonoBehaviour:
   _id: Reward_Cash
   _displayName: Cash
   _icon: {fileID: 21300000, guid: 813677272f37d4c1a80bf28304d44d57, type: 3}
+  _iconScale: 1.008
   _category: 4
   _defaultBaseAmount: 50
   _estimatedValue: 1

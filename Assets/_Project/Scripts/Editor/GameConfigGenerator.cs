@@ -55,9 +55,12 @@ namespace Vertigo.Wheel.Editor
             public readonly RewardCategory Category;
             public readonly int BaseAmount;
             public readonly int UnitValue;
+            public readonly float IconScale;
+            public readonly Vector2 IconOffset;
 
             public RewardSpec(string assetName, string displayName, string spriteName,
-                RewardCategory category, int baseAmount, int unitValue)
+                RewardCategory category, int baseAmount, int unitValue, float iconScale = 1f,
+                Vector2 iconOffset = default)
             {
                 AssetName = assetName;
                 DisplayName = displayName;
@@ -65,48 +68,53 @@ namespace Vertigo.Wheel.Editor
                 Category = category;
                 BaseAmount = baseAmount;
                 UnitValue = unitValue;
+                IconScale = iconScale;
+                IconOffset = iconOffset;
             }
         }
 
+        // IconScale corrects for how much of each source PNG's own canvas the artwork fills — measured as
+        // median_fill / this_icon's_fill (content-bounding-box fill ratio), so every icon reads at a
+        // consistent visual size inside the same fixed slot/entry box regardless of authored padding.
         private static readonly RewardSpec[] Rewards =
         {
             // --- band 1 pool: zones 1-9 -------------------------------------------------
-            new RewardSpec("Reward_PistolPoints",     "Pistol Points",    "UI_Icons_Pistol_Points",      RewardCategory.Points,      1, 1),
-            new RewardSpec("Reward_KnifePoints",      "Knife Points",     "UI_Icons_Knife_Points",       RewardCategory.Points,      1, 1),
-            new RewardSpec("Reward_ArmorPoints",      "Armor Points",     "UI_Icons_Armor_Points",       RewardCategory.Points,      1, 1),
-            new RewardSpec("Reward_VestPoints",       "Vest Points",      "UI_Icons_Vest_Points",        RewardCategory.Points,      1, 1),
-            new RewardSpec("Reward_ShotgunPoints",    "Shotgun Points",   "UI_Icons_Shotgun_Points",     RewardCategory.Points,      1, 1),
-            new RewardSpec("Reward_Tier1Shotgun",     "Shotgun",          "UI_Icon_Renders_tier1_shotgun", RewardCategory.Weapon,    1, 25),
-            new RewardSpec("Reward_Cash",             "Cash",             "UI_icon_cash",                RewardCategory.Currency,   50, 1),
+            new RewardSpec("Reward_PistolPoints",     "Pistol Points",    "UI_Icons_Pistol_Points",      RewardCategory.Points,      1, 1, 0.990f),
+            new RewardSpec("Reward_KnifePoints",      "Knife Points",     "UI_Icons_Knife_Points",       RewardCategory.Points,      1, 1, 0.990f),
+            new RewardSpec("Reward_ArmorPoints",      "Armor Points",     "UI_Icons_Armor_Points",       RewardCategory.Points,      1, 1, 0.990f),
+            new RewardSpec("Reward_VestPoints",       "Vest Points",      "UI_Icons_Vest_Points",        RewardCategory.Points,      1, 1, 0.990f),
+            new RewardSpec("Reward_ShotgunPoints",    "Shotgun Points",   "UI_Icons_Shotgun_Points",     RewardCategory.Points,      1, 1, 0.990f),
+            new RewardSpec("Reward_Tier1Shotgun",     "Shotgun",          "UI_Icon_Renders_tier1_shotgun", RewardCategory.Weapon,    1, 25, 1.011f),
+            new RewardSpec("Reward_Cash",             "Cash",             "UI_icon_cash",                RewardCategory.Currency,   50, 1, 1.008f),
 
             // --- band 2 pool: zones 10-19 -----------------------------------------------
-            new RewardSpec("Reward_SmgPoints",        "SMG Points",       "UI_Icons_SMG_Points",         RewardCategory.Points,      1, 1),
-            new RewardSpec("Reward_RiflePoints",      "Rifle Points",     "UI_Icons_Rifle_Points",       RewardCategory.Points,      1, 1),
-            new RewardSpec("Reward_Tier2Rifle",       "Assault Rifle",    "UI_Icon_Renders_tier2_rifle", RewardCategory.Weapon,      1, 40),
-            new RewardSpec("Reward_Tier2Mle",         "Melee Weapon",     "UI_Icon_Renders_tier2_mle",   RewardCategory.Weapon,      1, 40),
-            new RewardSpec("Reward_GrenadeM67",       "M67 Grenade",      "ui_icon_render_cons_grenade_m67", RewardCategory.Consumable, 3, 8),
-            new RewardSpec("Reward_Healthshot",       "Regenerator",      "ui_icon_render_cons_healthshot_2_regenerator", RewardCategory.Consumable, 3, 8),
+            new RewardSpec("Reward_SmgPoints",        "SMG Points",       "UI_Icons_SMG_Points",         RewardCategory.Points,      1, 1, 0.990f),
+            new RewardSpec("Reward_RiflePoints",      "Rifle Points",     "UI_Icons_Rifle_Points",       RewardCategory.Points,      1, 1, 0.990f),
+            new RewardSpec("Reward_Tier2Rifle",       "Assault Rifle",    "UI_Icon_Renders_tier2_rifle", RewardCategory.Weapon,      1, 40, 1.016f),
+            new RewardSpec("Reward_Tier2Mle",         "Melee Weapon",     "UI_Icon_Renders_tier2_mle",   RewardCategory.Weapon,      1, 40, 1.094f),
+            new RewardSpec("Reward_GrenadeM67",       "M67 Grenade",      "ui_icon_render_cons_grenade_m67", RewardCategory.Consumable, 3, 8, 1.052f),
+            new RewardSpec("Reward_Healthshot",       "Regenerator",      "ui_icon_render_cons_healthshot_2_regenerator", RewardCategory.Consumable, 3, 8, 1.056f),
 
             // --- band 3 pool: zones 20+ -------------------------------------------------
-            new RewardSpec("Reward_SniperPoints",     "Sniper Points",    "UI_Icons_Sniper_Points",      RewardCategory.Points,      1, 2),
-            new RewardSpec("Reward_SubmachinePoints", "Submachine Points","UI_Icons_Submachine_Points",  RewardCategory.Points,      1, 2),
-            new RewardSpec("Reward_Tier3Sniper",      "Sniper Rifle",     "UI_Icon_Renders_tier3_sniper", RewardCategory.Weapon,     1, 80),
-            new RewardSpec("Reward_Tier3Smg",         "Submachine Gun",   "UI_Icon_Renders_tier3_smg",   RewardCategory.Weapon,      1, 80),
-            new RewardSpec("Reward_Molotov",          "Molotov",          "ui_icon_render_t_cons_molotov", RewardCategory.Consumable, 4, 10),
-            new RewardSpec(GOLD_REWARD_ID,              "Gold",             "UI_icon_gold",                RewardCategory.Currency,   40, 3),
+            new RewardSpec("Reward_SniperPoints",     "Sniper Points",    "UI_Icons_Sniper_Points",      RewardCategory.Points,      1, 2, 0.990f),
+            new RewardSpec("Reward_SubmachinePoints", "Submachine Points","UI_Icons_Submachine_Points",  RewardCategory.Points,      1, 2, 0.990f),
+            new RewardSpec("Reward_Tier3Sniper",      "Sniper Rifle",     "UI_Icon_Renders_tier3_sniper", RewardCategory.Weapon,     1, 80, 0.999f),
+            new RewardSpec("Reward_Tier3Smg",         "Submachine Gun",   "UI_Icon_Renders_tier3_smg",   RewardCategory.Weapon,      1, 80, 1.024f),
+            new RewardSpec("Reward_Molotov",          "Molotov",          "ui_icon_render_t_cons_molotov", RewardCategory.Consumable, 4, 10, 1.102f),
+            new RewardSpec(GOLD_REWARD_ID,              "Gold",             "UI_icon_gold",                RewardCategory.Currency,   40, 3, 1.061f),
 
             // --- safe zone extras -------------------------------------------------------
-            new RewardSpec("Reward_ChestSilver",      "Silver Chest",     "UI_icon_chest_silver_nolight", RewardCategory.Chest,      1, 60),
-            new RewardSpec("Reward_ChestStandard",    "Chest",            "UI_icon_chest_standart_nolight", RewardCategory.Chest,    1, 45),
+            new RewardSpec("Reward_ChestSilver",      "Silver Chest",     "UI_icon_chest_silver_nolight", RewardCategory.Chest,      1, 60, 0.990f),
+            new RewardSpec("Reward_ChestStandard",    "Chest",            "UI_icon_chest_standart_nolight", RewardCategory.Chest,    1, 45, 0.990f),
 
             // --- super zone pool --------------------------------------------------------
-            new RewardSpec("Reward_ChestSuper",       "Super Chest",      "UI_icon_chest_super_nolight", RewardCategory.Chest,       1, 200),
-            new RewardSpec("Reward_ChestGold",        "Gold Chest",       "UI_icon_chest_gold_nolight",  RewardCategory.Chest,       1, 150),
-            new RewardSpec("Reward_ChestBig",         "Big Chest",        "UI_icon_chest_big_nolight",   RewardCategory.Chest,       1, 120),
-            new RewardSpec("Reward_BayonetSummer",    "Summer Bayonet",   "ui_icon_mle_bayonet_summer_vice", RewardCategory.Cosmetic, 1, 150),
-            new RewardSpec("Reward_BayonetEaster",    "Easter Bayonet",   "ui_icon_mle_bayonet_easter_time", RewardCategory.Cosmetic, 1, 150),
-            new RewardSpec("Reward_AviatorGlasses",   "Aviator Glasses",  "ui_icon_aviator_glasses_easter", RewardCategory.Cosmetic,  1, 100),
-            new RewardSpec("Reward_PumpkinHelmet",    "Pumpkin Helmet",   "ui_icon_helmet_pumpkin",      RewardCategory.Cosmetic,    1, 100),
+            new RewardSpec("Reward_ChestSuper",       "Super Chest",      "UI_icon_chest_super_nolight", RewardCategory.Chest,       1, 200, 0.990f),
+            new RewardSpec("Reward_ChestGold",        "Gold Chest",       "UI_icon_chest_gold_nolight",  RewardCategory.Chest,       1, 150, 0.990f),
+            new RewardSpec("Reward_ChestBig",         "Big Chest",        "UI_icon_chest_big_nolight",   RewardCategory.Chest,       1, 120, 0.990f),
+            new RewardSpec("Reward_BayonetSummer",    "Summer Bayonet",   "ui_icon_mle_bayonet_summer_vice", RewardCategory.Cosmetic, 1, 150, 1.017f),
+            new RewardSpec("Reward_BayonetEaster",    "Easter Bayonet",   "ui_icon_mle_bayonet_easter_time", RewardCategory.Cosmetic, 1, 150, 1.017f),
+            new RewardSpec("Reward_AviatorGlasses",   "Aviator Glasses",  "ui_icon_aviator_glasses_easter", RewardCategory.Cosmetic,  1, 100, 1.800f),
+            new RewardSpec("Reward_PumpkinHelmet",    "Pumpkin Helmet",   "ui_icon_helmet_pumpkin",      RewardCategory.Cosmetic,    1, 100, 1.320f),
         };
 
         /// <summary>
@@ -212,6 +220,8 @@ namespace Vertigo.Wheel.Editor
                 so.FindProperty("_id").stringValue = spec.AssetName;
                 so.FindProperty("_displayName").stringValue = spec.DisplayName;
                 so.FindProperty("_icon").objectReferenceValue = icon;
+                so.FindProperty("_iconScale").floatValue = spec.IconScale;
+                so.FindProperty("_iconOffset").vector2Value = spec.IconOffset;
                 so.FindProperty("_category").enumValueIndex = (int)spec.Category;
                 so.FindProperty("_defaultBaseAmount").intValue = spec.BaseAmount;
                 so.FindProperty("_estimatedValue").intValue = spec.UnitValue;

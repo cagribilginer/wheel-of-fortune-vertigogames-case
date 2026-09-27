@@ -59,7 +59,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             for (int i = 0; i < entries.Count; i++)
             {
                 BankEntryView entry = _pool.Get();
-                entry.SetEntry(_catalog.IconFor(entries[i].Reward), entries[i].Amount);
+                entry.SetEntry(_catalog.IconFor(entries[i].Reward), entries[i].Amount, _catalog.IconScaleFor(entries[i].Reward));
                 entry.transform.SetSiblingIndex(i);
                 _active.Add(entry);
             }
@@ -100,6 +100,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             image.sprite = _catalog.IconFor(outcome.Reward);
             image.preserveAspect = true;
             image.raycastTarget = false;
+            image.rectTransform.localScale = Vector3.one * _catalog.IconScaleFor(outcome.Reward);
 
             ghostRect.DOMove(target.position, _juice.BankFlyDuration)
                 .SetEase(Ease.InBack)

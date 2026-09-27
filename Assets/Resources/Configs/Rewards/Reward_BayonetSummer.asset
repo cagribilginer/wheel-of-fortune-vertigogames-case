@@ -15,6 +15,7 @@ MonoBehaviour:
   _id: Reward_BayonetSummer
   _displayName: Summer Bayonet
   _icon: {fileID: 21300000, guid: 35bcffae81808401c96eef142e25373f, type: 3}
+  _iconScale: 1.017
   _category: 3
   _defaultBaseAmount: 1
   _estimatedValue: 150

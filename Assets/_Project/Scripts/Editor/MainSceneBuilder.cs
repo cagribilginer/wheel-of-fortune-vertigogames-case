@@ -144,12 +144,20 @@ namespace Vertigo.Wheel.Editor
             rt.pivot = new Vector2(0.5f, 0.5f);
             rt.sizeDelta = new Vector2(90f, 90f);
 
+            // Icon shrunk to 50x50 (from 55x55) to open a guaranteed 5-unit gap to the text — the old 55x55
+            // icon and text boxes overlapped by 9.5 units regardless of any shared shift, hidden only on
+            // icons with enough internal transparent padding to spare (e.g. not the "restricted" badge).
+            // The Y offsets (icon 6.1, text -35.9 — 42 units apart, matching WheelSlotView's
+            // TEXT_OFFSET_BELOW_ICON) are dialed in against the real render, not solved on paper: the
+            // algebraic "centred in the 90-tall slot" pair (14.5 / -27.5) still read low once the wheel's
+            // own radius was corrected to sit each slot dead-centre in its hole. Individual icons can still
+            // read a little off-centre depending on their own artwork's shape — see RewardDefinition.IconOffset.
             Image icon = AddImage(NewNode("ui_image_slot_icon_value", rt), null);
             icon.preserveAspect = true;
-            FixedCentered((RectTransform)icon.transform, Vector2.zero, new Vector2(55f, 55f));
+            FixedCentered((RectTransform)icon.transform, new Vector2(0f, 6.1f), new Vector2(50f, 50f));
 
             TextMeshProUGUI amount = AddText(NewNode("ui_text_slot_amount_value", rt), "x25", 17f);
-            FixedCentered((RectTransform)amount.transform, new Vector2(0f, -30f), new Vector2(84f, 24f));
+            FixedCentered((RectTransform)amount.transform, new Vector2(0f, -35.9f), new Vector2(84f, 24f));
 
             var view = root.AddComponent<WheelSlotView>();
             view.RebindReferences();
@@ -473,10 +481,20 @@ namespace Vertigo.Wheel.Editor
 
         // ------------------------------------------------------------------ bank + actions
 
+        // Full stretch (the old behaviour) leaves a large empty bottom half at tall aspects like 4:3, since
+        // the panel always fills the entire side column regardless of how many reward rows it actually
+        // holds. Capping the height and centring it in that column reads as intentional at every aspect —
+        // this value matches what the uncapped stretch already looked like at the 1920x1080 reference.
+        private const float BANK_MAX_HEIGHT = 780f;
+
         private static BankView BuildBank(RectTransform sidePanel, BankEntryView bankEntryPrefab)
         {
             RectTransform bank = NewNode("ui_panel_bank", sidePanel);
-            Stretch(bank, 0, 74f, 0, 0);
+            bank.anchorMin = new Vector2(0f, 0.5f);
+            bank.anchorMax = new Vector2(1f, 0.5f);
+            bank.pivot = new Vector2(0.5f, 0.5f);
+            bank.anchoredPosition = new Vector2(0f, 37f); // half the 74px bottom margin reserved for actions
+            bank.sizeDelta = new Vector2(0f, BANK_MAX_HEIGHT);
 
             // Fill is an opaque 9-slice tinted near-black; the rim is a 4px transparent-centre outline so
             // it draws a crisp edge, not the blown-up bevel the old 12px frame read as.

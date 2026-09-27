@@ -82,7 +82,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             for (int i = 0; i < lostHaul.Count; i++)
             {
                 BankEntryView entry = _bombListPool.Get();
-                entry.SetEntry(_catalog.IconFor(lostHaul[i].Reward), lostHaul[i].Amount);
+                entry.SetEntry(_catalog.IconFor(lostHaul[i].Reward), lostHaul[i].Amount, _catalog.IconScaleFor(lostHaul[i].Reward));
                 entry.transform.SetSiblingIndex(i);
                 _activeBombList.Add(entry);
             }
@@ -119,7 +119,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 total += haul[i].TotalValue;
 
                 BankEntryView entry = _listPool.Get();
-                entry.SetEntry(_catalog.IconFor(haul[i].Reward), haul[i].Amount);
+                entry.SetEntry(_catalog.IconFor(haul[i].Reward), haul[i].Amount, _catalog.IconScaleFor(haul[i].Reward));
                 entry.transform.SetSiblingIndex(i);
                 _activeList.Add(entry);
             }
