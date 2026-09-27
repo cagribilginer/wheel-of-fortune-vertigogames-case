@@ -20,9 +20,9 @@ namespace Vertigo.Wheel.Data.Configs
             new Keyframe(0.8f, 0.93f, 0.5f, 0.5f),
             new Keyframe(1f, 1f, 0f, 0f));
 
-        [SerializeField] private float _settlePunchDegrees = 2.5f;
-        [SerializeField] private float _tickPunchDegrees = 10f;
-        [SerializeField] private float _revealDelay = 0.35f;
+        [Range(0f, 45f)] [SerializeField] private float _settlePunchDegrees = 2.5f;
+        [Range(0f, 45f)] [SerializeField] private float _tickPunchDegrees = 10f;
+        [Min(0f)] [SerializeField] private float _revealDelay = 0.35f;
 
         public float Duration
         {

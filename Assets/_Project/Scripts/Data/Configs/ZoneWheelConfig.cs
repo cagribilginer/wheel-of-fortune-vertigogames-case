@@ -40,8 +40,15 @@ namespace Vertigo.Wheel.Data.Configs
             get { return _shuffleSliceOrder; }
         }
 
+        // Authored data never changes during play, so re-walking _slices on every zone transition (this
+        // asset lives for the whole run) is a pure waste — cache the immutable result and hand back the
+        // same instance every time instead.
+        private WheelBlueprint _cachedBlueprint;
+
         public WheelBlueprint ToBlueprint()
         {
+            if (_cachedBlueprint != null) return _cachedBlueprint;
+
             var blueprints = new List<SliceBlueprint>(_slices.Count);
 
             for (int i = 0; i < _slices.Count; i++)
@@ -53,12 +60,17 @@ namespace Vertigo.Wheel.Data.Configs
                 blueprints.Add(entry.ToBlueprint());
             }
 
-            return new WheelBlueprint(_tier, blueprints, _shuffleSliceOrder);
+            _cachedBlueprint = new WheelBlueprint(_tier, blueprints, _shuffleSliceOrder);
+            return _cachedBlueprint;
         }
 
 #if UNITY_EDITOR
         private void OnValidate()
         {
+            // An in-editor edit must be reflected the next time this is asked for, not stay stale for the
+            // rest of the Editor session.
+            _cachedBlueprint = null;
+
             if (_slices.Count != WheelModel.STANDARD_SLICE_COUNT)
                 Debug.LogError(
                     $"[Vertigo] Wheel '{name}' has {_slices.Count} slices; the artwork has " +

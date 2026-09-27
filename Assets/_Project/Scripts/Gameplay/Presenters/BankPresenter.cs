@@ -16,9 +16,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     /// <see cref="RewardBank"/> whenever it changes, plus the ghost that visibly carries a fresh reward from
     /// the wheel into its grid cell.
     /// <para>
-    /// The ghost is a plain temporary Image parented on the canvas root — never inside the
-    /// GridLayoutGroup-controlled content — because a layout rebuild would fight any tween applied to one of
-    /// its own children.
+    /// The ghost is a single reused Image parented on the canvas root — never inside the
+    /// GridLayoutGroup-controlled content, because a layout rebuild would fight any tween applied to one of
+    /// its own children — toggled active/inactive rather than instantiated and destroyed per grant, since
+    /// only one ever flies at a time.
     /// </para>
     /// </summary>
     public sealed class BankPresenter
@@ -31,6 +32,12 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly JuiceConfig _juice;
         private readonly ObjectPool<BankEntryView> _pool;
         private readonly List<BankEntryView> _active = new List<BankEntryView>();
+
+        // Lazily created, then reused for every fly-in — only one ever flies at a time (the state machine
+        // waits on FlyIn's onComplete before another spin can grant a reward), so there is nothing to pool
+        // here beyond keeping this single instance alive instead of Instantiate/Destroy-ing it per grant.
+        private RectTransform _ghostRect;
+        private Image _ghostImage;
 
         public BankPresenter(
             BankView view, BankEntryView entryPrefab, RewardCatalog catalog, RewardBank bank,
@@ -75,7 +82,6 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         public void FlyIn(SpinOutcome outcome, Vector3 fromWorldPosition, Action onComplete)
         {
             Refresh();
-            LayoutRebuilder.ForceRebuildLayoutImmediate(_view.Content);
 
             // Refresh has already rebuilt the grid from the post-grant bank, so this cell exists whether the
             // reward is a brand-new row (appended last) or a stack that was already there.
@@ -90,24 +96,19 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             int startAmount = Mathf.Max(0, finalAmount - outcome.Amount);
             targetEntry.SetAmount(startAmount);
 
-            var ghostGo = new GameObject("bank_fly_ghost", typeof(RectTransform), typeof(Image));
-            var ghostRect = (RectTransform)ghostGo.transform;
-            ghostRect.SetParent(_flightLayer, false);
-            ghostRect.sizeDelta = new Vector2(72f, 72f);
-            ghostRect.position = fromWorldPosition;
+            EnsureGhost();
+            _ghostRect.DOKill();
+            _ghostRect.gameObject.SetActive(true);
+            _ghostRect.position = fromWorldPosition;
+            _ghostImage.sprite = _catalog.IconFor(outcome.Reward);
+            _ghostImage.rectTransform.localScale = Vector3.one * _catalog.IconScaleFor(outcome.Reward);
 
-            Image image = ghostGo.GetComponent<Image>();
-            image.sprite = _catalog.IconFor(outcome.Reward);
-            image.preserveAspect = true;
-            image.raycastTarget = false;
-            image.rectTransform.localScale = Vector3.one * _catalog.IconScaleFor(outcome.Reward);
-
-            ghostRect.DOMove(target.position, _juice.BankFlyDuration)
+            _ghostRect.DOMove(target.position, _juice.BankFlyDuration)
                 .SetEase(Ease.InBack)
-                .SetLink(ghostGo, LinkBehaviour.KillOnDestroy)
+                .SetLink(_ghostRect.gameObject, LinkBehaviour.KillOnDestroy)
                 .OnComplete(() =>
             {
-                UnityEngine.Object.Destroy(ghostGo);
+                _ghostRect.gameObject.SetActive(false);
 
                 target.DOKill();
                 target.localScale = Vector3.one;
@@ -125,6 +126,20 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                         onComplete();
                     });
             });
+        }
+
+        private void EnsureGhost()
+        {
+            if (_ghostRect != null) return;
+
+            var ghostGo = new GameObject("bank_fly_ghost", typeof(RectTransform), typeof(Image));
+            _ghostRect = (RectTransform)ghostGo.transform;
+            _ghostRect.SetParent(_flightLayer, false);
+            _ghostRect.sizeDelta = new Vector2(72f, 72f);
+
+            _ghostImage = ghostGo.GetComponent<Image>();
+            _ghostImage.preserveAspect = true;
+            _ghostImage.raycastTarget = false;
         }
 
         private int IndexOf(RewardId reward)
