@@ -76,7 +76,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             if (!outcome.IsBomb)
             {
                 _audio.PlayReward();
-                if (zoneType != ZoneType.Normal || outcome.UnitValue >= _juice.BigRewardUnitValue)
+                if (zoneType != ZoneType.Normal)
                     _vfx.PlayRewardBurst();
             }
 

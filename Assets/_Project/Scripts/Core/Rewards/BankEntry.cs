@@ -5,19 +5,11 @@ namespace Vertigo.Wheel.Core.Rewards
     {
         public readonly RewardId Reward;
         public readonly int Amount;
-        public readonly int UnitValue;
 
-        public BankEntry(RewardId reward, int amount, int unitValue)
+        public BankEntry(RewardId reward, int amount)
         {
             Reward = reward;
             Amount = amount;
-            UnitValue = unitValue;
-        }
-
-        /// <summary>Used only to pick which chest sprite the cash-out popup shows.</summary>
-        public long TotalValue
-        {
-            get { return (long)Amount * UnitValue; }
         }
 
         public override string ToString()

@@ -105,10 +105,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 RewardDefinition definition = _catalog.All[i % count];
                 if (definition == null) continue;
 
-                _run.Bank.Add(
-                    definition.RewardId,
-                    definition.DefaultBaseAmount + _rng.Next(0, 40),
-                    Math.Max(1, definition.EstimatedValue));
+                _run.Bank.Add(definition.RewardId, definition.DefaultBaseAmount + _rng.Next(0, 40));
             }
 
             _bank.Refresh();

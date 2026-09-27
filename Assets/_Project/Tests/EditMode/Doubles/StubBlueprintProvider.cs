@@ -33,7 +33,7 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
 
                 slices.Add(isBomb
                     ? SliceBlueprint.CreateBomb(BombWeight)
-                    : SliceBlueprint.CreateReward(RewardFor(zoneType), BaseAmountFor(zoneType), weight: 1, unitValue: 2));
+                    : SliceBlueprint.CreateReward(RewardFor(zoneType), BaseAmountFor(zoneType), weight: 1));
             }
 
             return new WheelBlueprint(TierFor(zoneType), slices, _shuffle);

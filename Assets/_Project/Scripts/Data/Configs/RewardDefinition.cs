@@ -39,10 +39,6 @@ namespace Vertigo.Wheel.Data.Configs
         [Min(1)]
         [SerializeField] private int _defaultBaseAmount = 10;
 
-        [Tooltip("Relative worth per unit. Only sizes the cash-out chest; never affects odds.")]
-        [Min(0)]
-        [SerializeField] private int _estimatedValue = 1;
-
         public string Id
         {
             get { return string.IsNullOrEmpty(_id) ? name : _id; }
@@ -74,10 +70,6 @@ namespace Vertigo.Wheel.Data.Configs
         public int DefaultBaseAmount
         {
             get { return _defaultBaseAmount; }
-        }
-        public int EstimatedValue
-        {
-            get { return _estimatedValue; }
         }
 
         /// <summary>The shard ceiling from the design brief: Points rewards never exceed this.</summary>

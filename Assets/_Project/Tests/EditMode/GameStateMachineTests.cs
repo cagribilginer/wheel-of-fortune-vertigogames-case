@@ -154,7 +154,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         {
             AdvanceToZone(5);                              // zone 5 is safe, so leaving is legal here
             int zoneBefore = _run.CurrentZone;
-            long bankedBefore = _run.Bank.TotalValue;
+            int bankedBefore = _run.Bank.DistinctRewardCount;
 
             _machine.RequestLeave();
             _machine.Cancel();
@@ -162,7 +162,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.That(_machine.IsIn<IdleState>(), Is.True);
             Assert.That(_view.CashOutVisible, Is.False);
             Assert.That(_run.CurrentZone, Is.EqualTo(zoneBefore));
-            Assert.That(_run.Bank.TotalValue, Is.EqualTo(bankedBefore));
+            Assert.That(_run.Bank.DistinctRewardCount, Is.EqualTo(bankedBefore));
             Assert.That(bankedBefore, Is.GreaterThan(0));
         }
 
@@ -198,7 +198,7 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             _machine.RequestSpin();                       // zone 1 -> 2, banks a reward
             int zoneBefore = _run.CurrentZone;
-            long bankedBefore = _run.Bank.TotalValue;
+            int bankedBefore = _run.Bank.DistinctRewardCount;
 
             _resolver.LandOn(BOMB_SLOT);
             _machine.RequestSpin();                       // bomb clears the bank
@@ -213,7 +213,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.LessThan(walletBefore), "The continue must have been paid for.");
             Assert.That(_run.ContinuesUsedThisRun, Is.EqualTo(1));
             Assert.That(bankedBefore, Is.GreaterThan(0));
-            Assert.That(_run.Bank.TotalValue, Is.EqualTo(bankedBefore), "the continue restores the lost haul");
+            Assert.That(_run.Bank.DistinctRewardCount, Is.EqualTo(bankedBefore), "the continue restores the lost haul");
         }
 
         [Test]

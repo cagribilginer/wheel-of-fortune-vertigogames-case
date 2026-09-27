@@ -45,12 +45,6 @@ namespace Vertigo.Wheel.Data.Configs
         [Range(0f, 1f)] [SerializeField] private float _zoneScrollDuration = 0.45f;
         [Range(1f, 2f)] [SerializeField] private float _currentZoneTileScale = 1.12f;
 
-        [Header("Rewards")]
-        [Tooltip(
-            "Per-unit worth (RewardDefinition.EstimatedValue) at or above which a landed reward earns the " +
-            "glow burst on top of any safe/super zone clear it might also be.")]
-        [Min(0)] [SerializeField] private int _bigRewardUnitValue = 60;
-
         public float TickPunchDuration
         {
             get { return _tickPunchDuration; }
@@ -150,10 +144,6 @@ namespace Vertigo.Wheel.Data.Configs
         public float CurrentZoneTileScale
         {
             get { return _currentZoneTileScale; }
-        }
-        public int BigRewardUnitValue
-        {
-            get { return _bigRewardUnitValue; }
         }
     }
 }

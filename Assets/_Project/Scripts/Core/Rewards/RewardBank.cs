@@ -42,34 +42,22 @@ namespace Vertigo.Wheel.Core.Rewards
             get { return _entries.Count == 0; }
         }
 
-        public long TotalValue
-        {
-            get
-            {
-                long total = 0;
-                for (int i = 0; i < _entries.Count; i++) total += _entries[i].TotalValue;
-                return total;
-            }
-        }
-
-        public void Add(RewardId reward, int amount, int unitValue = 1)
+        public void Add(RewardId reward, int amount)
         {
             if (reward.IsEmpty)
                 throw new ArgumentException("Cannot bank an empty RewardId.", nameof(reward));
             if (amount < 1)
                 throw new ArgumentOutOfRangeException(nameof(amount), amount, "Banked amount must be >= 1.");
-            if (unitValue < 0)
-                throw new ArgumentOutOfRangeException(nameof(unitValue), unitValue, "Unit value cannot be negative.");
 
             if (_indexByReward.TryGetValue(reward, out int index))
             {
                 BankEntry existing = _entries[index];
-                _entries[index] = new BankEntry(reward, existing.Amount + amount, existing.UnitValue);
+                _entries[index] = new BankEntry(reward, existing.Amount + amount);
             }
             else
             {
                 _indexByReward[reward] = _entries.Count;
-                _entries.Add(new BankEntry(reward, amount, unitValue));
+                _entries.Add(new BankEntry(reward, amount));
             }
 
             Changed?.Invoke();

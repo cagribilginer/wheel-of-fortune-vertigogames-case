@@ -144,8 +144,8 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void CashOut_CreditsBothWalletCurrenciesFromTheSameBank()
         {
-            _run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Gold, 40), 3);
-            _run.Grant(new SpinOutcome(2, SliceKind.Reward, TestWheels.Cash, 50), 1);
+            _run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Gold, 40));
+            _run.Grant(new SpinOutcome(2, SliceKind.Reward, TestWheels.Cash, 50));
 
             _run.CashOut();
 

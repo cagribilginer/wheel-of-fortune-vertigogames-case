@@ -119,12 +119,12 @@ namespace Vertigo.Wheel.Core.Run
         }
 
         /// <summary>Banks a non-bomb spin result.</summary>
-        public void Grant(SpinOutcome outcome, int unitValue = 1)
+        public void Grant(SpinOutcome outcome)
         {
             if (outcome.IsBomb)
                 throw new InvalidOperationException("Grant was called with a bomb outcome; call Detonate instead.");
 
-            Bank.Add(outcome.Reward, outcome.Amount, unitValue);
+            Bank.Add(outcome.Reward, outcome.Amount);
         }
 
         public void AdvanceZone()
@@ -190,7 +190,7 @@ namespace Vertigo.Wheel.Core.Run
             for (int i = 0; i < _lostHaul.Count; i++)
             {
                 BankEntry entry = _lostHaul[i];
-                Bank.Add(entry.Reward, entry.Amount, entry.UnitValue);
+                Bank.Add(entry.Reward, entry.Amount);
             }
 
             _lostHaul = null;

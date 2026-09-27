@@ -25,7 +25,6 @@ namespace Vertigo.Wheel.Tests.EditMode
         {
             Assert.That(_bank.IsEmpty, Is.True);
             Assert.That(_bank.Entries, Is.Empty);
-            Assert.That(_bank.TotalValue, Is.Zero);
         }
 
         [Test]
@@ -99,24 +98,6 @@ namespace Vertigo.Wheel.Tests.EditMode
                 "Entries must be a read-only view, not the live backing list.");
         }
 
-        [Test]
-        public void TotalValue_SumsAmountTimesUnitValue()
-        {
-            _bank.Add(Pistol, 10, unitValue: 3);
-            _bank.Add(Rifle, 2, unitValue: 50);
-
-            Assert.That(_bank.TotalValue, Is.EqualTo(10 * 3 + 2 * 50));
-        }
-
-        [Test]
-        public void ToppingUp_KeepsTheOriginalUnitValue()
-        {
-            _bank.Add(Pistol, 1, unitValue: 10);
-            _bank.Add(Pistol, 1, unitValue: 999);
-
-            Assert.That(_bank.TotalValue, Is.EqualTo(20));
-        }
-
         [TestCase(0)]
         [TestCase(-5)]
         public void NonPositiveAmount_Throws(int amount)
@@ -128,12 +109,6 @@ namespace Vertigo.Wheel.Tests.EditMode
         public void EmptyRewardId_Throws()
         {
             Assert.Throws<ArgumentException>(() => _bank.Add(RewardId.None, 1));
-        }
-
-        [Test]
-        public void NegativeUnitValue_Throws()
-        {
-            Assert.Throws<ArgumentOutOfRangeException>(() => _bank.Add(Pistol, 1, unitValue: -1));
         }
     }
 }

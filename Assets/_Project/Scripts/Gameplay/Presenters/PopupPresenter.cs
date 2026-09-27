@@ -11,13 +11,12 @@ using Vertigo.Wheel.UI.Views.Popups;
 
 namespace Vertigo.Wheel.Gameplay.Presenters
 {
-    /// <summary>Bomb and cash-out popups: population, chest sizing, and input forwarding.</summary>
+    /// <summary>Bomb and cash-out popups: population and input forwarding.</summary>
     public sealed class PopupPresenter : IDisposable
     {
         private readonly BombPopupView _bomb;
         private readonly CollectPopupView _collect;
         private readonly RewardCatalog _catalog;
-        private readonly ChestTierConfig _chestTiers;
         private readonly AudioPresenter _audio;
         private readonly ObjectPool<BankEntryView> _listPool;
         private readonly List<BankEntryView> _activeList = new List<BankEntryView>();
@@ -27,12 +26,11 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public PopupPresenter(
             BombPopupView bomb, CollectPopupView collect, BankEntryView entryPrefab,
-            RewardCatalog catalog, ChestTierConfig chestTiers, AudioPresenter audio)
+            RewardCatalog catalog, AudioPresenter audio)
         {
             _bomb = bomb;
             _collect = collect;
             _catalog = catalog;
-            _chestTiers = chestTiers;
             _audio = audio;
 
             _listPool = new ObjectPool<BankEntryView>(
@@ -113,11 +111,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             for (int i = 0; i < _activeList.Count; i++) _listPool.Release(_activeList[i]);
             _activeList.Clear();
 
-            long total = 0;
             for (int i = 0; i < haul.Count; i++)
             {
-                total += haul[i].TotalValue;
-
                 BankEntryView entry = _listPool.Get();
                 entry.SetEntry(_catalog.IconFor(haul[i].Reward), haul[i].Amount, _catalog.IconScaleFor(haul[i].Reward));
                 entry.transform.SetSiblingIndex(i);
@@ -128,8 +123,6 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             // the frame the cash-out summary opens.
             LayoutRebuilder.ForceRebuildLayoutImmediate(_collect.Content);
 
-            RewardDefinition chest = _chestTiers.ChestFor(total);
-            _collect.SetChest(chest != null ? chest.Icon : null);
             _audio.PlayPopupOpen();
             _collect.Show(zonesCleared, playerCash, playerGold);
         }

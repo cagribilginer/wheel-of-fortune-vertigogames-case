@@ -115,7 +115,7 @@ namespace Vertigo.Wheel.Tests.EditMode
                 Assert.That(_view.LastWheel[i].Amount, Is.GreaterThanOrEqualTo(0),
                     "A negative amount means the scaling cast wrapped.");
 
-            Assert.That(_run.Bank.TotalValue, Is.GreaterThan(0));
+            Assert.That(_run.Bank.DistinctRewardCount, Is.GreaterThan(0));
         }
 
         /// <summary>

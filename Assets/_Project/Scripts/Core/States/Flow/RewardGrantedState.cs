@@ -7,7 +7,7 @@ namespace Vertigo.Wheel.Core.States.Flow
 
         public override void Enter()
         {
-            Context.Run.Grant(Context.PendingOutcome, Context.PendingOutcome.UnitValue);
+            Context.Run.Grant(Context.PendingOutcome);
 
             Context.Presentation.PlayRewardGranted(Context.PendingOutcome, () =>
             {

@@ -14,19 +14,15 @@ namespace Vertigo.Wheel.Core.Spin
         public readonly int Amount;
         public readonly int Weight;
 
-        /// <summary>Per-unit worth, used only to size the cash-out chest. Never affects odds.</summary>
-        public readonly int UnitValue;
-
-        private WheelSlice(SliceKind kind, RewardId reward, int amount, int weight, int unitValue)
+        private WheelSlice(SliceKind kind, RewardId reward, int amount, int weight)
         {
             Kind = kind;
             Reward = reward;
             Amount = amount;
             Weight = weight;
-            UnitValue = unitValue;
         }
 
-        public static WheelSlice CreateReward(RewardId reward, int amount, int weight = 1, int unitValue = 1)
+        public static WheelSlice CreateReward(RewardId reward, int amount, int weight = 1)
         {
             if (reward.IsEmpty)
                 throw new ArgumentException("A reward slice must carry a non-empty RewardId.", nameof(reward));
@@ -34,10 +30,8 @@ namespace Vertigo.Wheel.Core.Spin
                 throw new ArgumentOutOfRangeException(nameof(amount), amount, "A reward slice must grant at least 1.");
             if (weight < 0)
                 throw new ArgumentOutOfRangeException(nameof(weight), weight, "Weight cannot be negative.");
-            if (unitValue < 0)
-                throw new ArgumentOutOfRangeException(nameof(unitValue), unitValue, "Unit value cannot be negative.");
 
-            return new WheelSlice(SliceKind.Reward, reward, amount, weight, unitValue);
+            return new WheelSlice(SliceKind.Reward, reward, amount, weight);
         }
 
         public static WheelSlice CreateBomb(int weight = 1)
@@ -45,7 +39,7 @@ namespace Vertigo.Wheel.Core.Spin
             if (weight < 0)
                 throw new ArgumentOutOfRangeException(nameof(weight), weight, "Weight cannot be negative.");
 
-            return new WheelSlice(SliceKind.Bomb, RewardId.None, 0, weight, 0);
+            return new WheelSlice(SliceKind.Bomb, RewardId.None, 0, weight);
         }
 
         public bool IsBomb
@@ -56,7 +50,7 @@ namespace Vertigo.Wheel.Core.Spin
         public bool Equals(WheelSlice other)
         {
             return Kind == other.Kind && Reward.Equals(other.Reward) && Amount == other.Amount &&
-                Weight == other.Weight && UnitValue == other.UnitValue;
+                Weight == other.Weight;
         }
 
         public override bool Equals(object obj)
@@ -72,7 +66,6 @@ namespace Vertigo.Wheel.Core.Spin
                 hash = (hash * 397) ^ Reward.GetHashCode();
                 hash = (hash * 397) ^ Amount;
                 hash = (hash * 397) ^ Weight;
-                hash = (hash * 397) ^ UnitValue;
                 return hash;
             }
         }

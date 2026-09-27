@@ -95,7 +95,6 @@ namespace Vertigo.Wheel.Gameplay
             var progression = Addressables.LoadAssetAsync<ZoneProgressionConfig>("Configs/Settings/ZoneProgression_Default").WaitForCompletion();
             var continueConfig = Addressables.LoadAssetAsync<ContinueConfig>("Configs/Settings/Continue_Default").WaitForCompletion();
             var juice = Addressables.LoadAssetAsync<JuiceConfig>("Configs/Settings/Juice_Default").WaitForCompletion();
-            var chestTiers = Addressables.LoadAssetAsync<ChestTierConfig>("Configs/Settings/ChestTiers_Default").WaitForCompletion();
 
             IZoneClassifier classifier = progression.CreateClassifier();
             // The wheel factory gets its own RNG so a zone's slices are dealt onto different wedges each
@@ -123,7 +122,7 @@ namespace Vertigo.Wheel.Gameplay
                 _bank, _bankEntryPrefab, catalog, runModel.Bank, _flightLayer, audioPresenter, juice);
             var actionBarPresenter = new ActionBarPresenter(_actionBar);
             var popupPresenter = new PopupPresenter(
-                _bombPopup, _collectPopup, _bankEntryPrefab, catalog, chestTiers, audioPresenter);
+                _bombPopup, _collectPopup, _bankEntryPrefab, catalog, audioPresenter);
             var vfxPresenter = new VfxPresenter(_vfx, juice);
 
             var presentation = new ScreenPresentation(

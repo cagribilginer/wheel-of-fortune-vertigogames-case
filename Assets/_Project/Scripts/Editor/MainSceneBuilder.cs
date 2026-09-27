@@ -980,15 +980,6 @@ namespace Vertigo.Wheel.Editor
             frame.type = Image.Type.Sliced;
             Stretch((RectTransform)frame.transform, 0, 0, 0, 0);
 
-            Image chest = AddImage(NewNode("ui_image_popup_collect_chest_value", anim), "UI_icon_chest_standart_nolight");
-            chest.preserveAspect = true;
-            LeftMiddle((RectTransform)chest.transform, 60f, new Vector2(320, 320));
-
-            Image shine = AddImage(NewNode("ui_image_popup_collect_shine", anim), "star_glow_alpha");
-            shine.preserveAspect = true;
-            LeftMiddle((RectTransform)shine.transform, 60f, new Vector2(400, 400));
-            shine.transform.SetSiblingIndex(chest.transform.GetSiblingIndex());
-
             TextMeshProUGUI title = AddText(NewNode("ui_text_popup_collect_title", anim), "REWARDS COLLECTED", 38f);
             title.alignment = TextAlignmentOptions.Top;
             TopStripText((RectTransform)title.transform, 30f, new Vector2(1200, 50));
@@ -1021,8 +1012,9 @@ namespace Vertigo.Wheel.Editor
             cancelGlyph.alignment = TextAlignmentOptions.Center;
             Stretch((RectTransform)cancelGlyph.transform, 0, 0, 0, 2);
 
+            // Left inset matches the right (40f) now that the chest that used to occupy this side is gone.
             RectTransform scrollRect = NewNode("ui_scroll_popup_collect_list", anim);
-            Stretch(scrollRect, 480f, 100f, 40f, 140f);
+            Stretch(scrollRect, 40f, 100f, 40f, 140f);
             var scroll = scrollRect.gameObject.AddComponent<ScrollRect>();
             scroll.horizontal = false;
             scroll.vertical = true;
@@ -1059,11 +1051,12 @@ namespace Vertigo.Wheel.Editor
 
             scroll.content = content;
 
-            // Anchored to the lower-right of the 720-tall card, inside the 100px margin the reward list
-            // leaves below itself (Stretch(scrollRect, 480, 100, 40, 140)) rather than to the card center.
+            // Centred in the card's own 100px bottom margin (the reward list stops short of the card edge,
+            // see Stretch(scrollRect, ...) above). Used to sit right-biased (anchor 0.75) to dodge the
+            // chest that occupied the left side — that's gone now, so centred reads correctly again.
             BuildPopupButton(anim, "ui_button_popup_collect_confirm", "ui_transform_popup_collect_confirm_anim",
                 "UI_button_orange_standard", pivotX: 0.5f, anchoredX: 0f, anchoredY: 50f,
-                animOut: out RectTransform confirmAnim, fixedAnchorMode: true, anchorPoint: new Vector2(0.75f, 0f));
+                animOut: out RectTransform confirmAnim, fixedAnchorMode: true, anchorPoint: new Vector2(0.5f, 0f));
             TextMeshProUGUI confirmText = AddText(NewNode("ui_text_popup_collect_confirm_value", confirmAnim), "CLAIM & LEAVE", 30f);
             confirmText.alignment = TextAlignmentOptions.Center;
             Stretch((RectTransform)confirmText.transform, 0, 0, 0, 0);

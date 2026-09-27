@@ -83,16 +83,6 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void UnitValue_SurvivesIntoTheBuiltSlice()
-        {
-            WheelModel wheel = _factory.Build(1);
-
-            for (int i = 0; i < wheel.SliceCount; i++)
-                if (!wheel[i].IsBomb)
-                    Assert.That(wheel[i].UnitValue, Is.EqualTo(2));
-        }
-
-        [Test]
         public void BombSlice_CarriesNoAmountRegardlessOfZone()
         {
             WheelModel deep = _factory.Build(99);

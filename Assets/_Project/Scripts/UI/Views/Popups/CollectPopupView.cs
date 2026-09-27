@@ -12,15 +12,14 @@ namespace Vertigo.Wheel.UI.Views.Popups
     /// <para>
     /// Nothing is committed while this is open: <see cref="CancelClicked"/> (the corner X) drops the player
     /// straight back onto the wheel with their haul intact; <see cref="ConfirmClicked"/> ("CLAIM &amp; LEAVE")
-    /// runs <see cref="PlayClaim"/> — the chest punch and a hold — and then hands back to the state machine
-    /// to reset the run.
+    /// runs <see cref="PlayClaim"/> — a card punch and a hold — and then hands back to the state machine to
+    /// reset the run.
     /// </para>
     /// </summary>
     public sealed class CollectPopupView : PopupViewBase
     {
         [SerializeField] private Image _ui_image_popup_collect_backdrop;
         [SerializeField] private RectTransform _ui_transform_popup_collect_anim;
-        [SerializeField] private Image _ui_image_popup_collect_chest_value;
         [SerializeField] private TextMeshProUGUI _ui_text_popup_collect_zone_value;
         [SerializeField] private TextMeshProUGUI _ui_text_popup_collect_cash_value;
         [SerializeField] private TextMeshProUGUI _ui_text_popup_collect_gold_value;
@@ -31,12 +30,12 @@ namespace Vertigo.Wheel.UI.Views.Popups
         private readonly CountingLabel _cash = new CountingLabel();
         private readonly CountingLabel _gold = new CountingLabel();
 
-        // How long the celebration holds before the run resets — long enough for the chest punch and the
+        // How long the celebration holds before the run resets — long enough for the card punch and the
         // cash/gold count-up to read, short enough not to stall the loop.
         private const float CLAIM_HOLD_SECONDS = 0.8f;
 
-        private const float CHEST_PUNCH_SCALE = 0.25f;
-        private const float CHEST_PUNCH_DURATION = 0.35f;
+        private const float CARD_PUNCH_SCALE = 0.25f;
+        private const float CARD_PUNCH_DURATION = 0.35f;
 
         // Also used by the nested CountingLabel below for its own DOVirtual.Int tween.
         private const float COUNT_UP_DURATION = 0.5f;
@@ -53,7 +52,6 @@ namespace Vertigo.Wheel.UI.Views.Popups
         {
             Bind(ref _ui_image_popup_collect_backdrop, "ui_image_popup_collect_backdrop");
             Bind(ref _ui_transform_popup_collect_anim, "ui_transform_popup_collect_anim");
-            Bind(ref _ui_image_popup_collect_chest_value, "ui_image_popup_collect_chest_value");
             Bind(ref _ui_text_popup_collect_zone_value, "ui_text_popup_collect_zone_value");
             Bind(ref _ui_text_popup_collect_cash_value, "ui_text_popup_collect_cash_value");
             Bind(ref _ui_text_popup_collect_gold_value, "ui_text_popup_collect_gold_value");
@@ -83,11 +81,6 @@ namespace Vertigo.Wheel.UI.Views.Popups
             CancelClicked?.Invoke();
         }
 
-        public void SetChest(Sprite chest)
-        {
-            _ui_image_popup_collect_chest_value.sprite = chest;
-        }
-
         /// <summary>
         /// <paramref name="cash"/> and <paramref name="gold"/> are the wallet balances as they stand before
         /// this claim lands — same top-right HUD as the bomb screen, same numbers wherever a currency is
@@ -107,7 +100,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
         }
 
         /// <summary>
-        /// The "rewards claimed" celebration. Locks the buttons, punches the chest, counts the cash/gold row
+        /// The "rewards claimed" celebration. Locks the buttons, punches the card, counts the cash/gold row
         /// up to <paramref name="newCash"/>/<paramref name="newGold"/> (the post-claim wallet balances) right
         /// here in the popup — this is the only place the climb is shown. Holds briefly, then invokes
         /// <paramref name="onComplete"/> (the state machine resets the run there) and closes.
@@ -117,10 +110,9 @@ namespace Vertigo.Wheel.UI.Views.Popups
             _ui_button_popup_collect_confirm.interactable = false;
             _ui_button_popup_collect_cancel.interactable = false;
 
-            var chest = (RectTransform)_ui_image_popup_collect_chest_value.transform;
-            chest.DOKill();
-            chest.localScale = Vector3.one;
-            chest.DOPunchScale(Vector3.one * CHEST_PUNCH_SCALE, CHEST_PUNCH_DURATION).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
+            _ui_transform_popup_collect_anim.DOKill();
+            _ui_transform_popup_collect_anim.localScale = Vector3.one;
+            _ui_transform_popup_collect_anim.DOPunchScale(Vector3.one * CARD_PUNCH_SCALE, CARD_PUNCH_DURATION).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
 
             _cash.SetTarget(newCash, _ui_text_popup_collect_cash_value, gameObject);
             _gold.SetTarget(newGold, _ui_text_popup_collect_gold_value, gameObject);
