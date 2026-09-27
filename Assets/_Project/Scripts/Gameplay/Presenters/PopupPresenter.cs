@@ -72,13 +72,12 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _collect.CancelClicked -= _machine.Cancel;
         }
 
-        public void ShowGameOver(
-            int zoneReached, IReadOnlyList<BankEntry> lostHaul, int playerGold, int playerCash,
-            bool goldReviveOffered, int goldReviveCost, bool adReviveOffered)
+        public void ShowGameOver(GameOverSummary summary)
         {
             for (int i = 0; i < _activeBombList.Count; i++) _bombListPool.Release(_activeBombList[i]);
             _activeBombList.Clear();
 
+            IReadOnlyList<BankEntry> lostHaul = summary.LostHaul;
             for (int i = 0; i < lostHaul.Count; i++)
             {
                 BankEntryView entry = _bombListPool.Get();
@@ -95,10 +94,11 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _audio.PlayDefeatAmbience();
 
             // The corner HUD shows the actual wallet — the same two numbers ShowCashOut shows — not a
-            // score built from the lost haul's value.
+            // score built from the lost haul's value. The view stays Core-agnostic, so the summary is
+            // unpacked into plain values here rather than passed through.
             _bomb.Show(
-                zoneReached, lostHaul.Count, playerCash, playerGold,
-                goldReviveOffered, goldReviveCost, adReviveOffered);
+                summary.ZoneReached, lostHaul.Count, summary.PlayerCash, summary.PlayerGold,
+                summary.GoldReviveOffered, summary.GoldReviveCost, summary.AdReviveOffered);
         }
 
         public void HideGameOver()

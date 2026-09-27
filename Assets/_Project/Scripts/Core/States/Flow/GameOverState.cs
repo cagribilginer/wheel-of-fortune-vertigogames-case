@@ -19,14 +19,14 @@ namespace Vertigo.Wheel.Core.States.Flow
             int goldUsed = Context.Run.GoldRevivesUsedThisRun;
             int adUsed = Context.Run.AdRevivesUsedThisRun;
 
-            Context.Presentation.ShowGameOver(
+            Context.Presentation.ShowGameOver(new GameOverSummary(
                 zoneReached,
                 Context.Run.LostHaul,
                 Context.Run.GoldBalance,
                 Context.Run.CashBalance,
                 Context.ContinueService.IsGoldReviveOffered(zoneReached, goldUsed),
                 Context.ContinueService.CostFor(zoneReached, goldUsed),
-                Context.ContinueService.IsAdReviveOffered(adUsed));
+                Context.ContinueService.IsAdReviveOffered(adUsed)));
         }
 
         // "Give up" on the bomb screen forfeits the haul and drops back to zone one — mechanically a restart.

@@ -32,17 +32,8 @@ namespace Vertigo.Wheel.Core.States
 
         void PlayBomb(Action onComplete);
 
-        /// <summary>
-        /// The bomb defeat / revive screen. <paramref name="lostHaul"/> is what the bomb just took (the run
-        /// bank is already empty by now) so the screen can show the player what a revive would win back;
-        /// <paramref name="playerGold"/> and <paramref name="playerCash"/> are the persistent wallet
-        /// balances shown in the corner — the same two numbers <see cref="ShowCashOut"/> shows, since both
-        /// screens display the actual wallet, never a haul total wearing a currency's name. The two revive
-        /// offers are independent: paid needs an affordable, unused continue slot, ad only an unused one.
-        /// </summary>
-        void ShowGameOver(
-            int zoneReached, IReadOnlyList<BankEntry> lostHaul, int playerGold, int playerCash,
-            bool goldReviveOffered, int goldReviveCost, bool adReviveOffered);
+        /// <summary>The bomb defeat / revive screen. See <see cref="GameOverSummary"/> for what it shows.</summary>
+        void ShowGameOver(GameOverSummary summary);
         void HideGameOver();
 
         /// <summary>

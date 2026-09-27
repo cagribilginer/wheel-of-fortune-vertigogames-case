@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Vertigo.Wheel.Core.Rewards;
 
@@ -79,34 +80,39 @@ namespace Vertigo.Wheel.Data.Configs
             get { return _estimatedValue; }
         }
 
-        /// <summary>
-        /// Whether more than one of this reward can be granted at once. Consumables, currencies and craft
-        /// shards (the "Points" rewards) stack — their amounts also grow with zone depth. A fully-built
-        /// weapon, a cosmetic or a chest is a single unique drop: its count is always 1 and zone scaling
-        /// never touches it.
-        /// </summary>
-        public bool IsStackable
-        {
-            get
-            {
-                return _category == RewardCategory.Consumable ||
-                    _category == RewardCategory.Currency ||
-                    _category == RewardCategory.Points;
-            }
-        }
-
-        /// <summary>
-        /// Hard ceiling on a single drop's count after zone scaling, or 0 for no ceiling. Craft shards
-        /// (the "Points" rewards) top out at 5 however deep the run goes; consumables and currencies are
-        /// left uncapped so a deep run still feels rewarding.
-        /// </summary>
-        public int MaxAmountPerDrop
-        {
-            get { return _category == RewardCategory.Points ? POINTS_CEILING : 0; }
-        }
-
         /// <summary>The shard ceiling from the design brief: Points rewards never exceed this.</summary>
         public const int POINTS_CEILING = 5;
+
+        /// <summary>
+        /// Stackability and per-drop ceiling, one row per category. Consumables, currencies and craft
+        /// shards (the "Points" rewards) stack — their amounts also grow with zone depth; a fully-built
+        /// weapon, a cosmetic or a chest is a single unique drop, count always 1, never scaled. A new
+        /// category is a deliberate design decision (what does it mean for this to stack, does it cap?),
+        /// so this stays a table designers can't accidentally skip a row on — not free-form per-reward
+        /// data a new Weapon asset could quietly mis-author as stackable.
+        /// </summary>
+        private static readonly Dictionary<RewardCategory, (bool Stackable, int MaxAmountPerDrop)> CATEGORY_RULES =
+            new Dictionary<RewardCategory, (bool Stackable, int MaxAmountPerDrop)>
+            {
+                { RewardCategory.Points, (true, POINTS_CEILING) },
+                { RewardCategory.Weapon, (false, 0) },
+                { RewardCategory.Consumable, (true, 0) },
+                { RewardCategory.Cosmetic, (false, 0) },
+                { RewardCategory.Currency, (true, 0) },
+                { RewardCategory.Chest, (false, 0) },
+            };
+
+        /// <summary>Whether more than one of this reward can be granted at once. See <see cref="CATEGORY_RULES"/>.</summary>
+        public bool IsStackable
+        {
+            get { return CATEGORY_RULES[_category].Stackable; }
+        }
+
+        /// <summary>Hard ceiling on a single drop's count after zone scaling, or 0 for no ceiling. See <see cref="CATEGORY_RULES"/>.</summary>
+        public int MaxAmountPerDrop
+        {
+            get { return CATEGORY_RULES[_category].MaxAmountPerDrop; }
+        }
 
 #if UNITY_EDITOR
         private void OnValidate()

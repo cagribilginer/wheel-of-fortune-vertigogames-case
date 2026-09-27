@@ -99,12 +99,9 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _bombDelay = DOVirtual.DelayedCall(_juice.BombImpactHoldDuration, () => onComplete());
         }
 
-        public void ShowGameOver(
-            int zoneReached, IReadOnlyList<BankEntry> lostHaul, int playerGold, int playerCash,
-            bool goldReviveOffered, int goldReviveCost, bool adReviveOffered)
+        public void ShowGameOver(GameOverSummary summary)
         {
-            _popups.ShowGameOver(
-                zoneReached, lostHaul, playerGold, playerCash, goldReviveOffered, goldReviveCost, adReviveOffered);
+            _popups.ShowGameOver(summary);
         }
 
         public void HideGameOver()

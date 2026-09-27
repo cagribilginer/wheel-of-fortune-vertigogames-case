@@ -86,19 +86,18 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             onComplete?.Invoke();
         }
 
-        public virtual void ShowGameOver(
-            int zoneReached, IReadOnlyList<BankEntry> lostHaul, int playerGold, int playerCash,
-            bool goldReviveOffered, int goldReviveCost, bool adReviveOffered)
+        public virtual void ShowGameOver(GameOverSummary summary)
         {
             GameOverVisible = true;
-            GameOverZoneShown = zoneReached;
-            ContinueOffered = goldReviveOffered;
-            ContinueCostShown = goldReviveCost;
-            AdReviveOffered = adReviveOffered;
-            PlayerGoldShown = playerGold;
-            PlayerCashShown = playerCash;
+            GameOverZoneShown = summary.ZoneReached;
+            ContinueOffered = summary.GoldReviveOffered;
+            ContinueCostShown = summary.GoldReviveCost;
+            AdReviveOffered = summary.AdReviveOffered;
+            PlayerGoldShown = summary.PlayerGold;
+            PlayerCashShown = summary.PlayerCash;
 
             LostHaulShown.Clear();
+            IReadOnlyList<BankEntry> lostHaul = summary.LostHaul;
             for (int i = 0; i < lostHaul.Count; i++) LostHaulShown.Add(lostHaul[i]);
         }
 
