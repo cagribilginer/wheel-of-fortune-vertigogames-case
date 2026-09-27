@@ -22,6 +22,8 @@ namespace Vertigo.Wheel.Editor
             ("Assets/Resources/Configs/Settings/ZoneProgression_Default.asset", "Configs/Settings/ZoneProgression_Default"),
             ("Assets/Resources/Configs/Settings/Continue_Default.asset", "Configs/Settings/Continue_Default"),
             ("Assets/Resources/Configs/Settings/AudioLibrary.asset", "Configs/Settings/AudioLibrary"),
+            ("Assets/Resources/Configs/Settings/Juice_Default.asset", "Configs/Settings/Juice_Default"),
+            ("Assets/Resources/Configs/Settings/ChestTiers_Default.asset", "Configs/Settings/ChestTiers_Default"),
         };
 
         [MenuItem("Tools/Vertigo/Assets/Migrate Configs To Addressables")]

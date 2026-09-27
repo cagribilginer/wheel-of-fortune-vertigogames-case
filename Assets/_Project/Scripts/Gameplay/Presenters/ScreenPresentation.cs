@@ -23,20 +23,16 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly VfxPresenter _vfx;
         private readonly AudioPresenter _audio;
         private readonly ZoneProgressionConfig _progression;
+        private readonly JuiceConfig _juice;
 
         // The bomb-impact hold has no single view to SetLink to (it just delays onComplete), so its
         // lifetime is guaranteed by hand: killed before a new one starts, and on Dispose.
         private Tween _bombDelay;
 
-        // Fixed, zone-independent per-unit worth (RewardDefinition.EstimatedValue) — the same scale
-        // PopupPresenter's chest tiers use — at or above which a landed reward earns the glow burst on top
-        // of any safe/super zone clear it might also be.
-        private const int BIG_REWARD_UNIT_VALUE = 60;
-
         public ScreenPresentation(
             WheelPresenter wheel, ZoneMapPresenter zoneMap, BankPresenter bank,
             ActionBarPresenter actionBar, PopupPresenter popups, VfxPresenter vfx, AudioPresenter audio,
-            ZoneProgressionConfig progression)
+            ZoneProgressionConfig progression, JuiceConfig juice)
         {
             _wheel = wheel;
             _zoneMap = zoneMap;
@@ -46,6 +42,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _vfx = vfx;
             _audio = audio;
             _progression = progression;
+            _juice = juice;
         }
 
         public void ShowZone(int zone, ZoneType zoneType, WheelModel wheel, Action onComplete)
@@ -79,7 +76,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             if (!outcome.IsBomb)
             {
                 _audio.PlayReward();
-                if (zoneType != ZoneType.Normal || outcome.UnitValue >= BIG_REWARD_UNIT_VALUE)
+                if (zoneType != ZoneType.Normal || outcome.UnitValue >= _juice.BigRewardUnitValue)
                     _vfx.PlayRewardBurst();
             }
 
@@ -99,7 +96,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             // the defeat vignette so a revive restores it seamlessly. HideGameOver refreshes once the
             // player has actually chosen (revive keeps it, give-up/restart empties it).
             _bombDelay?.Kill();
-            _bombDelay = DOVirtual.DelayedCall(0.4f, () => onComplete());
+            _bombDelay = DOVirtual.DelayedCall(_juice.BombImpactHoldDuration, () => onComplete());
         }
 
         public void ShowGameOver(

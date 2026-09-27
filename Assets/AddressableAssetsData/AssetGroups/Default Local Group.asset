@@ -42,6 +42,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0ac47a7e5f5af4773a868faba5f8131e
+    m_Address: Configs/Settings/Juice_Default
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 758f5daae8c834c3088658e902e01d2b
+    m_Address: Configs/Settings/ChestTiers_Default
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: e2cdacff1ac7b459b93370f03c4b9f77, type: 2}
   m_SchemaSet:

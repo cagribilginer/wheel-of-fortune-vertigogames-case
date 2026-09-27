@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UI;
 using Vertigo.Wheel.Core.Zones;
+using Vertigo.Wheel.Data.Configs;
 using Vertigo.Wheel.UI.Views;
 
 namespace Vertigo.Wheel.Gameplay.Presenters
@@ -39,13 +40,16 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         private readonly ZoneMapView _view;
         private readonly IZoneClassifier _classifier;
+        private readonly JuiceConfig _juice;
         private readonly ObjectPool<ZoneMapTileView> _pool;
         private readonly List<ZoneMapTileView> _active = new List<ZoneMapTileView>();
 
-        public ZoneMapPresenter(ZoneMapView view, ZoneMapTileView tilePrefab, IZoneClassifier classifier)
+        public ZoneMapPresenter(
+            ZoneMapView view, ZoneMapTileView tilePrefab, IZoneClassifier classifier, JuiceConfig juice)
         {
             _view = view;
             _classifier = classifier;
+            _juice = juice;
 
             _pool = new ObjectPool<ZoneMapTileView>(
                 () => Object.Instantiate(tilePrefab, _view.Content),
@@ -117,7 +121,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             target = Mathf.Clamp(target, minX, 0f);
 
             _view.Content.DOKill();
-            _view.Content.DOAnchorPosX(target, 0.45f)
+            _view.Content.DOAnchorPosX(target, _juice.ZoneScrollDuration)
                 .SetEase(Ease.OutCubic)
                 .SetLink(_view.Content.gameObject, LinkBehaviour.KillOnDestroy)
                 .OnComplete(() => onComplete());

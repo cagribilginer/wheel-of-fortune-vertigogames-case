@@ -28,18 +28,20 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly RewardBank _bank;
         private readonly Transform _flightLayer;
         private readonly AudioPresenter _audio;
+        private readonly JuiceConfig _juice;
         private readonly ObjectPool<BankEntryView> _pool;
         private readonly List<BankEntryView> _active = new List<BankEntryView>();
 
         public BankPresenter(
             BankView view, BankEntryView entryPrefab, RewardCatalog catalog, RewardBank bank,
-            Transform flightLayer, AudioPresenter audio)
+            Transform flightLayer, AudioPresenter audio, JuiceConfig juice)
         {
             _view = view;
             _catalog = catalog;
             _bank = bank;
             _flightLayer = flightLayer;
             _audio = audio;
+            _juice = juice;
 
             _pool = new ObjectPool<BankEntryView>(
                 () => UnityEngine.Object.Instantiate(entryPrefab, _view.Content),
@@ -99,7 +101,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             image.preserveAspect = true;
             image.raycastTarget = false;
 
-            ghostRect.DOMove(target.position, 0.5f)
+            ghostRect.DOMove(target.position, _juice.BankFlyDuration)
                 .SetEase(Ease.InBack)
                 .SetLink(ghostGo, LinkBehaviour.KillOnDestroy)
                 .OnComplete(() =>
@@ -108,13 +110,13 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
                 target.DOKill();
                 target.localScale = Vector3.one;
-                target.DOPunchScale(Vector3.one * 0.2f, 0.2f)
+                target.DOPunchScale(Vector3.one * _juice.BankPunchScale, _juice.BankPunchDuration)
                     .SetLink(target.gameObject, LinkBehaviour.KillOnDestroy);
 
                 // The reveal sting already played at the wheel stop; this is the softer "into the bag" swoosh.
                 _audio.PlayBankCollect();
 
-                DOVirtual.Int(startAmount, finalAmount, 0.4f, v => targetEntry.SetAmount(v))
+                DOVirtual.Int(startAmount, finalAmount, _juice.BankCounterDuration, v => targetEntry.SetAmount(v))
                     .SetLink(target.gameObject, LinkBehaviour.KillOnDestroy)
                     .OnComplete(() =>
                     {

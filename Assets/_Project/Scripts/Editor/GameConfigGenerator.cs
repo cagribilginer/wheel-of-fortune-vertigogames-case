@@ -175,6 +175,8 @@ namespace Vertigo.Wheel.Editor
                 GenerateContinueConfig(ref created, ref updated);
                 GenerateCatalog(rewards, ref created, ref updated);
                 GenerateAudioLibrary(ref created, ref updated);
+                GenerateJuiceConfig(ref created, ref updated);
+                GenerateChestTiers(rewards, ref created, ref updated);
             }
             finally
             {
@@ -421,6 +423,72 @@ namespace Vertigo.Wheel.Editor
         private static void GenerateAudioLibrary(ref int created, ref int updated)
         {
             LoadOrCreate<AudioLibrary>($"{SETTINGS_FOLDER}/AudioLibrary.asset", ref created, ref updated);
+        }
+
+        private static void GenerateJuiceConfig(ref int created, ref int updated)
+        {
+            JuiceConfig asset = LoadOrCreate<JuiceConfig>(
+                $"{SETTINGS_FOLDER}/Juice_Default.asset", ref created, ref updated);
+
+            var so = new SerializedObject(asset);
+            so.FindProperty("_tickPunchDuration").floatValue = 0.09f;
+            so.FindProperty("_breatheScale").floatValue = 1.04f;
+            so.FindProperty("_breatheDuration").floatValue = 1.1f;
+            so.FindProperty("_zoneExitDuration").floatValue = 0.35f;
+            so.FindProperty("_zoneEnterDuration").floatValue = 0.45f;
+            so.FindProperty("_zoneHiddenOffsetY").floatValue = 900f;
+            so.FindProperty("_settlePunchDuration").floatValue = 0.28f;
+            so.FindProperty("_settlePunchVibrato").intValue = 6;
+            so.FindProperty("_settlePunchElasticity").floatValue = 1f;
+            so.FindProperty("_highlightScale").floatValue = 1.25f;
+            so.FindProperty("_highlightDuration").floatValue = 0.18f;
+            so.FindProperty("_bombShakeDuration").floatValue = 0.5f;
+            so.FindProperty("_bombShakeStrength").floatValue = 34f;
+            so.FindProperty("_bombShakeVibrato").intValue = 22;
+            so.FindProperty("_bombShakeRandomness").floatValue = 90f;
+            so.FindProperty("_flashInDuration").floatValue = 0.06f;
+            so.FindProperty("_flashOutDuration").floatValue = 0.45f;
+            so.FindProperty("_bombImpactHoldDuration").floatValue = 0.4f;
+            so.FindProperty("_bankFlyDuration").floatValue = 0.5f;
+            so.FindProperty("_bankPunchScale").floatValue = 0.2f;
+            so.FindProperty("_bankPunchDuration").floatValue = 0.2f;
+            so.FindProperty("_bankCounterDuration").floatValue = 0.4f;
+            so.FindProperty("_zoneScrollDuration").floatValue = 0.45f;
+            so.FindProperty("_bigRewardUnitValue").intValue = 60;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // Ascending by MinTotalValue; the highest tier at or below the cash-out total wins. Reuses the
+        // chest RewardDefinitions already generated above rather than a second set of sprite references.
+        private static readonly (long MinTotalValue, string RewardAssetName)[] ChestTiers =
+        {
+            (0, "Reward_ChestStandard"),
+            (60, "Reward_ChestSilver"),
+            (120, "Reward_ChestBig"),
+            (150, "Reward_ChestGold"),
+            (200, "Reward_ChestSuper"),
+        };
+
+        private static void GenerateChestTiers(
+            IReadOnlyDictionary<string, RewardDefinition> rewards, ref int created, ref int updated)
+        {
+            ChestTierConfig asset = LoadOrCreate<ChestTierConfig>(
+                $"{SETTINGS_FOLDER}/ChestTiers_Default.asset", ref created, ref updated);
+
+            var so = new SerializedObject(asset);
+            SerializedProperty list = so.FindProperty("_tiers");
+            list.arraySize = ChestTiers.Length;
+
+            for (int i = 0; i < ChestTiers.Length; i++)
+            {
+                SerializedProperty element = list.GetArrayElementAtIndex(i);
+                element.FindPropertyRelative("_minTotalValue").longValue = ChestTiers[i].MinTotalValue;
+
+                rewards.TryGetValue(ChestTiers[i].RewardAssetName, out RewardDefinition chest);
+                element.FindPropertyRelative("_chest").objectReferenceValue = chest;
+            }
+
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         // ------------------------------------------------------------------ helpers

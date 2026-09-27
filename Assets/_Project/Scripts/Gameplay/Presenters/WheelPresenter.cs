@@ -27,6 +27,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly RewardCatalog _catalog;
         private readonly Sprite _bombIcon;
         private readonly IAudioService _audio;
+        private readonly JuiceConfig _juice;
         private readonly Tween _tickTween;
         private readonly Tween _breatheTween;
 
@@ -43,16 +44,18 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private bool _slotsLaidOut;
 
         public WheelPresenter(
-            WheelView view, WheelSpinConfig spinConfig, RewardCatalog catalog, Sprite bombIcon, IAudioService audio)
+            WheelView view, WheelSpinConfig spinConfig, RewardCatalog catalog, Sprite bombIcon,
+            IAudioService audio, JuiceConfig juice)
         {
             _view = view;
             _spinConfig = spinConfig;
             _catalog = catalog;
             _bombIcon = bombIcon;
             _audio = audio;
+            _juice = juice;
 
             _homeY = _view.Root.anchoredPosition.y;
-            _hiddenY = _homeY - 900f; // a 720px panel plus margin: clears the bottom of the safe area entirely
+            _hiddenY = _homeY - _juice.ZoneHiddenOffsetY;
 
             // Slot placement isn't done here: the Canvas hasn't laid out yet at construction time, so the
             // rotor's rect still reads 0 wide. It happens on the first SetTheme instead — see LayoutSlots.
@@ -60,7 +63,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             // Built once and restarted per tick rather than fired fresh each time: ~45 ticks happen over one
             // spin, and a prebuilt, paused, non-autokilled tween is the zero-alloc way to replay that.
             _tickTween = _view.Indicator
-                .DOPunchRotation(new Vector3(0f, 0f, -_spinConfig.TickPunchDegrees), 0.09f, 1, 0f)
+                .DOPunchRotation(new Vector3(0f, 0f, -_spinConfig.TickPunchDegrees), _juice.TickPunchDuration, 1, 0f)
                 .SetAutoKill(false)
                 .SetLink(_view.Indicator.gameObject, LinkBehaviour.KillOnDestroy)
                 .Pause();
@@ -68,7 +71,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             // Targets the spin button's own rect, not its "_anim" child (UIButtonPunch's target), so the
             // idle-breathe loop and a click's punch tween never fight over one transform's localScale.
             _breatheTween = _view.SpinButtonRect
-                .DOScale(1.04f, 1.1f)
+                .DOScale(_juice.BreatheScale, _juice.BreatheDuration)
                 .SetLoops(-1, LoopType.Yoyo)
                 .SetEase(Ease.InOutSine)
                 .SetAutoKill(false)
@@ -106,12 +109,12 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             Sequence seq = DOTween.Sequence().SetLink(root.gameObject, LinkBehaviour.KillOnDestroy);
 
             if (_hasShownZone)
-                seq.Append(root.DOAnchorPosY(_hiddenY, 0.35f).SetEase(Ease.InBack));
+                seq.Append(root.DOAnchorPosY(_hiddenY, _juice.ZoneExitDuration).SetEase(Ease.InBack));
             else
                 root.anchoredPosition = new Vector2(root.anchoredPosition.x, _hiddenY);
 
             seq.AppendCallback(() => SetTheme(wheel, theme));
-            seq.Append(root.DOAnchorPosY(_homeY, 0.45f).SetEase(Ease.OutBack));
+            seq.Append(root.DOAnchorPosY(_homeY, _juice.ZoneEnterDuration).SetEase(Ease.OutBack));
             seq.OnComplete(() =>
             {
                 _hasShownZone = true;
@@ -248,7 +251,9 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 .OnUpdate(EmitTicks)
                 .OnComplete(() =>
                 {
-                    _view.Rotor.DOPunchRotation(new Vector3(0f, 0f, _spinConfig.SettlePunchDegrees), 0.28f, 6, 1f)
+                    _view.Rotor.DOPunchRotation(
+                            new Vector3(0f, 0f, _spinConfig.SettlePunchDegrees),
+                            _juice.SettlePunchDuration, _juice.SettlePunchVibrato, _juice.SettlePunchElasticity)
                         .SetLink(_view.Rotor.gameObject, LinkBehaviour.KillOnDestroy);
                     onComplete();
                 });
@@ -261,7 +266,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             RectTransform slotRect = _view.Slots[slotIndex].Rect;
             slotRect.DOKill();
             slotRect
-                .DOScale(1.25f, 0.18f)
+                .DOScale(_juice.HighlightScale, _juice.HighlightDuration)
                 .SetLoops(2, LoopType.Yoyo)
                 .SetLink(slotRect.gameObject, LinkBehaviour.KillOnDestroy)
                 .OnComplete(() => onComplete());

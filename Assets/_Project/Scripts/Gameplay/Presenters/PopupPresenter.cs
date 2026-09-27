@@ -14,20 +14,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     /// <summary>Bomb and cash-out popups: population, chest sizing, and input forwarding.</summary>
     public sealed class PopupPresenter : IDisposable
     {
-        // Ascending by total haul value; the highest tier at or below the total wins. Reuses the chest
-        // RewardDefinitions' own icons rather than a second set of sprite references.
-        private static readonly (long Value, string RewardId)[] ChestTiers =
-        {
-            (0, "Reward_ChestStandard"),
-            (60, "Reward_ChestSilver"),
-            (120, "Reward_ChestBig"),
-            (150, "Reward_ChestGold"),
-            (200, "Reward_ChestSuper"),
-        };
-
         private readonly BombPopupView _bomb;
         private readonly CollectPopupView _collect;
         private readonly RewardCatalog _catalog;
+        private readonly ChestTierConfig _chestTiers;
         private readonly AudioPresenter _audio;
         private readonly ObjectPool<BankEntryView> _listPool;
         private readonly List<BankEntryView> _activeList = new List<BankEntryView>();
@@ -36,12 +26,13 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private GameStateMachine _machine;
 
         public PopupPresenter(
-            BombPopupView bomb, CollectPopupView collect,
-            BankEntryView entryPrefab, RewardCatalog catalog, AudioPresenter audio)
+            BombPopupView bomb, CollectPopupView collect, BankEntryView entryPrefab,
+            RewardCatalog catalog, ChestTierConfig chestTiers, AudioPresenter audio)
         {
             _bomb = bomb;
             _collect = collect;
             _catalog = catalog;
+            _chestTiers = chestTiers;
             _audio = audio;
 
             _listPool = new ObjectPool<BankEntryView>(
@@ -137,7 +128,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             // the frame the cash-out summary opens.
             LayoutRebuilder.ForceRebuildLayoutImmediate(_collect.Content);
 
-            _collect.SetChest(ChestFor(total));
+            RewardDefinition chest = _chestTiers.ChestFor(total);
+            _collect.SetChest(chest != null ? chest.Icon : null);
             _audio.PlayPopupOpen();
             _collect.Show(zonesCleared, playerCash, playerGold);
         }
@@ -158,18 +150,6 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 _audio.PlayPopupClose();
                 onComplete();
             });
-        }
-
-        private Sprite ChestFor(long totalValue)
-        {
-            string id = ChestTiers[0].RewardId;
-            for (int i = 0; i < ChestTiers.Length; i++)
-                if (totalValue >= ChestTiers[i].Value) id = ChestTiers[i].RewardId;
-
-            // Not "?.": that null-conditional skips Unity's overloaded null check, so a destroyed-but-not-
-            // collected ScriptableObject would read as non-null here and fail on the property access instead.
-            RewardDefinition definition = _catalog.Find(id);
-            return definition != null ? definition.Icon : null;
         }
     }
 }

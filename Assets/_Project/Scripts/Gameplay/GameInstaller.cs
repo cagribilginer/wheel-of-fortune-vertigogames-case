@@ -94,6 +94,8 @@ namespace Vertigo.Wheel.Gameplay
             var spinConfig = Addressables.LoadAssetAsync<WheelSpinConfig>("Configs/Settings/WheelSpin_Default").WaitForCompletion();
             var progression = Addressables.LoadAssetAsync<ZoneProgressionConfig>("Configs/Settings/ZoneProgression_Default").WaitForCompletion();
             var continueConfig = Addressables.LoadAssetAsync<ContinueConfig>("Configs/Settings/Continue_Default").WaitForCompletion();
+            var juice = Addressables.LoadAssetAsync<JuiceConfig>("Configs/Settings/Juice_Default").WaitForCompletion();
+            var chestTiers = Addressables.LoadAssetAsync<ChestTierConfig>("Configs/Settings/ChestTiers_Default").WaitForCompletion();
 
             IZoneClassifier classifier = progression.CreateClassifier();
             // The wheel factory gets its own RNG so a zone's slices are dealt onto different wedges each
@@ -115,18 +117,18 @@ namespace Vertigo.Wheel.Gameplay
             // Skipped when the scene predates the milestone popup — a rebuild adds it.
             if (_milestonePopup != null)
                 _milestonePreviewPresenter = new MilestonePreviewPresenter(_zoneMap, _milestonePopup);
-            var wheelPresenter = new WheelPresenter(_wheel, spinConfig, catalog, _bombSlotIcon, audioService);
-            var zoneMapPresenter = new ZoneMapPresenter(_zoneMap, _zoneMapTilePrefab, classifier);
+            var wheelPresenter = new WheelPresenter(_wheel, spinConfig, catalog, _bombSlotIcon, audioService, juice);
+            var zoneMapPresenter = new ZoneMapPresenter(_zoneMap, _zoneMapTilePrefab, classifier, juice);
             var bankPresenter = new BankPresenter(
-                _bank, _bankEntryPrefab, catalog, runModel.Bank, _flightLayer, audioPresenter);
+                _bank, _bankEntryPrefab, catalog, runModel.Bank, _flightLayer, audioPresenter, juice);
             var actionBarPresenter = new ActionBarPresenter(_actionBar);
             var popupPresenter = new PopupPresenter(
-                _bombPopup, _collectPopup, _bankEntryPrefab, catalog, audioPresenter);
-            var vfxPresenter = new VfxPresenter(_vfx);
+                _bombPopup, _collectPopup, _bankEntryPrefab, catalog, chestTiers, audioPresenter);
+            var vfxPresenter = new VfxPresenter(_vfx, juice);
 
             var presentation = new ScreenPresentation(
                 wheelPresenter, zoneMapPresenter, bankPresenter, actionBarPresenter, popupPresenter,
-                vfxPresenter, audioPresenter, progression);
+                vfxPresenter, audioPresenter, progression, juice);
 
             var context = new GameContext(runModel, wheelFactory, spinService, continueService, presentation);
             GameStateMachine machine = GameFlow.Build(context);

@@ -1,6 +1,7 @@
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
+using Vertigo.Wheel.Data.Configs;
 using Vertigo.Wheel.UI.Views;
 
 namespace Vertigo.Wheel.Gameplay.Presenters
@@ -12,10 +13,12 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     public sealed class VfxPresenter
     {
         private readonly VfxView _view;
+        private readonly JuiceConfig _juice;
 
-        public VfxPresenter(VfxView view)
+        public VfxPresenter(VfxView view, JuiceConfig juice)
         {
             _view = view;
+            _juice = juice;
         }
 
         public void PlayBombImpact()
@@ -23,7 +26,9 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             RectTransform shake = _view.Shake;
             shake.DOKill();
             shake.anchoredPosition = Vector2.zero;
-            shake.DOShakeAnchorPos(0.5f, 34f, 22, 90f, fadeOut: true)
+            shake.DOShakeAnchorPos(
+                    _juice.BombShakeDuration, _juice.BombShakeStrength,
+                    _juice.BombShakeVibrato, _juice.BombShakeRandomness, fadeOut: true)
                 .SetLink(shake.gameObject, LinkBehaviour.KillOnDestroy);
 
             Flash(_view.Flash, new Color(1f, 0.2f, 0.2f, 1f));
@@ -36,14 +41,14 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         // A quick spike in then a slower fade out, on whichever image is passed — the flash and the reward
         // burst are the exact same shape, just different tint and target image.
-        private static void Flash(Image image, Color tint)
+        private void Flash(Image image, Color tint)
         {
             image.DOKill();
             image.color = new Color(tint.r, tint.g, tint.b, 0f);
 
             Sequence sequence = DOTween.Sequence().SetLink(image.gameObject, LinkBehaviour.KillOnDestroy);
-            sequence.Append(image.DOFade(0.85f, 0.06f));
-            sequence.Append(image.DOFade(0f, 0.45f));
+            sequence.Append(image.DOFade(0.85f, _juice.FlashInDuration));
+            sequence.Append(image.DOFade(0f, _juice.FlashOutDuration));
         }
     }
 }
