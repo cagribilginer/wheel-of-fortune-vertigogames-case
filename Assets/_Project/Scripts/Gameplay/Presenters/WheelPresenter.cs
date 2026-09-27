@@ -20,7 +20,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     /// <see cref="RotateMode.LocalAxisAdd"/> accumulates.
     /// </para>
     /// </summary>
-    public sealed class WheelPresenter
+    public sealed class WheelPresenter : IDisposable
     {
         private readonly WheelView _view;
         private readonly WheelSpinConfig _spinConfig;
@@ -30,6 +30,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly Tween _tickTween;
         private readonly Tween _breatheTween;
 
+        private GameStateMachine _machine;
         private float _slotAngle = 45f;
         private int _lastTickIndex = int.MinValue;
         private AudioClip _tickClip;
@@ -63,6 +64,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _tickTween = _view.Indicator
                 .DOPunchRotation(new Vector3(0f, 0f, -_spinConfig.TickPunchDegrees), 0.09f, 1, 0f)
                 .SetAutoKill(false)
+                .SetLink(_view.Indicator.gameObject, LinkBehaviour.KillOnDestroy)
                 .Pause();
 
             // Targets the spin button's own rect, not its "_anim" child — that child is UIButtonPunch's
@@ -74,10 +76,23 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 .SetLoops(-1, LoopType.Yoyo)
                 .SetEase(Ease.InOutSine)
                 .SetAutoKill(false)
+                .SetLink(_view.SpinButtonRect.gameObject, LinkBehaviour.KillOnDestroy)
                 .Pause();
         }
 
-        public void WireInput(GameStateMachine machine) => _view.SpinClicked += machine.RequestSpin;
+        public void WireInput(GameStateMachine machine)
+        {
+            _machine = machine;
+            _view.SpinClicked += machine.RequestSpin;
+        }
+
+        public void Dispose()
+        {
+            _tickTween.Kill();
+            _breatheTween.Kill();
+
+            if (_machine != null) _view.SpinClicked -= _machine.RequestSpin;
+        }
 
         /// <summary>
         /// The zone-advance cinematic: drop the current wheel off the bottom, swap in the new zone's
@@ -240,7 +255,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 .OnUpdate(EmitTicks)
                 .OnComplete(() =>
                 {
-                    _view.Rotor.DOPunchRotation(new Vector3(0f, 0f, _spinConfig.SettlePunchDegrees), 0.28f, 6, 1f);
+                    _view.Rotor.DOPunchRotation(new Vector3(0f, 0f, _spinConfig.SettlePunchDegrees), 0.28f, 6, 1f)
+                        .SetLink(_view.Rotor.gameObject, LinkBehaviour.KillOnDestroy);
                     onComplete();
                 });
         }
@@ -249,10 +265,12 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         {
             if (slotIndex < 0 || slotIndex >= _view.Slots.Count) { onComplete(); return; }
 
-            _view.Slots[slotIndex].Rect.DOKill();
-            _view.Slots[slotIndex].Rect
+            RectTransform slotRect = _view.Slots[slotIndex].Rect;
+            slotRect.DOKill();
+            slotRect
                 .DOScale(1.25f, 0.18f)
                 .SetLoops(2, LoopType.Yoyo)
+                .SetLink(slotRect.gameObject, LinkBehaviour.KillOnDestroy)
                 .OnComplete(() => onComplete());
         }
 

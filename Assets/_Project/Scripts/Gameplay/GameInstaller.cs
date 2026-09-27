@@ -46,8 +46,16 @@ namespace Vertigo.Wheel.Gameplay
         /// </summary>
         public GameStateMachine Machine { get; private set; }
 
-        // Held so its milestone badge -> preview-popup subscription outlives this method.
+        // Held past Awake so OnDestroy can dispose them — killing any persistent tween and unwiring every
+        // += this composition root wired, rather than relying on the scene teardown to simply drop them.
         private MilestonePreviewPresenter _milestonePreviewPresenter;
+        private WheelPresenter _wheelPresenter;
+        private ActionBarPresenter _actionBarPresenter;
+        private PopupPresenter _popupPresenter;
+        private ScreenPresentation _presentation;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        private DebugPresenter _debugPresenter;
+#endif
 
         /// <summary>Called once by the editor scene-build step; never touched by hand.</summary>
         public void Configure(
@@ -125,13 +133,32 @@ namespace Vertigo.Wheel.Gameplay
             actionBarPresenter.WireInput(machine);
             popupPresenter.WireInput(machine);
 
+            _wheelPresenter = wheelPresenter;
+            _actionBarPresenter = actionBarPresenter;
+            _popupPresenter = popupPresenter;
+            _presentation = presentation;
+
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (_debugOverlay != null)
-                new DebugPresenter(runModel, machine, wallet, goldRewardId, catalog, bankPresenter)
-                    .WireInput(_debugOverlay);
+            {
+                _debugPresenter = new DebugPresenter(runModel, machine, wallet, goldRewardId, catalog, bankPresenter);
+                _debugPresenter.WireInput(_debugOverlay);
+            }
 #endif
 
             GameFlow.Start(machine);
+        }
+
+        private void OnDestroy()
+        {
+            _milestonePreviewPresenter?.Dispose();
+            _wheelPresenter?.Dispose();
+            _actionBarPresenter?.Dispose();
+            _popupPresenter?.Dispose();
+            _presentation?.Dispose();
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            _debugPresenter?.Dispose();
+#endif
         }
     }
 }

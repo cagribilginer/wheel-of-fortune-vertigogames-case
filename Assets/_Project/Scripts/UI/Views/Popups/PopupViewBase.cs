@@ -20,10 +20,10 @@ namespace Vertigo.Wheel.UI.Views.Popups
 
             Color c = backdrop.color;
             backdrop.color = new Color(c.r, c.g, c.b, 0f);
-            backdrop.DOFade(backdropAlpha, 0.2f);
+            backdrop.DOFade(backdropAlpha, 0.2f).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
 
             card.localScale = Vector3.one * 0.85f;
-            card.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
+            card.DOScale(1f, 0.3f).SetEase(Ease.OutBack).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
         }
 
         protected void PlayClose(Image backdrop, RectTransform card)
@@ -31,9 +31,10 @@ namespace Vertigo.Wheel.UI.Views.Popups
             backdrop.DOKill();
             card.DOKill();
 
-            backdrop.DOFade(0f, 0.2f);
+            backdrop.DOFade(0f, 0.2f).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
             card.DOScale(0.85f, 0.2f)
                 .SetEase(Ease.InBack)
+                .SetLink(gameObject, LinkBehaviour.KillOnDestroy)
                 .OnComplete(() => gameObject.SetActive(false));
         }
     }

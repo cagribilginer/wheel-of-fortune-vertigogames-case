@@ -13,7 +13,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     /// or a development build (see <see cref="GameInstaller"/>), so the cheats do not need their own
     /// guards — reaching them at all already means debug tooling is on.
     /// </summary>
-    public sealed class DebugPresenter
+    public sealed class DebugPresenter : IDisposable
     {
         private const int GoldGrant = 1000;
         private const int ItemGrantCount = 40;
@@ -25,6 +25,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly RewardCatalog _catalog;
         private readonly BankPresenter _bank;
         private readonly Random _rng = new Random();
+
+        private DebugOverlayView _view;
 
         public DebugPresenter(
             RunModel run, GameStateMachine machine, Wallet wallet, RewardId goldCurrency,
@@ -40,12 +42,28 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void WireInput(DebugOverlayView view)
         {
-            view.JumpToZone5Clicked += () => JumpToZone(5);
-            view.JumpToZone30Clicked += () => JumpToZone(30);
+            _view = view;
+            view.JumpToZone5Clicked += JumpToZone5;
+            view.JumpToZone30Clicked += JumpToZone30;
             view.TriggerBombClicked += TriggerBombDefeat;
-            view.GrantGoldClicked += () => _wallet.Add(_goldCurrency, GoldGrant);
+            view.GrantGoldClicked += GrantGold;
             view.GrantItemsClicked += GrantItems;
         }
+
+        public void Dispose()
+        {
+            if (_view == null) return;
+
+            _view.JumpToZone5Clicked -= JumpToZone5;
+            _view.JumpToZone30Clicked -= JumpToZone30;
+            _view.TriggerBombClicked -= TriggerBombDefeat;
+            _view.GrantGoldClicked -= GrantGold;
+            _view.GrantItemsClicked -= GrantItems;
+        }
+
+        private void JumpToZone5() => JumpToZone(5);
+        private void JumpToZone30() => JumpToZone(30);
+        private void GrantGold() => _wallet.Add(_goldCurrency, GoldGrant);
 
         // Warping only makes sense between spins; from anywhere else the wheel or a popup owns the screen.
         private void JumpToZone(int zone)

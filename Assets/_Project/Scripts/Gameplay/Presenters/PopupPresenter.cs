@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -11,7 +12,7 @@ using Vertigo.Wheel.UI.Views.Popups;
 namespace Vertigo.Wheel.Gameplay.Presenters
 {
     /// <summary>Bomb and cash-out popups: population, chest sizing, and input forwarding.</summary>
-    public sealed class PopupPresenter
+    public sealed class PopupPresenter : IDisposable
     {
         // Ascending by total haul value; the highest tier at or below the total wins. Reuses the chest
         // RewardDefinitions' own icons rather than a second set of sprite references.
@@ -32,6 +33,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly List<BankEntryView> _activeList = new List<BankEntryView>();
         private readonly ObjectPool<BankEntryView> _bombListPool;
         private readonly List<BankEntryView> _activeBombList = new List<BankEntryView>();
+        private GameStateMachine _machine;
 
         public PopupPresenter(
             BombPopupView bomb, CollectPopupView collect,
@@ -57,6 +59,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void WireInput(GameStateMachine machine)
         {
+            _machine = machine;
+
             // "Give up" forfeits the haul and drops back to zone one — the machine already models that as a
             // restart, so the bomb screen's give-up button raises the same input the old "TRY AGAIN" did.
             _bomb.GiveUpClicked += machine.RequestRestart;
@@ -64,6 +68,17 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _bomb.AdContinueClicked += machine.RequestAdContinue;
             _collect.ConfirmClicked += machine.Confirm;
             _collect.CancelClicked += machine.Cancel;
+        }
+
+        public void Dispose()
+        {
+            if (_machine == null) return;
+
+            _bomb.GiveUpClicked -= _machine.RequestRestart;
+            _bomb.ContinueClicked -= _machine.RequestContinue;
+            _bomb.AdContinueClicked -= _machine.RequestAdContinue;
+            _collect.ConfirmClicked -= _machine.Confirm;
+            _collect.CancelClicked -= _machine.Cancel;
         }
 
         public void ShowGameOver(

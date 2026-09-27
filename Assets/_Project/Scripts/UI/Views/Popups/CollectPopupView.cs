@@ -102,7 +102,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
             var chest = (RectTransform)_ui_image_popup_collect_chest_value.transform;
             chest.DOKill();
             chest.localScale = Vector3.one;
-            chest.DOPunchScale(Vector3.one * 0.25f, 0.35f);
+            chest.DOPunchScale(Vector3.one * 0.25f, 0.35f).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
 
             _cash.SetTarget(newCash, _ui_text_popup_collect_cash_value, gameObject);
             _gold.SetTarget(newGold, _ui_text_popup_collect_gold_value, gameObject);

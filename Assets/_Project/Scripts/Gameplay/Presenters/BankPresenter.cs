@@ -99,18 +99,23 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             image.preserveAspect = true;
             image.raycastTarget = false;
 
-            ghostRect.DOMove(target.position, 0.5f).SetEase(Ease.InBack).OnComplete(() =>
+            ghostRect.DOMove(target.position, 0.5f)
+                .SetEase(Ease.InBack)
+                .SetLink(ghostGo, LinkBehaviour.KillOnDestroy)
+                .OnComplete(() =>
             {
                 UnityEngine.Object.Destroy(ghostGo);
 
                 target.DOKill();
                 target.localScale = Vector3.one;
-                target.DOPunchScale(Vector3.one * 0.2f, 0.2f);
+                target.DOPunchScale(Vector3.one * 0.2f, 0.2f)
+                    .SetLink(target.gameObject, LinkBehaviour.KillOnDestroy);
 
                 // The reveal sting already played at the wheel stop; this is the softer "into the bag" swoosh.
                 _audio.PlayBankCollect();
 
                 DOVirtual.Int(startAmount, finalAmount, 0.4f, v => targetEntry.SetAmount(v))
+                    .SetLink(target.gameObject, LinkBehaviour.KillOnDestroy)
                     .OnComplete(() =>
                     {
                         targetEntry.SetAmount(finalAmount);

@@ -117,7 +117,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             target = Mathf.Clamp(target, minX, 0f);
 
             _view.Content.DOKill();
-            _view.Content.DOAnchorPosX(target, 0.45f).SetEase(Ease.OutCubic).OnComplete(() => onComplete());
+            _view.Content.DOAnchorPosX(target, 0.45f)
+                .SetEase(Ease.OutCubic)
+                .SetLink(_view.Content.gameObject, LinkBehaviour.KillOnDestroy)
+                .OnComplete(() => onComplete());
         }
     }
 }

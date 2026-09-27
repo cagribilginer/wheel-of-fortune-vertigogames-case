@@ -100,7 +100,8 @@ namespace Vertigo.Wheel.UI.Views.Popups
         public void Hide()
         {
             _ui_image_popup_bomb_vignette.DOKill();
-            _ui_image_popup_bomb_vignette.DOFade(0f, 0.2f);
+            _ui_image_popup_bomb_vignette.DOFade(0f, 0.2f)
+                .SetLink(_ui_image_popup_bomb_vignette.gameObject, LinkBehaviour.KillOnDestroy);
             PlayClose(_ui_image_popup_bomb_backdrop, _ui_transform_popup_bomb_anim);
         }
 

@@ -13,7 +13,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     /// The single <see cref="IWheelPresentation"/> the state machine talks to, composed from one small
     /// presenter per screen region. Core never sees any of the classes this delegates to.
     /// </summary>
-    public sealed class ScreenPresentation : IWheelPresentation
+    public sealed class ScreenPresentation : IWheelPresentation, IDisposable
     {
         private readonly WheelPresenter _wheel;
         private readonly ZoneMapPresenter _zoneMap;
@@ -23,6 +23,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly VfxPresenter _vfx;
         private readonly AudioPresenter _audio;
         private readonly ZoneProgressionConfig _progression;
+
+        // The bomb-impact hold has no single view to SetLink to (it just delays onComplete), so its
+        // lifetime is guaranteed by hand: killed before a new one starts, and on Dispose.
+        private Tween _bombDelay;
 
         // Fixed, zone-independent per-unit worth (RewardDefinition.EstimatedValue) — the same scale
         // PopupPresenter's chest tiers use — at or above which a landed reward earns the glow burst on top
@@ -89,7 +93,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             // The bank panel is deliberately NOT refreshed here: the pre-bomb haul stays on screen behind
             // the defeat vignette so a revive restores it seamlessly. HideGameOver refreshes once the
             // player has actually chosen (revive keeps it, give-up/restart empties it).
-            DOVirtual.DelayedCall(0.4f, () => onComplete());
+            _bombDelay?.Kill();
+            _bombDelay = DOVirtual.DelayedCall(0.4f, () => onComplete());
         }
 
         public void ShowGameOver(
@@ -115,5 +120,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void ClaimCashOut(int playerGold, int playerCash, Action onComplete) =>
             _popups.ClaimCashOut(playerGold, playerCash, onComplete);
+
+        public void Dispose() => _bombDelay?.Kill();
     }
 }
