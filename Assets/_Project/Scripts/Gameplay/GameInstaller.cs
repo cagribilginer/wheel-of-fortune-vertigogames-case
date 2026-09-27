@@ -88,10 +88,8 @@ namespace Vertigo.Wheel.Gameplay
             DOTween.Init(recycleAllByDefault: true, useSafeMode: true, logBehaviour: LogBehaviour.ErrorsOnly)
                    .SetCapacity(tweenersCapacity: 120, sequencesCapacity: 40);
 
-            // .WaitForCompletion() keeps this load synchronous, same as the Resources.Load it replaces —
-            // Awake stays a plain method (no coroutine/async restructure) and the Play Mode smoke test's
-            // boot-to-Idle budget is unaffected. Addressables.LoadAssetAsync internally caches by address,
-            // so this pays the disk read once no matter how many times Awake happens to run.
+            // .WaitForCompletion() keeps this synchronous like the Resources.Load it replaces, so Awake
+            // stays a plain method and the Play Mode smoke test's boot-to-Idle budget is unaffected.
             var catalog = Addressables.LoadAssetAsync<RewardCatalog>("Configs/Settings/RewardCatalog").WaitForCompletion();
             var spinConfig = Addressables.LoadAssetAsync<WheelSpinConfig>("Configs/Settings/WheelSpin_Default").WaitForCompletion();
             var progression = Addressables.LoadAssetAsync<ZoneProgressionConfig>("Configs/Settings/ZoneProgression_Default").WaitForCompletion();

@@ -290,11 +290,8 @@ namespace Vertigo.Wheel.Editor
             return graphic.gameObject.name.EndsWith("_backdrop", StringComparison.Ordinal);
         }
 
-        // includeInactive: true throughout. The scan walks inactive graphics (GetComponentsInChildren(true)),
-        // and the popups it cares about most — the bomb-defeat and cash-out scroll lists — are built
-        // SetActive(false). Without the flag GetComponentInParent stops at the first inactive ancestor and
-        // reports null, so every draggable viewport Image inside a hidden popup was flagged as a Rule 1
-        // false positive even though its ScrollRect parent was right there.
+        // includeInactive: true — without it, GetComponentInParent stops at the first inactive ancestor,
+        // so a hidden popup's draggable viewport Image was flagged as a false positive.
         private static bool HasInteractiveAncestor(Transform transform)
         {
             Transform parent = transform.parent;

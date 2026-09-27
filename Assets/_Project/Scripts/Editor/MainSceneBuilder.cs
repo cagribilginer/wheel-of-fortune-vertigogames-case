@@ -116,12 +116,8 @@ namespace Vertigo.Wheel.Editor
             layoutElement.preferredWidth = 60f;
             layoutElement.preferredHeight = 76f;
 
-            // The reference strip has no per-tile card: tiles are bare numbers on the shared dark bar. The
-            // only decoration a tile ever carries is this raised white marker, shown on exactly one tile —
-            // the current zone. The sprite is 9-sliced horizontally only (border 4/0/4/0), so its top notch
-            // keeps its shape at any width; the rect height is pinned to the art's native 64px for the same
-            // reason. The presenter toggles Image.enabled, never the GameObject, so a pooled tile that was
-            // once "current" cleanly goes back to plain.
+            // The raised white marker on the current-zone tile; sliced horizontally only (4/0/4/0) so its
+            // top notch keeps shape at any width. The presenter toggles Image.enabled, not the GameObject.
             Image marker = AddImage(NewNode("ui_image_zonemap_tile_marker_value", rt), "ui_card_panel_zone_current_white");
             marker.type = Image.Type.Sliced;
             marker.maskable = true;
@@ -141,11 +137,8 @@ namespace Vertigo.Wheel.Editor
         {
             var root = new GameObject("ui_item_wheel_slot", typeof(RectTransform));
             var rt = (RectTransform)root.transform;
-            // Anchored dead-centre so WheelPresenter.LayoutSlots' anchoredPosition places the slot's centre
-            // exactly on the polar ring. 90x90 with a 55x55 icon sits strictly inside one bronze cylinder
-            // hole: it clears the outer rim and the neighbouring numbers, where the old 140x140 slot's
-            // rectangular grey-backed reward icons bled over the rim. preserveAspect stops the non-square
-            // icons distorting inside that box.
+            // Anchored dead-centre so WheelPresenter.LayoutSlots' anchoredPosition lands on the polar ring;
+            // 90x90 with a 55x55 icon sits inside one bronze cylinder hole without bleeding over the rim.
             rt.anchorMin = new Vector2(0.5f, 0.5f);
             rt.anchorMax = new Vector2(0.5f, 0.5f);
             rt.pivot = new Vector2(0.5f, 0.5f);
@@ -203,10 +196,8 @@ namespace Vertigo.Wheel.Editor
             PrefabUtility.SaveAsPrefabAsset(root, path);
             Object.DestroyImmediate(root);
 
-            // The reference SaveAsPrefabAsset hands back doesn't survive the NewScene(...) teardown a few
-            // lines later in Build() — it reads as valid here but comes back destroyed by the time BuildWheel
-            // tries to instantiate from it. Forcing a full import + a fresh AssetDatabase load gives every
-            // caller a genuinely disk-backed reference instead.
+            // The reference SaveAsPrefabAsset returns doesn't survive Build()'s later NewScene(...) teardown;
+            // forcing a full import + reload gives every caller a genuinely disk-backed reference instead.
             AssetDatabase.SaveAssets();
             AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
             return AssetDatabase.LoadAssetAtPath<GameObject>(path).GetComponent<T>();
@@ -235,11 +226,8 @@ namespace Vertigo.Wheel.Editor
         {
             var go = new GameObject("EventSystem", typeof(EventSystem));
 
-            // Project runs the classic Input Manager (Player Settings > Active Input Handling = Input
-            // Manager), so StandaloneInputModule is the right module. Force it active: under the Device
-            // Simulator's touch simulation Input.mousePresent goes false, and without this the module
-            // deactivates itself mid-session — pointer drags stop reaching the EventSystem and ScrollRects
-            // freeze even though they work in the plain Game view.
+            // Force active: under Device Simulator touch, Input.mousePresent goes false and the module
+            // deactivates itself mid-session otherwise, freezing ScrollRect drags.
             var module = go.AddComponent<StandaloneInputModule>();
             module.forceModuleActive = true;
 
@@ -279,12 +267,8 @@ namespace Vertigo.Wheel.Editor
             RectTransform zoneMap = NewNode("ui_panel_zonemap", safeArea);
             TopStrip(zoneMap, 120f, 100f);
 
-            // One solid, rounded, dark container strip — no gradient backdrop bars, no outer corner
-            // brackets. Fixed width, centred, vertically inset a little inside the 120px panel so the raised
-            // current-zone marker still reads as a badge sitting on the bar rather than filling it. The bar
-            // is matched to the scroll window's width (not the full panel) so it hugs the actual track and
-            // never reaches into the milestone badges: at the 1920 reference width (CanvasScaler Expand only
-            // grows it) there is a clear ~320px gap between the centred bar and the badges.
+            // Matched to the scroll window's width, not the full panel, so the bar hugs the track and never
+            // reaches into the milestone badges (a clear ~320px gap at the 1920 reference width).
             RectTransform barRect = NewNode("ui_image_zonemap_bg", zoneMap);
             barRect.anchorMin = new Vector2(0.5f, 0f);
             barRect.anchorMax = new Vector2(0.5f, 1f);
@@ -366,10 +350,8 @@ namespace Vertigo.Wheel.Editor
             return view;
         }
 
-        // Every SUPER/SAFE milestone card shares these exactly so the two badges are typographically
-        // identical — same box, same fixed font size (auto-sizing was letting the longer "SUPER ZONE 60"
-        // shrink relative to "SAFE ZONE 10"), same padding, same icon slot. Compact, with a thin 4px
-        // stroke rather than the chunky bevelled 12px frame.
+        // Shared by both milestone cards so SUPER/SAFE badges match exactly — fixed font size, since
+        // auto-sizing let "SUPER ZONE 60" shrink relative to "SAFE ZONE 10".
         private static readonly Vector2 MilestoneCardSize = new Vector2(224f, 50f);
         private const float MILESTONE_FONT_SIZE = 16f;
         private const float MILESTONE_ICON_SIZE = 30f;
@@ -496,10 +478,8 @@ namespace Vertigo.Wheel.Editor
             RectTransform bank = NewNode("ui_panel_bank", sidePanel);
             Stretch(bank, 0, 74f, 0, 0);
 
-            // Fill: ui_card_panel_zone_bg is an opaque 9-slice (the same one the zone bar and milestone
-            // badges use cleanly), tinted near-black. Rim: ui_card_frame_4px_zone is a 4px outline
-            // (transparent centre) so it only ever draws a crisp 1-2px edge — no blown-up bevel like the old
-            // 12px frame that read as "stretched / blurry".
+            // Fill is an opaque 9-slice tinted near-black; the rim is a 4px transparent-centre outline so
+            // it draws a crisp edge, not the blown-up bevel the old 12px frame read as.
             Image bg = AddImage(NewNode("ui_image_bank_bg", bank), "ui_card_panel_zone_bg");
             bg.type = Image.Type.Sliced;
             bg.color = new Color(0.10f, 0.11f, 0.13f, 0.97f);
@@ -677,12 +657,8 @@ namespace Vertigo.Wheel.Editor
             skull.color = new Color(0.78f, 0.13f, 0.13f, 0.92f);
             FixedCentered((RectTransform)skull.transform, new Vector2(0, 40), new Vector2(220, 220));
 
-            // The lost haul: pooled BankEntryView tiles in one horizontal row, centred below the skull.
-            // A deep run can bank more tiles than fit across the screen, so the row is a real horizontal
-            // ScrollRect — same three-node shape as the bank and cash-out lists: a ScrollRect node, a
-            // viewport child that owns the RectMask2D clip and the drag raycast target, and the content row
-            // inside it. Keeping the raycast Image on the viewport (a child of the ScrollRect) is what stops
-            // the UI-hygiene "raycast target on a non-interactive Image" rule from flagging it.
+            // Same three-node ScrollRect shape as the bank/cash-out lists. Keeping the raycast Image on the
+            // viewport child (not the ScrollRect node) is what stops the UI-hygiene rule from flagging it.
             RectTransform listFrame = NewNode("ui_scroll_popup_bomb_list", anim);
             FixedCentered(listFrame, new Vector2(0f, -155f), new Vector2(1160f, 176f));
             var listScroll = listFrame.gameObject.AddComponent<ScrollRect>();

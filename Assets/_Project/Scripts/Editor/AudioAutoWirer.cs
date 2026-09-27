@@ -212,9 +212,7 @@ namespace Vertigo.Wheel.Editor
         }
 
         // ------------------------------------------------------------------ slot profiles
-        //
-        // Every scorer returns roughly 0..1. Acoustic terms are weighted to sum to ~1; a matching name
-        // keyword adds a flat bonus on top so a well-named clip beats an equally-fitting unnamed one.
+        // Every scorer returns roughly 0..1; a matching name keyword adds a flat bonus on top.
 
         private static float ScoreTick(ClipFeatures c)
         {
