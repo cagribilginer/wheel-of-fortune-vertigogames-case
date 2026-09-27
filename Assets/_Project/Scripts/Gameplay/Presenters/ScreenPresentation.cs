@@ -22,9 +22,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly PopupPresenter _popups;
         private readonly VfxPresenter _vfx;
         private readonly AudioPresenter _audio;
-        private readonly WheelThemeConfig _bronzeTheme;
-        private readonly WheelThemeConfig _silverTheme;
-        private readonly WheelThemeConfig _goldenTheme;
+        private readonly ZoneProgressionConfig _progression;
 
         // Fixed, zone-independent per-unit worth (RewardDefinition.EstimatedValue) — the same scale
         // PopupPresenter's chest tiers use — at or above which a landed reward earns the glow burst on top
@@ -34,7 +32,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         public ScreenPresentation(
             WheelPresenter wheel, ZoneMapPresenter zoneMap, BankPresenter bank,
             ActionBarPresenter actionBar, PopupPresenter popups, VfxPresenter vfx, AudioPresenter audio,
-            WheelThemeConfig bronzeTheme, WheelThemeConfig silverTheme, WheelThemeConfig goldenTheme)
+            ZoneProgressionConfig progression)
         {
             _wheel = wheel;
             _zoneMap = zoneMap;
@@ -43,9 +41,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _popups = popups;
             _vfx = vfx;
             _audio = audio;
-            _bronzeTheme = bronzeTheme;
-            _silverTheme = silverTheme;
-            _goldenTheme = goldenTheme;
+            _progression = progression;
         }
 
         public void ShowZone(int zone, ZoneType zoneType, WheelModel wheel, Action onComplete)
@@ -57,7 +53,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             // whole move, tier swaps included (a Bronze->Silver change always rides a zone transition).
             _audio.PlayWheelTransition();
             _wheel.PlayZoneTransition(
-                wheel, ThemeFor(wheel.Tier), () => _zoneMap.ShowZone(zone, onComplete));
+                wheel, _progression.ThemeFor(zone, zoneType), () => _zoneMap.ShowZone(zone, onComplete));
         }
 
         public void SetInputState(bool canSpin, bool canLeave)
@@ -119,15 +115,5 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void ClaimCashOut(int playerGold, int playerCash, Action onComplete) =>
             _popups.ClaimCashOut(playerGold, playerCash, onComplete);
-
-        private WheelThemeConfig ThemeFor(WheelTier tier)
-        {
-            switch (tier)
-            {
-                case WheelTier.Silver: return _silverTheme;
-                case WheelTier.Golden: return _goldenTheme;
-                default: return _bronzeTheme;
-            }
-        }
     }
 }

@@ -83,9 +83,6 @@ namespace Vertigo.Wheel.Gameplay
             var spinConfig = Resources.Load<WheelSpinConfig>("Configs/Settings/WheelSpin_Default");
             var progression = Resources.Load<ZoneProgressionConfig>("Configs/Settings/ZoneProgression_Default");
             var continueConfig = Resources.Load<ContinueConfig>("Configs/Settings/Continue_Default");
-            var bronzeTheme = Resources.Load<WheelThemeConfig>("Configs/Themes/Theme_Bronze");
-            var silverTheme = Resources.Load<WheelThemeConfig>("Configs/Themes/Theme_Silver");
-            var goldenTheme = Resources.Load<WheelThemeConfig>("Configs/Themes/Theme_Golden");
 
             IZoneClassifier classifier = progression.CreateClassifier();
             // The wheel factory gets its own RNG so a zone's slices are dealt onto different wedges each
@@ -118,7 +115,7 @@ namespace Vertigo.Wheel.Gameplay
 
             var presentation = new ScreenPresentation(
                 wheelPresenter, zoneMapPresenter, bankPresenter, actionBarPresenter, popupPresenter,
-                vfxPresenter, audioPresenter, bronzeTheme, silverTheme, goldenTheme);
+                vfxPresenter, audioPresenter, progression);
 
             var context = new GameContext(runModel, wheelFactory, spinService, continueService, presentation);
             GameStateMachine machine = GameFlow.Build(context);

@@ -48,6 +48,19 @@ namespace Vertigo.Wheel.Data.Configs
             return config == null ? null : config.ToBlueprint();
         }
 
+        /// <summary>
+        /// The authored theme for whichever wheel actually backs this zone — the same
+        /// <see cref="ResolveConfig"/> lookup <see cref="GetBlueprint"/> uses, band overrides included. This
+        /// is what lets a designer give a band-overridden wheel (e.g. a later bronze band) its own look:
+        /// the presentation reads the theme the asset was actually given, instead of inferring one from
+        /// <see cref="WheelTier"/> and silently ignoring whatever the asset says.
+        /// </summary>
+        public WheelThemeConfig ThemeFor(int zone, ZoneType zoneType)
+        {
+            ZoneWheelConfig config = ResolveConfig(zone, zoneType);
+            return config != null ? config.Theme : null;
+        }
+
         private ZoneWheelConfig ResolveConfig(int zone, ZoneType zoneType)
         {
             switch (zoneType)
