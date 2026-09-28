@@ -22,7 +22,6 @@ namespace Vertigo.Wheel.Data.Configs
 
         [Range(0f, 45f)] [SerializeField] private float _settlePunchDegrees = 2.5f;
         [Range(0f, 45f)] [SerializeField] private float _tickPunchDegrees = 10f;
-        [Min(0f)] [SerializeField] private float _revealDelay = 0.35f;
 
         public float Duration
         {
@@ -47,10 +46,6 @@ namespace Vertigo.Wheel.Data.Configs
         public float TickPunchDegrees
         {
             get { return _tickPunchDegrees; }
-        }
-        public float RevealDelay
-        {
-            get { return _revealDelay; }
         }
 
 #if UNITY_EDITOR

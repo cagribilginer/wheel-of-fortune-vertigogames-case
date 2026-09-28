@@ -59,4 +59,3 @@ MonoBehaviour:
     m_RotationOrder: 4
   _settlePunchDegrees: 2.5
   _tickPunchDegrees: 10
-  _revealDelay: 0.35

@@ -31,10 +31,6 @@ namespace Vertigo.Wheel.Data.Configs
         [Header("Economy")]
         [SerializeField] private ScalingStrategySO _scaling;
 
-        [Header("Demo")]
-        [Tooltip("0 = endless, which is what ships. Only set this to shorten a recording.")]
-        [Min(0)] [SerializeField] private int _demoMaxZone;
-
         public int SafeZoneInterval
         {
             get { return _safeZoneInterval; }
@@ -46,10 +42,6 @@ namespace Vertigo.Wheel.Data.Configs
         public ScalingStrategySO Scaling
         {
             get { return _scaling; }
-        }
-        public int DemoMaxZone
-        {
-            get { return _demoMaxZone; }
         }
 
         public ZoneClassifier CreateClassifier()
@@ -115,11 +107,6 @@ namespace Vertigo.Wheel.Data.Configs
 
             if (_scaling == null)
                 Debug.LogError($"[Vertigo] Progression '{name}' has no scaling strategy assigned.", this);
-
-            if (_demoMaxZone > 0)
-                Debug.LogWarning(
-                    $"[Vertigo] Progression '{name}' caps the run at zone {_demoMaxZone}. " +
-                    "This is a recording aid and must be 0 in the shipped build.", this);
         }
 
         private void RequireWheel(ZoneWheelConfig wheel, string role, WheelTier expectedTier)

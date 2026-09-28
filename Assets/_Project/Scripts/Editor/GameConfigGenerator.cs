@@ -338,9 +338,6 @@ namespace Vertigo.Wheel.Editor
             so.FindProperty("_superWheel").objectReferenceValue = super;
             so.FindProperty("_scaling").objectReferenceValue = scaling;
 
-            // 0 means endless, which is what ships. The demo cap is a recording aid only.
-            so.FindProperty("_demoMaxZone").intValue = 0;
-
             SerializedProperty bands = so.FindProperty("_bandOverrides");
             bands.arraySize = 2;
             SetBand(bands.GetArrayElementAtIndex(0), 10, band2);
@@ -366,7 +363,6 @@ namespace Vertigo.Wheel.Editor
             so.FindProperty("_maxTurns").intValue = 6;
             so.FindProperty("_settlePunchDegrees").floatValue = 2.5f;
             so.FindProperty("_tickPunchDegrees").floatValue = 10f;
-            so.FindProperty("_revealDelay").floatValue = 0.35f;
 
             // A steep ramp, a long glide, then a hard stop. An Ease enum decelerates too gently and the
             // final third of the spin reads as dead time.

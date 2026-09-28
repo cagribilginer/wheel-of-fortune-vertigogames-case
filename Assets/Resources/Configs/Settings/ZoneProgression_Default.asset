@@ -23,4 +23,3 @@ MonoBehaviour:
   - _fromZone: 20
     _wheel: {fileID: 11400000, guid: ea9b2bfa288504527b4f8d7de4fed049, type: 2}
   _scaling: {fileID: 11400000, guid: cc971a9bf55d44fbd9dedaa32df0b543, type: 2}
-  _demoMaxZone: 0
