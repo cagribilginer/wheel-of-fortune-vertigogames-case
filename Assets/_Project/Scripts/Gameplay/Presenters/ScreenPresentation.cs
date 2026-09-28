@@ -96,7 +96,12 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             // the defeat vignette so a revive restores it seamlessly. HideGameOver refreshes once the
             // player has actually chosen (revive keeps it, give-up/restart empties it).
             _bombDelay?.Kill();
-            _bombDelay = DOVirtual.DelayedCall(_juice.BombImpactHoldDuration, () => onComplete());
+
+            // Dropped on kill: with recycling on (GameInstaller), a finished delay's object gets reused, and
+            // killing it through a stale reference would kill whatever tween now owns it.
+            Tween delay = DOVirtual.DelayedCall(_juice.BombImpactHoldDuration, () => onComplete());
+            delay.OnKill(() => { if (_bombDelay == delay) _bombDelay = null; });
+            _bombDelay = delay;
         }
 
         public void ShowGameOver(GameOverSummary summary)

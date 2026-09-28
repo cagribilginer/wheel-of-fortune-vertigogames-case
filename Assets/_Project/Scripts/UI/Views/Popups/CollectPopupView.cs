@@ -157,13 +157,18 @@ namespace Vertigo.Wheel.UI.Views.Popups
                     return;
                 }
 
-                _tween = DOVirtual.Int(_shown, target, COUNT_UP_DURATION, value =>
+                Tween countUp = DOVirtual.Int(_shown, target, COUNT_UP_DURATION, value =>
                     {
                         _shown = value;
                         label.text = value.ToString("N0");
                     })
                     .SetEase(Ease.OutCubic)
                     .SetLink(owner);
+
+                // DOTween recycles finished tweens (GameInstaller turns recycling on), so a reference kept
+                // past its tween's death can end up pointing at an unrelated live tween — drop it on kill.
+                countUp.OnKill(() => { if (_tween == countUp) _tween = null; });
+                _tween = countUp;
             }
         }
     }
