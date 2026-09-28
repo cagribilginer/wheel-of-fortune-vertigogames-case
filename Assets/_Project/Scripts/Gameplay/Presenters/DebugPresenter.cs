@@ -105,7 +105,11 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 RewardDefinition definition = _catalog.All[i % count];
                 if (definition == null) continue;
 
-                _run.Bank.Add(definition.RewardId, definition.DefaultBaseAmount + _rng.Next(0, 40));
+                // Same per-drop rules as a real wheel slice: unique drops are always one, shards stay capped.
+                int amount = definition.IsStackable ? definition.DefaultBaseAmount + _rng.Next(0, 40) : 1;
+                if (definition.MaxAmountPerDrop > 0) amount = Math.Min(amount, definition.MaxAmountPerDrop);
+
+                _run.Bank.Add(definition.RewardId, amount);
             }
 
             _bank.Refresh();
