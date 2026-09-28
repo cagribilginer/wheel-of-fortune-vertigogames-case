@@ -4,7 +4,7 @@ using Vertigo.Wheel.Data.Services;
 namespace Vertigo.Wheel.Gameplay.Presenters
 {
     /// <summary>
-    /// The non-tier SFX: reward chime, bomb impact, and popup open/close. Tier-specific audio (the wheel's
+    /// The non-tier SFX: reward chime, bomb impact, and popup open. Tier-specific audio (the wheel's
     /// tick) is played directly by <see cref="WheelPresenter"/>, which already owns the per-zone
     /// <c>WheelThemeConfig</c> this class has no reason to duplicate. Fire-and-forget, same as
     /// <see cref="VfxPresenter"/> — nothing in the flow waits on a sound finishing.
@@ -55,10 +55,6 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         public void PlayPopupOpen()
         {
             _audio.PlayOneShot(_library != null ? _library.PopupOpen : null);
-        }
-        public void PlayPopupClose()
-        {
-            _audio.PlayOneShot(_library != null ? _library.PopupClose : null);
         }
     }
 }

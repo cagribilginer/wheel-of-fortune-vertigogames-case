@@ -31,7 +31,6 @@ namespace Vertigo.Wheel.Editor
     {
         private const string LIBRARY_PROP_BUTTON_CLICK = "_buttonClick";
         private const string LIBRARY_PROP_POPUP_OPEN = "_popupOpen";
-        private const string LIBRARY_PROP_POPUP_CLOSE = "_popupClose";
         private const string LIBRARY_PROP_REWARD_CHIME = "_rewardChime";
         private const string LIBRARY_PROP_BANK_COLLECT = "_bankCollect";
         private const string LIBRARY_PROP_WHEEL_TRANSITION = "_wheelTransition";
@@ -101,7 +100,6 @@ namespace Vertigo.Wheel.Editor
                 new Slot("Wheel Transition", ScoreWheelTransition),
                 new Slot("Bomb Explosion", ScoreBombExplosion),
                 new Slot("Popup Open", ScorePopupOpen),
-                new Slot("Popup Close", ScorePopupClose),
                 new Slot("Defeat Ambience", ScoreDefeatAmbience),
             };
 
@@ -277,12 +275,6 @@ namespace Vertigo.Wheel.Editor
             Keyword(c, 0.4f, "open", "swoosh", "whoosh", "swipe", "transition", "appear", "reveal", "slide");
         }
 
-        private static float ScorePopupClose(ClipFeatures c)
-        {
-            return 0.8f * Whoosh(c) + 0.2f * (1f - Rise(c)) +
-            Keyword(c, 0.4f, "close", "swoosh", "whoosh", "swipe", "transition", "hide", "dismiss");
-        }
-
         private static float ScoreDefeatAmbience(ClipFeatures c)
         {
             return 0.35f * AtLeast(c.Length, 1.5f, 1.0f) +
@@ -373,7 +365,6 @@ namespace Vertigo.Wheel.Editor
                 case "Wheel Transition": return LIBRARY_PROP_WHEEL_TRANSITION;
                 case "Bomb Explosion": return LIBRARY_PROP_BOMB_EXPLOSION;
                 case "Popup Open": return LIBRARY_PROP_POPUP_OPEN;
-                case "Popup Close": return LIBRARY_PROP_POPUP_CLOSE;
                 case "Defeat Ambience": return LIBRARY_PROP_DEFEAT_AMBIENCE;
                 default: throw new ArgumentOutOfRangeException(nameof(slotLabel), slotLabel, "Not a library slot.");
             }

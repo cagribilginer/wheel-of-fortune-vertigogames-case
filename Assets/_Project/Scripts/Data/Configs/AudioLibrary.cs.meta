@@ -6,7 +6,6 @@ MonoImporter:
   defaultReferences:
   - _buttonClick: {fileID: 8300000, guid: b287f2ce23b0b47a4959f63caade72ca, type: 3}
   - _popupOpen: {instanceID: 0}
-  - _popupClose: {instanceID: 0}
   - _rewardChime: {instanceID: 0}
   - _bombExplosion: {instanceID: 0}
   executionOrder: 0

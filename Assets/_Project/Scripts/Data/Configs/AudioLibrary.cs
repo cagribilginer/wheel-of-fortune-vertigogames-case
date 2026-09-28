@@ -18,7 +18,6 @@ namespace Vertigo.Wheel.Data.Configs
     {
         [SerializeField] private AudioClip _buttonClick;
         [SerializeField] private AudioClip _popupOpen;
-        [SerializeField] private AudioClip _popupClose;
         [SerializeField] private AudioClip _rewardChime;
         [SerializeField] private AudioClip _bankCollect;
         [SerializeField] private AudioClip _wheelTransition;
@@ -32,10 +31,6 @@ namespace Vertigo.Wheel.Data.Configs
         public AudioClip PopupOpen
         {
             get { return _popupOpen; }
-        }
-        public AudioClip PopupClose
-        {
-            get { return _popupClose; }
         }
 
         /// <summary>The bright sting when a reward is revealed at the wheel stop.</summary>

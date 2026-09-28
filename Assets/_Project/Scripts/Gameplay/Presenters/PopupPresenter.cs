@@ -102,7 +102,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         public void HideGameOver()
         {
             // No dismiss sting here: every route out is an action button, and each already fires the
-            // shared button-click cue via UIButtonPunch — layering PlayPopupClose on top would double it.
+            // shared button-click cue via UIButtonPunch.
             _bomb.Hide();
         }
 
@@ -131,18 +131,16 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         {
             // Dismissing the cash-out summary is the corner X only, and it already fires the shared
             // button-click cue via UIButtonPunch — exactly what the Safe/Super milestone popup's close X
-            // plays. No extra PlayPopupClose so the two dismiss the same way.
+            // plays, so the two dismiss the same way.
             _collect.Hide();
         }
 
         public void ClaimCashOut(int playerGold, int playerCash, System.Action onComplete)
         {
+            // No close sound when the popup goes: onComplete starts the next zone, whose wheel-transition
+            // swoosh fires on the same frame and already covers the exit.
             _audio.PlayClaim();
-            _collect.PlayClaim(playerCash, playerGold, () =>
-            {
-                _audio.PlayPopupClose();
-                onComplete();
-            });
+            _collect.PlayClaim(playerCash, playerGold, onComplete);
         }
     }
 }
