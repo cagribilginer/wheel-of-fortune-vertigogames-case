@@ -15,7 +15,7 @@ namespace Vertigo.Wheel.Editor
     /// </summary>
     public static class GameConfigValidator
     {
-        private const string SETTINGS_FOLDER = "Assets/Resources/Configs/Settings";
+        private const string SETTINGS_FOLDER = "Assets/_Project/Configs/Settings";
 
         [MenuItem("Tools/Vertigo/Validate Game Configs")]
         public static void Validate()
