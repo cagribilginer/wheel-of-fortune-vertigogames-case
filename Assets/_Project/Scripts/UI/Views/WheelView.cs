@@ -16,7 +16,7 @@ namespace Vertigo.Wheel.UI.Views
     public sealed class WheelView : UIViewBase
     {
         /// <summary>Hole centres as a fraction of the wheel's width, measured off the bronze/silver/golden base art.</summary>
-        public const float SLOT_RING_RADIUS = 0.2955f;
+        private const float SLOT_RING_RADIUS = 0.2955f;
 
         [SerializeField] private Image _ui_image_wheel_glow;
         [SerializeField] private RectTransform _ui_transform_wheel_rotor;
@@ -96,14 +96,33 @@ namespace Vertigo.Wheel.UI.Views
             _ui_button_wheel_spin.interactable = interactable;
         }
 
-#if UNITY_EDITOR
         /// <summary>
-        /// Places the eight fixed slots on the polar ring implied by the cylinder artwork: slot 0 sits
-        /// under the indicator at 12 o'clock, and slots run clockwise every 45 degrees. R is tuned against
-        /// the actual base sprite rather than hard-coded, so re-running after an art swap stays correct.
+        /// Places the slots on the polar ring of the base art's holes: slot 0 under the indicator at
+        /// 12 o'clock, the rest clockwise at equal angles. The one layout both play mode and the editor
+        /// menu below use, so an edit-mode preview can't drift from what the game shows.
         /// </summary>
+        public void LayoutSlots(float wheelSize)
+        {
+            float radius = SLOT_RING_RADIUS * wheelSize;
+            float slotAngle = 360f / _slots.Length;
+
+            for (int i = 0; i < _slots.Length; i++)
+            {
+                float angleDeg = i * slotAngle;
+                float angleRad = angleDeg * Mathf.Deg2Rad;
+
+                RectTransform slot = _slots[i].Rect;
+                slot.anchoredPosition = new Vector2(radius * Mathf.Sin(angleRad), radius * Mathf.Cos(angleRad));
+
+                // Cancels the slot's own position angle so its local "up" points radially outward — the
+                // bottom of the icon/text faces the hub, and stays correct through any later rotor spin.
+                slot.localEulerAngles = new Vector3(0f, 0f, -angleDeg);
+            }
+        }
+
+#if UNITY_EDITOR
         [ContextMenu("Vertigo/Layout Wheel Slots")]
-        private void LayoutWheelSlots()
+        private void LayoutSlotsInEditor()
         {
             CacheReferences();
 
@@ -114,22 +133,10 @@ namespace Vertigo.Wheel.UI.Views
             }
 
             float wheelSize = _ui_transform_wheel_rotor.rect.width;
-            float radius = SLOT_RING_RADIUS * wheelSize;
-            float slotAngle = 360f / _slots.Length;
+            LayoutSlots(wheelSize);
+            for (int i = 0; i < _slots.Length; i++) UnityEditor.EditorUtility.SetDirty(_slots[i].Rect);
 
-            for (int i = 0; i < _slots.Length; i++)
-            {
-                float angleRad = i * slotAngle * Mathf.Deg2Rad;
-                float x = radius * Mathf.Sin(angleRad);
-                float y = radius * Mathf.Cos(angleRad);
-
-                RectTransform slotRect = _slots[i].Rect;
-                slotRect.anchoredPosition = new Vector2(x, y);
-
-                UnityEditor.EditorUtility.SetDirty(slotRect);
-            }
-
-            Debug.Log($"[Vertigo] Laid out {_slots.Length} wheel slots at R={radius:F1} for a {wheelSize:F0} wheel.", this);
+            Debug.Log($"[Vertigo] Laid out {_slots.Length} wheel slots for a {wheelSize:F0} wheel.", this);
         }
 #endif
     }
