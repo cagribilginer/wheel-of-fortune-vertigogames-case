@@ -16,9 +16,8 @@ namespace Vertigo.Wheel.Editor
     /// <para>
     /// <see cref="ApplyAndroidPlayerSettings"/> sets these in code rather than relying on whatever the
     /// Inspector currently shows, so the build is reproducible regardless of what a previous session left
-    /// behind — the same reasoning <see cref="GameConfigGenerator"/> uses for the authored data set.
-    /// Code signing is deliberately untouched: a release keystore is a per-developer secret (see the
-    /// architecture plan's §12), not something a build script should assume or generate.
+    /// behind. Code signing is deliberately untouched: a release keystore is a per-developer secret, not
+    /// something a build script should assume or generate.
     /// </para>
     /// </summary>
     public static class BuildPipelineRunner

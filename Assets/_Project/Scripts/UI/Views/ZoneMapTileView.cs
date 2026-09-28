@@ -8,7 +8,7 @@ namespace Vertigo.Wheel.UI.Views
     /// One pooled tile in the zone-map strip. Purely passive: the presenter decides a tile's number, its
     /// text colour/weight and whether it is the current zone; this view only ever renders what it is told.
     /// <para>
-    /// The strip itself is now a single solid dark bar (built in <c>MainSceneBuilder</c>), so a tile has no
+    /// The strip itself is a single solid dark bar in the scene, so a tile has no
     /// per-tile card of its own any more — just the number, plus one raised white "current zone" marker
     /// with a downward notch that is shown on exactly one tile at a time.
     /// </para>

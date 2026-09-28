@@ -13,9 +13,9 @@ namespace Vertigo.Wheel.UI.Views
         // Layout inside the wheel hole (~115 units across on the 720 wheel, measured off the base art), in
         // screen-upright space around the slot centre. Upright, not slot-local: the slot is rotated to its
         // angle on the ring, so a slot-local offset would push the content outward on every slot instead.
-        public static readonly Vector2 ICON_AREA_SIZE = new Vector2(70f, 52f);
-        public static readonly Vector2 ICON_CENTER = new Vector2(0f, 10f);
-        public static readonly Vector2 TEXT_CENTER = new Vector2(0f, -32f);
+        private static readonly Vector2 ICON_AREA_SIZE = new Vector2(70f, 52f);
+        private static readonly Vector2 ICON_CENTER = new Vector2(0f, 10f);
+        private static readonly Vector2 TEXT_CENTER = new Vector2(0f, -32f);
 
         [SerializeField] private Image _ui_image_slot_icon_value;
         [SerializeField] private TextMeshProUGUI _ui_text_slot_amount_value;

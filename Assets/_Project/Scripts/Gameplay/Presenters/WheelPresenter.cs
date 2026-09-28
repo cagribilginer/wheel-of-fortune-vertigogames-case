@@ -137,8 +137,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             PopulateSlots(wheel);
         }
 
-        // The wheel panel's authored, fixed design size (see MainSceneBuilder.BuildWheel) — the fallback
-        // LayoutSlots reaches for if the rotor's rect ever reads back degenerate.
+        // The wheel panel's authored, fixed design size in Main.unity — the fallback LayoutSlots reaches for
+        // if the rotor's rect ever reads back degenerate.
         private const float DESIGN_WHEEL_SIZE = 720f;
 
         private void LayoutSlots()
@@ -157,8 +157,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
             if (wheelSize < 50f)
             {
-                // Still degenerate: fall back to the authored fixed size (MainSceneBuilder.BuildWheel pins
-                // the panel to 720x720) rather than collapse every slot's radius to ~0 at the rotor centre.
+                // Still degenerate: fall back to the authored fixed size (the panel is 720x720 in the scene)
+                // rather than collapse every slot's radius to ~0 at the rotor centre.
                 wheelSize = DESIGN_WHEEL_SIZE;
             }
             else

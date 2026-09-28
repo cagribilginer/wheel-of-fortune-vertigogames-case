@@ -19,12 +19,8 @@ namespace Vertigo.Wheel.Gameplay
     /// <summary>
     /// The composition root: wires Core services, the authored ScriptableObject configs, and the scene's
     /// Views into one running <see cref="GameStateMachine"/> with explicit <c>new</c> — no DI container, no
-    /// singletons, no <c>FindObjectOfType</c>.
-    /// <para>
-    /// Every field below is populated once, by <c>MainSceneBuilder</c> via <see cref="Configure"/> at
-    /// scene-build time — the same "never drag a reference by hand" rule every <see cref="UIViewBase"/>
-    /// follows through its own name-based auto-wiring.
-    /// </para>
+    /// singletons, no <c>FindObjectOfType</c>. The view and prefab fields below are scene references
+    /// serialized in <c>Main.unity</c>.
     /// </summary>
     public sealed class GameInstaller : MonoBehaviour
     {
@@ -61,29 +57,6 @@ namespace Vertigo.Wheel.Gameplay
 #endif
 
         private readonly List<AsyncOperationHandle> _configLoads = new List<AsyncOperationHandle>();
-
-        /// <summary>Called once by the editor scene-build step; never touched by hand.</summary>
-        public void Configure(
-            WheelView wheel, ZoneMapView zoneMap, BankView bank, ActionBarView actionBar,
-            BombPopupView bombPopup, CollectPopupView collectPopup,
-            MilestonePreviewPopupView milestonePopup, VfxView vfx, DebugOverlayView debugOverlay,
-            ZoneMapTileView zoneMapTilePrefab, BankEntryView bankEntryPrefab, Transform flightLayer,
-            Sprite bombSlotIcon)
-        {
-            _wheel = wheel;
-            _zoneMap = zoneMap;
-            _bank = bank;
-            _actionBar = actionBar;
-            _bombPopup = bombPopup;
-            _collectPopup = collectPopup;
-            _milestonePopup = milestonePopup;
-            _vfx = vfx;
-            _debugOverlay = debugOverlay;
-            _zoneMapTilePrefab = zoneMapTilePrefab;
-            _bankEntryPrefab = bankEntryPrefab;
-            _flightLayer = flightLayer;
-            _bombSlotIcon = bombSlotIcon;
-        }
 
         private void Awake()
         {
