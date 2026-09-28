@@ -4,7 +4,7 @@ namespace Vertigo.Wheel.Data.Configs
 {
     /// <summary>
     /// The handful of SFX clips that aren't tied to a wheel tier (compare <see cref="WheelThemeConfig"/>'s
-    /// per-tier <c>Tick</c>/<c>SpinLoop</c>) — one clip each, played the same way regardless of which zone or
+    /// per-tier <c>Tick</c>) — one clip each, played the same way regardless of which zone or
     /// theme is active. A single asset rather than one per clip, for the same reason <c>RewardCatalog</c> is
     /// one asset: there is exactly one of these in the whole game.
     /// <para>

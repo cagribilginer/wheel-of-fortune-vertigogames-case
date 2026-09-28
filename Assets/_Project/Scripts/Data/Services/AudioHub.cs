@@ -19,11 +19,6 @@ namespace Vertigo.Wheel.Data.Services
             _library = library;
         }
 
-        public static IAudioService Service
-        {
-            get { return _service; }
-        }
-
         public static void PlayButtonClick()
         {
             _service.PlayOneShot(_library != null ? _library.ButtonClick : null);

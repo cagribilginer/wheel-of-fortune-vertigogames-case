@@ -109,7 +109,7 @@ namespace Vertigo.Wheel.Gameplay
             var runModel = new RunModel(classifier, wallet, goldRewardId, cashRewardId);
 
             var audioLibrary = Addressables.LoadAssetAsync<AudioLibrary>("Configs/Settings/AudioLibrary").WaitForCompletion();
-            IAudioService audioService = new AudioService(new PlayerPrefsSaveService(), transform);
+            IAudioService audioService = new AudioService(transform);
             AudioHub.Initialize(audioService, audioLibrary);
             var audioPresenter = new AudioPresenter(audioService, audioLibrary);
 
