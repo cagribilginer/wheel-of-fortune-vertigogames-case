@@ -3,17 +3,14 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Vertigo.Wheel.Core.Run;
+using Vertigo.Wheel.Core.States;
 
 namespace Vertigo.Wheel.UI.Views.Popups
 {
     /// <summary>
-    /// The bomb defeat / revive screen. No modal card — the title, the lost haul and the three buttons sit
-    /// straight on a near-black backdrop with a breathing red vignette. Shows the haul the bomb just took
-    /// (so the player sees what a revive wins back) and the currency HUD in the corner.
-    /// <para>
-    /// All three buttons are always in the layout; a revive path that isn't currently available is shown
-    /// disabled rather than removed, so the row never reflows.
-    /// </para>
+    /// The bomb defeat / revive screen: the lost haul, the currency HUD and three buttons on a near-black backdrop
+    /// with a breathing red vignette. An unavailable revive is shown disabled, not removed, so the row never reflows.
     /// </summary>
     public sealed class BombPopupView : PopupViewBase
     {
@@ -30,10 +27,6 @@ namespace Vertigo.Wheel.UI.Views.Popups
         [SerializeField] private TextMeshProUGUI _ui_text_popup_bomb_continue_value;
         [SerializeField] private Button _ui_button_popup_bomb_advert;
 
-        // Dark, but not opaque: the pre-bomb bank panel stays faintly visible behind it so a revive reads
-        // as "you kept your haul", and the red vignette carries the defeat mood on top.
-        private const float BACKDROP_ALPHA = 0.86f;
-
         /// <summary>Where the presenter pools the lost-haul preview tiles.</summary>
         public RectTransform Content
         {
@@ -44,6 +37,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
         public event Action ContinueClicked;
         public event Action AdContinueClicked;
 
+        #region Wiring
         protected override void CacheReferences()
         {
             Bind(ref _ui_image_popup_bomb_backdrop, "ui_image_popup_bomb_backdrop");
@@ -86,55 +80,50 @@ namespace Vertigo.Wheel.UI.Views.Popups
         {
             AdContinueClicked?.Invoke();
         }
+        #endregion
 
-        public void Show(
-            int zoneReached, int lostRewardCount, int playerCash, int playerGold,
-            bool goldReviveOffered, int goldReviveCost, bool adReviveOffered)
+        #region Presentation
+        public void Show(GameOverSummary summary)
         {
-            _ui_text_popup_bomb_zone_value.SetText("You reached Zone {0}", zoneReached);
+            _ui_text_popup_bomb_zone_value.SetText("You reached Zone {0}", summary.ZoneReached);
 
             // SetText's zero-alloc formatter does not honour ":N0" (it prints the literal characters), so the
             // thousands separator has to come from the regular setter.
-            _ui_text_popup_bomb_cash_value.text = playerCash.ToString("N0");
-            _ui_text_popup_bomb_gold_value.text = playerGold.ToString("N0");
-            _ui_text_popup_bomb_continue_value.text = goldReviveCost.ToString("N0");
+            _ui_text_popup_bomb_cash_value.text = summary.Wallet.Cash.ToString("N0");
+            _ui_text_popup_bomb_gold_value.text = summary.Wallet.Gold.ToString("N0");
+            _ui_text_popup_bomb_continue_value.text = summary.GoldReviveCost.ToString("N0");
 
-            _ui_text_popup_bomb_empty_value.gameObject.SetActive(lostRewardCount == 0);
+            _ui_text_popup_bomb_empty_value.gameObject.SetActive(summary.LostHaul.Count == 0);
 
             // Every button stays in the row; an unavailable revive is disabled, not hidden.
-            _ui_button_popup_bomb_continue.interactable = goldReviveOffered;
-            _ui_button_popup_bomb_advert.interactable = adReviveOffered;
+            _ui_button_popup_bomb_continue.interactable = summary.GoldReviveOffered;
+            _ui_button_popup_bomb_advert.interactable = summary.AdReviveOffered;
 
             PlayVignette();
-            PlayOpen(_ui_image_popup_bomb_backdrop, _ui_transform_popup_bomb_anim, BACKDROP_ALPHA);
+            PlayOpen(_ui_image_popup_bomb_backdrop, _ui_transform_popup_bomb_anim, Juice.BombBackdropAlpha);
         }
-
-        // The breathing red vignette's own alpha range and half-cycle duration — distinct from
-        // BACKDROP_ALPHA, which is the separate darkening layer behind the card.
-        private const float VIGNETTE_MIN_ALPHA = 0.5f;
-        private const float VIGNETTE_PEAK_ALPHA = 0.9f;
-        private const float VIGNETTE_BREATHE_DURATION = 0.85f;
 
         public void Hide()
         {
             _ui_image_popup_bomb_vignette.DOKill();
-            _ui_image_popup_bomb_vignette.DOFade(0f, FADE_DURATION)
+            _ui_image_popup_bomb_vignette.DOFade(0f, Juice.PopupFadeDuration)
                 .SetLink(_ui_image_popup_bomb_vignette.gameObject, LinkBehaviour.KillOnDestroy);
             PlayClose(_ui_image_popup_bomb_backdrop, _ui_transform_popup_bomb_anim);
         }
 
-        // The breathing red vignette: a slow alpha yoyo that runs for as long as the screen is up.
+        // A slow alpha yoyo that runs for as long as the screen is up.
         private void PlayVignette()
         {
             Image vignette = _ui_image_popup_bomb_vignette;
             vignette.DOKill();
 
             Color c = vignette.color;
-            vignette.color = new Color(c.r, c.g, c.b, VIGNETTE_MIN_ALPHA);
-            vignette.DOFade(VIGNETTE_PEAK_ALPHA, VIGNETTE_BREATHE_DURATION)
+            vignette.color = new Color(c.r, c.g, c.b, Juice.VignetteMinAlpha);
+            vignette.DOFade(Juice.VignettePeakAlpha, Juice.VignetteBreatheDuration)
                 .SetEase(Ease.InOutSine)
                 .SetLoops(-1, LoopType.Yoyo)
                 .SetLink(vignette.gameObject, LinkBehaviour.KillOnDestroy);
         }
+        #endregion
     }
 }

@@ -6,12 +6,8 @@ using Vertigo.Wheel.Core.Zones;
 namespace Vertigo.Wheel.Data.Configs
 {
     /// <summary>
-    /// The rules of progression, and the asset that supplies wheels to the core layer.
-    /// <para>
-    /// Implementing <see cref="IWheelBlueprintProvider"/> is what keeps the factory engine-free: this asset
-    /// is the plug, the interface in Core is the port. Band selection and safe/super routing happen here,
-    /// where a designer can see them.
-    /// </para>
+    /// The rules of progression, and the asset that supplies wheels to Core through IWheelBlueprintProvider.
+    /// Band selection and safe/super routing live here, where a designer can see them.
     /// </summary>
     [CreateAssetMenu(menuName = "Vertigo/Config/Zone Progression", fileName = "ZoneProgression_")]
     public sealed class ZoneProgressionConfig : ScriptableObject, IWheelBlueprintProvider
@@ -22,8 +18,9 @@ namespace Vertigo.Wheel.Data.Configs
 
         [Header("Wheels")]
         [SerializeField] private ZoneWheelConfig _defaultNormalWheel;
-        [SerializeField] private ZoneWheelConfig _safeWheel;
-        [SerializeField] private ZoneWheelConfig _superWheel;
+
+        [Tooltip("One wheel per special zone type (safe, super). A type listed here ignores the band overrides.")]
+        [SerializeField] private List<ZoneTypeWheel> _typeWheels = new List<ZoneTypeWheel>();
 
         [Tooltip("Sorted ascending on validate. The deepest entry at or below the zone wins.")]
         [SerializeField] private List<ZoneBandOverride> _bandOverrides = new List<ZoneBandOverride>();
@@ -52,28 +49,24 @@ namespace Vertigo.Wheel.Data.Configs
         public WheelBlueprint GetBlueprint(int zone, ZoneType zoneType)
         {
             ZoneWheelConfig config = ResolveConfig(zone, zoneType);
-            return config == null ? null : config.ToBlueprint();
+            return config ? config.ToBlueprint() : null;
         }
 
         /// <summary>
-        /// The authored theme for whichever wheel actually backs this zone — the same
-        /// <see cref="ResolveConfig"/> lookup <see cref="GetBlueprint"/> uses, band overrides included. This
-        /// is what lets a designer give a band-overridden wheel (e.g. a later bronze band) its own look:
-        /// the presentation reads the theme the asset was actually given, instead of inferring one from
-        /// <see cref="WheelTier"/> and silently ignoring whatever the asset says.
+        /// The authored theme of the wheel that actually backs this zone, band overrides included, so a designer
+        /// can restyle a band without the presentation inferring a theme from the tier.
         /// </summary>
         public WheelThemeConfig ThemeFor(int zone, ZoneType zoneType)
         {
             ZoneWheelConfig config = ResolveConfig(zone, zoneType);
-            return config != null ? config.Theme : null;
+            return config ? config.Theme : null;
         }
 
         private ZoneWheelConfig ResolveConfig(int zone, ZoneType zoneType)
         {
-            switch (zoneType)
+            for (int i = 0; i < _typeWheels.Count; i++)
             {
-                case ZoneType.Super: return _superWheel;
-                case ZoneType.Safe: return _safeWheel;
+                if (_typeWheels[i].ZoneType == zoneType) return _typeWheels[i].Wheel;
             }
 
             ZoneWheelConfig chosen = _defaultNormalWheel;
@@ -81,7 +74,7 @@ namespace Vertigo.Wheel.Data.Configs
             for (int i = 0; i < _bandOverrides.Count; i++)
             {
                 ZoneBandOverride band = _bandOverrides[i];
-                if (band?.Wheel == null) continue;
+                if (band == null || !band.Wheel) continue;
                 if (band.FromZone <= zone) chosen = band.Wheel;
             }
 
@@ -102,16 +95,29 @@ namespace Vertigo.Wheel.Data.Configs
                     "inconsistent progression.", this);
 
             RequireWheel(_defaultNormalWheel, "default normal", WheelTier.Bronze);
-            RequireWheel(_safeWheel, "safe", WheelTier.Silver);
-            RequireWheel(_superWheel, "super", WheelTier.Golden);
+            RequireTypeWheel(ZoneType.Safe, WheelTier.Silver);
+            RequireTypeWheel(ZoneType.Super, WheelTier.Golden);
 
-            if (_scaling == null)
+            if (!_scaling)
                 Debug.LogError($"[Vertigo] Progression '{name}' has no scaling strategy assigned.", this);
+        }
+
+        private void RequireTypeWheel(ZoneType zoneType, WheelTier expectedTier)
+        {
+            for (int i = 0; i < _typeWheels.Count; i++)
+            {
+                if (_typeWheels[i].ZoneType != zoneType) continue;
+
+                RequireWheel(_typeWheels[i].Wheel, zoneType.ToString().ToLowerInvariant(), expectedTier);
+                return;
+            }
+
+            Debug.LogError($"[Vertigo] Progression '{name}' lists no wheel for {zoneType} zones.", this);
         }
 
         private void RequireWheel(ZoneWheelConfig wheel, string role, WheelTier expectedTier)
         {
-            if (wheel == null)
+            if (!wheel)
             {
                 Debug.LogError($"[Vertigo] Progression '{name}' has no {role} wheel assigned.", this);
                 return;

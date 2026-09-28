@@ -22,6 +22,9 @@ namespace Vertigo.Wheel.Core.Run
         // The currency CashBalance reports — the same wallet balance shown everywhere as "cash".
         private readonly RewardId _cashCurrency;
 
+        // Every reward that lands in the wallet on cash-out. Gold and cash are always members.
+        private readonly HashSet<RewardId> _currencies;
+
         private int _currentZone = 1;
         private RunPhase _phase = RunPhase.Idle;
         private int _goldRevivesUsed;
@@ -31,16 +34,20 @@ namespace Vertigo.Wheel.Core.Run
         // restart discards it. Null when no bomb is pending an answer.
         private List<BankEntry> _lostHaul;
 
-        public RunModel(IZoneClassifier classifier, Wallet wallet, RewardId goldCurrency, RewardId cashCurrency)
+        public RunModel(
+            IZoneClassifier classifier, Wallet wallet, RewardId goldCurrency, RewardId cashCurrency,
+            IEnumerable<RewardId> currencies = null)
         {
             _classifier = classifier ?? throw new ArgumentNullException(nameof(classifier));
             _wallet = wallet ?? throw new ArgumentNullException(nameof(wallet));
             _goldCurrency = goldCurrency;
             _cashCurrency = cashCurrency;
+            _currencies = new HashSet<RewardId>(currencies ?? Array.Empty<RewardId>()) { goldCurrency, cashCurrency };
 
             Bank = new RewardBank();
         }
 
+        #region Events and state
         public event Action<int> ZoneChanged;
         public event Action<RunPhase> PhaseChanged;
         public event Action<RunEndReason> RunEnded;
@@ -91,6 +98,12 @@ namespace Vertigo.Wheel.Core.Run
             get { return _wallet.BalanceOf(_cashCurrency); }
         }
 
+        /// <summary>Both balances as one value, for handing to the presentation.</summary>
+        public WalletBalances Balances
+        {
+            get { return new WalletBalances(GoldBalance, CashBalance); }
+        }
+
         public ZoneType CurrentZoneType
         {
             get { return _classifier.Classify(_currentZone); }
@@ -117,7 +130,9 @@ namespace Vertigo.Wheel.Core.Run
         {
             get { return CashOutPolicy.CanLeave(_phase, !Bank.IsEmpty, CurrentZoneType); }
         }
+        #endregion
 
+        #region Transitions
         /// <summary>Banks a non-bomb spin result.</summary>
         public void Grant(SpinOutcome outcome)
         {
@@ -207,7 +222,7 @@ namespace Vertigo.Wheel.Core.Run
             for (int i = 0; i < entries.Count; i++)
             {
                 BankEntry entry = entries[i];
-                if (entry.Amount > 0 && (entry.Reward == _goldCurrency || entry.Reward == _cashCurrency))
+                if (entry.Amount > 0 && _currencies.Contains(entry.Reward))
                     _wallet.Add(entry.Reward, entry.Amount);
             }
 
@@ -229,5 +244,6 @@ namespace Vertigo.Wheel.Core.Run
             Phase = RunPhase.Idle;
             if (zoneChanged) ZoneChanged?.Invoke(_currentZone);
         }
+        #endregion
     }
 }

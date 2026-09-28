@@ -15,7 +15,7 @@ namespace Vertigo.Wheel.Core.States.Flow
             ZoneType zoneType = Context.Run.CurrentZoneType;
 
             Context.CurrentWheel = Context.WheelFactory.Build(zone, zoneType);
-            Context.Presentation.ShowZone(zone, zoneType, Context.CurrentWheel, () => Machine.Change<IdleState>());
+            Context.Zone.ShowZone(zone, zoneType, Context.CurrentWheel, () => Machine.Change<IdleState>());
         }
     }
 }

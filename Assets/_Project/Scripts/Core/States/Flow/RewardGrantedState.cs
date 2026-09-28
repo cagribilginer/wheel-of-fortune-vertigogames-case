@@ -9,7 +9,7 @@ namespace Vertigo.Wheel.Core.States.Flow
         {
             Context.Run.Grant(Context.PendingOutcome);
 
-            Context.Presentation.PlayRewardGranted(Context.PendingOutcome, () =>
+            Context.Spin.PlayRewardGranted(Context.PendingOutcome, () =>
             {
                 Context.Run.AdvanceZone();
                 Machine.Change<ZoneSetupState>();

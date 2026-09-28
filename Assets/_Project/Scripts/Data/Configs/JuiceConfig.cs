@@ -45,6 +45,24 @@ namespace Vertigo.Wheel.Data.Configs
         [Range(0f, 1f)] [SerializeField] private float _zoneScrollDuration = 0.45f;
         [Range(1f, 2f)] [SerializeField] private float _currentZoneTileScale = 1.12f;
 
+        [Header("Popups")]
+        [Range(0f, 1f)] [SerializeField] private float _popupBackdropAlpha = 0.82f;
+        [Range(0f, 1f)] [SerializeField] private float _popupFadeDuration = 0.2f;
+        [Range(0.5f, 1f)] [SerializeField] private float _popupClosedScale = 0.85f;
+        [Range(0f, 1f)] [SerializeField] private float _popupOpenDuration = 0.3f;
+
+        [Header("Bomb popup")]
+        [Range(0f, 1f)] [SerializeField] private float _bombBackdropAlpha = 0.86f;
+        [Range(0f, 1f)] [SerializeField] private float _vignetteMinAlpha = 0.5f;
+        [Range(0f, 1f)] [SerializeField] private float _vignettePeakAlpha = 0.9f;
+        [Range(0f, 3f)] [SerializeField] private float _vignetteBreatheDuration = 0.85f;
+
+        [Header("Collect popup")]
+        [Range(0f, 3f)] [SerializeField] private float _claimHoldDuration = 0.8f;
+        [Range(0f, 1f)] [SerializeField] private float _cardPunchScale = 0.25f;
+        [Range(0f, 1f)] [SerializeField] private float _cardPunchDuration = 0.35f;
+        [Range(0f, 2f)] [SerializeField] private float _countUpDuration = 0.5f;
+
         public float TickPunchDuration
         {
             get { return _tickPunchDuration; }
@@ -144,6 +162,54 @@ namespace Vertigo.Wheel.Data.Configs
         public float CurrentZoneTileScale
         {
             get { return _currentZoneTileScale; }
+        }
+        public float PopupBackdropAlpha
+        {
+            get { return _popupBackdropAlpha; }
+        }
+        public float PopupFadeDuration
+        {
+            get { return _popupFadeDuration; }
+        }
+        public float PopupClosedScale
+        {
+            get { return _popupClosedScale; }
+        }
+        public float PopupOpenDuration
+        {
+            get { return _popupOpenDuration; }
+        }
+        public float BombBackdropAlpha
+        {
+            get { return _bombBackdropAlpha; }
+        }
+        public float VignetteMinAlpha
+        {
+            get { return _vignetteMinAlpha; }
+        }
+        public float VignettePeakAlpha
+        {
+            get { return _vignettePeakAlpha; }
+        }
+        public float VignetteBreatheDuration
+        {
+            get { return _vignetteBreatheDuration; }
+        }
+        public float ClaimHoldDuration
+        {
+            get { return _claimHoldDuration; }
+        }
+        public float CardPunchScale
+        {
+            get { return _cardPunchScale; }
+        }
+        public float CardPunchDuration
+        {
+            get { return _cardPunchDuration; }
+        }
+        public float CountUpDuration
+        {
+            get { return _countUpDuration; }
         }
     }
 }

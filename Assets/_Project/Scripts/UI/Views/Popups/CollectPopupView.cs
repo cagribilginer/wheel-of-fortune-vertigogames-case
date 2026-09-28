@@ -3,18 +3,14 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Vertigo.Wheel.Core.Run;
 
 namespace Vertigo.Wheel.UI.Views.Popups
 {
     /// <summary>
-    /// The cash-out confirmation. The reward list is pooled <see cref="BankEntryView"/> instances driven
-    /// by the presenter into <see cref="Content"/> — the same prefab and grid layout as the bank panel.
-    /// <para>
-    /// Nothing is committed while this is open: <see cref="CancelClicked"/> (the corner X) drops the player
-    /// straight back onto the wheel with their haul intact; <see cref="ConfirmClicked"/> ("CLAIM &amp; LEAVE")
-    /// runs <see cref="PlayClaim"/> — a card punch and a hold — and then hands back to the state machine to
-    /// reset the run.
-    /// </para>
+    /// The cash-out confirmation, listing the haul in pooled <see cref="BankEntryView"/> cells. Nothing is committed while
+    /// it is open: cancel returns to the wheel with the haul intact, confirm runs <see cref="PlayClaim"/> and then the
+    /// state machine resets the run.
     /// </summary>
     public sealed class CollectPopupView : PopupViewBase
     {
@@ -30,16 +26,6 @@ namespace Vertigo.Wheel.UI.Views.Popups
         private readonly CountingLabel _cash = new CountingLabel();
         private readonly CountingLabel _gold = new CountingLabel();
 
-        // How long the celebration holds before the run resets — long enough for the card punch and the
-        // cash/gold count-up to read, short enough not to stall the loop.
-        private const float CLAIM_HOLD_SECONDS = 0.8f;
-
-        private const float CARD_PUNCH_SCALE = 0.25f;
-        private const float CARD_PUNCH_DURATION = 0.35f;
-
-        // Also used by the nested CountingLabel below for its own DOVirtual.Int tween.
-        private const float COUNT_UP_DURATION = 0.5f;
-
         public RectTransform Content
         {
             get { return _ui_content_popup_collect_list; }
@@ -48,6 +34,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
         public event Action ConfirmClicked;
         public event Action CancelClicked;
 
+        #region Wiring
         protected override void CacheReferences()
         {
             Bind(ref _ui_image_popup_collect_backdrop, "ui_image_popup_collect_backdrop");
@@ -80,17 +67,19 @@ namespace Vertigo.Wheel.UI.Views.Popups
         {
             CancelClicked?.Invoke();
         }
+        #endregion
 
+        #region Presentation
         /// <summary>
         /// <paramref name="cash"/> and <paramref name="gold"/> are the wallet balances as they stand before
         /// this claim lands — same top-right HUD as the bomb screen, same numbers wherever a currency is
         /// shown. <see cref="PlayClaim"/> is what counts them up once the claim actually happens.
         /// </summary>
-        public void Show(int zonesCleared, int cash, int gold)
+        public void Show(int zonesCleared, WalletBalances wallet)
         {
             _ui_text_popup_collect_zone_value.SetText("Cleared {0} zones", zonesCleared);
-            _cash.SetTarget(cash, _ui_text_popup_collect_cash_value, gameObject);
-            _gold.SetTarget(gold, _ui_text_popup_collect_gold_value, gameObject);
+            _cash.SetTarget(wallet.Cash, Juice.CountUpDuration, _ui_text_popup_collect_cash_value, gameObject);
+            _gold.SetTarget(wallet.Gold, Juice.CountUpDuration, _ui_text_popup_collect_gold_value, gameObject);
 
             // A fresh summary is fully interactive again.
             _ui_button_popup_collect_confirm.interactable = true;
@@ -100,24 +89,22 @@ namespace Vertigo.Wheel.UI.Views.Popups
         }
 
         /// <summary>
-        /// The "rewards claimed" celebration. Locks the buttons, punches the card, counts the cash/gold row
-        /// up to <paramref name="newCash"/>/<paramref name="newGold"/> (the post-claim wallet balances) right
-        /// here in the popup — this is the only place the climb is shown. Holds briefly, then invokes
-        /// <paramref name="onComplete"/> (the state machine resets the run there) and closes.
+        /// The claim celebration: locks the buttons, punches the card and counts the balances up to
+        /// <paramref name="newBalances"/>, then calls <paramref name="onComplete"/> (the run resets there) and closes.
         /// </summary>
-        public void PlayClaim(int newCash, int newGold, Action onComplete)
+        public void PlayClaim(WalletBalances newBalances, Action onComplete)
         {
             _ui_button_popup_collect_confirm.interactable = false;
             _ui_button_popup_collect_cancel.interactable = false;
 
             _ui_transform_popup_collect_anim.DOKill();
             _ui_transform_popup_collect_anim.localScale = Vector3.one;
-            _ui_transform_popup_collect_anim.DOPunchScale(Vector3.one * CARD_PUNCH_SCALE, CARD_PUNCH_DURATION).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
+            _ui_transform_popup_collect_anim.DOPunchScale(Vector3.one * Juice.CardPunchScale, Juice.CardPunchDuration).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
 
-            _cash.SetTarget(newCash, _ui_text_popup_collect_cash_value, gameObject);
-            _gold.SetTarget(newGold, _ui_text_popup_collect_gold_value, gameObject);
+            _cash.SetTarget(newBalances.Cash, Juice.CountUpDuration, _ui_text_popup_collect_cash_value, gameObject);
+            _gold.SetTarget(newBalances.Gold, Juice.CountUpDuration, _ui_text_popup_collect_gold_value, gameObject);
 
-            DOVirtual.DelayedCall(CLAIM_HOLD_SECONDS, () =>
+            DOVirtual.DelayedCall(Juice.ClaimHoldDuration, () =>
             {
                 onComplete?.Invoke();
                 Hide();
@@ -128,16 +115,12 @@ namespace Vertigo.Wheel.UI.Views.Popups
         {
             PlayClose(_ui_image_popup_collect_backdrop, _ui_transform_popup_collect_anim);
         }
+        #endregion
 
+        #region Counting label
         /// <summary>
-        /// One label's count-up state. The first value is shown outright; every later one counts up/down
-        /// from whatever is currently on screen, so the claim celebration reads as the number climbing
-        /// rather than jump-cutting to the new total. Private to this view because <see cref="_cash"/> and
-        /// <see cref="_gold"/> are its only two users — nothing outside this popup shows a counting balance.
-        /// <para>
-        /// TMP_Text.SetText's zero-alloc formatter only understands bare {0}..{4}, not ".N0", so the
-        /// thousands separator goes through the plain setter.
-        /// </para>
+        /// One label's count-up: the first value shows outright, later ones count from what is on screen. Thousands
+        /// separators go through the plain setter, since TMP's zero-alloc SetText only understands bare {0}..{4}.
         /// </summary>
         private sealed class CountingLabel
         {
@@ -145,7 +128,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
             private bool _initialised;
             private Tween _tween;
 
-            public void SetTarget(int target, TextMeshProUGUI label, GameObject owner)
+            public void SetTarget(int target, float duration, TextMeshProUGUI label, GameObject owner)
             {
                 _tween?.Kill();
 
@@ -157,7 +140,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
                     return;
                 }
 
-                Tween countUp = DOVirtual.Int(_shown, target, COUNT_UP_DURATION, value =>
+                Tween countUp = DOVirtual.Int(_shown, target, duration, value =>
                     {
                         _shown = value;
                         label.text = value.ToString("N0");
@@ -171,5 +154,6 @@ namespace Vertigo.Wheel.UI.Views.Popups
                 _tween = countUp;
             }
         }
+        #endregion
     }
 }

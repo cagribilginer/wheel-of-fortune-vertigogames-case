@@ -17,10 +17,8 @@ using Vertigo.Wheel.UI.Views.Popups;
 namespace Vertigo.Wheel.Gameplay
 {
     /// <summary>
-    /// The composition root: wires Core services, the authored ScriptableObject configs, and the scene's
-    /// Views into one running <see cref="GameStateMachine"/> with explicit <c>new</c> — no DI container, no
-    /// singletons, no <c>FindObjectOfType</c>. The view and prefab fields below are scene references
-    /// serialized in <c>Main.unity</c>.
+    /// The composition root: wires Core services, the ScriptableObject configs and the scene's views into one
+    /// <see cref="GameStateMachine"/> with explicit <c>new</c>. No DI container, no singletons, no FindObjectOfType.
     /// </summary>
     public sealed class GameInstaller : MonoBehaviour
     {
@@ -45,8 +43,7 @@ namespace Vertigo.Wheel.Gameplay
         /// </summary>
         public GameStateMachine Machine { get; private set; }
 
-        // Held past Awake so OnDestroy can dispose them — killing any persistent tween and unwiring every
-        // += this composition root wired, rather than relying on the scene teardown to simply drop them.
+        // Held past Awake so OnDestroy can dispose them: kill persistent tweens and unwire every += made here.
         private MilestonePreviewPresenter _milestonePreviewPresenter;
         private WheelPresenter _wheelPresenter;
         private ActionBarPresenter _actionBarPresenter;
@@ -58,10 +55,10 @@ namespace Vertigo.Wheel.Gameplay
 
         private readonly List<AsyncOperationHandle> _configLoads = new List<AsyncOperationHandle>();
 
+        #region Composition
         private void Awake()
         {
-            // Sized against the busiest moment (a spin's tick punches plus a bomb's shake) so the first
-            // real spin never pays for a capacity resize on the frame the player is watching.
+            // Sized for the busiest moment (tick punches plus a bomb shake) so no spin pays for a resize.
             DOTween.Init(recycleAllByDefault: true, useSafeMode: true, logBehaviour: LogBehaviour.ErrorsOnly)
                    .SetCapacity(tweenersCapacity: 120, sequencesCapacity: 40);
 
@@ -72,8 +69,7 @@ namespace Vertigo.Wheel.Gameplay
             var juice = LoadConfig<JuiceConfig>("Configs/Settings/Juice_Default");
 
             IZoneClassifier classifier = progression.CreateClassifier();
-            // The wheel factory gets its own RNG so a zone's slices are dealt onto different wedges each
-            // time; the resolver's RNG stays separate so the two concerns can't perturb each other.
+            // The factory gets its own RNG so wedge dealing and slot resolution cannot perturb each other.
             var wheelFactory = new ZoneWheelFactory(
                 classifier, progression, progression.Scaling, new UnityRandomProvider());
             var spinService = new SpinService(new WeightedSliceResolver(new UnityRandomProvider()));
@@ -81,13 +77,16 @@ namespace Vertigo.Wheel.Gameplay
             RewardId cashRewardId = catalog.CashCurrency;
             var wallet = new Wallet(new PlayerPrefsSaveService());
             var continueService = new ContinueService(wallet, goldRewardId, continueConfig.ToSettings());
-            var runModel = new RunModel(classifier, wallet, goldRewardId, cashRewardId);
+            var runModel = new RunModel(classifier, wallet, goldRewardId, cashRewardId, catalog.CurrencyIds);
 
             var audioLibrary = LoadConfig<AudioLibrary>("Configs/Settings/AudioLibrary");
             IAudioService audioService = new AudioService(transform);
             AudioHub.Initialize(audioService, audioLibrary);
             var audioPresenter = new AudioPresenter(audioService, audioLibrary);
 
+            _bombPopup.Configure(juice);
+            _collectPopup.Configure(juice);
+            _milestonePopup.Configure(juice);
             _milestonePreviewPresenter = new MilestonePreviewPresenter(_zoneMap, _milestonePopup);
             var wheelPresenter = new WheelPresenter(_wheel, spinConfig, catalog, _bombSlotIcon, audioService, juice);
             var zoneMapPresenter = new ZoneMapPresenter(_zoneMap, _zoneMapTilePrefab, classifier, juice);
@@ -116,7 +115,7 @@ namespace Vertigo.Wheel.Gameplay
             _presentation = presentation;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (_debugOverlay != null)
+            if (_debugOverlay)
             {
                 _debugPresenter = new DebugPresenter(runModel, machine, wallet, goldRewardId, catalog, bankPresenter);
                 _debugPresenter.WireInput(_debugOverlay);
@@ -126,22 +125,22 @@ namespace Vertigo.Wheel.Gameplay
             GameFlow.Start(machine);
         }
 
-        // Synchronous (WaitForCompletion) like the Resources.Load it replaced, so Awake stays a plain method
-        // and the Play Mode smoke test's boot-to-Idle budget is unaffected. A missing address fails here, by
-        // name, instead of as a NullReferenceException wherever the config is first used.
+        // Synchronous so Awake stays a plain method; a missing address fails here, by name.
         private T LoadConfig<T>(string address) where T : Object
         {
             AsyncOperationHandle<T> handle = Addressables.LoadAssetAsync<T>(address);
             T config = handle.WaitForCompletion();
             _configLoads.Add(handle);
 
-            if (config == null)
+            if (!config)
                 throw new System.InvalidOperationException(
                     $"[Vertigo] Addressable config '{address}' did not load ({handle.Status}); check the Addressables groups.");
 
             return config;
         }
+        #endregion
 
+        #region Teardown
         private void OnDestroy()
         {
             _milestonePreviewPresenter?.Dispose();
@@ -158,5 +157,6 @@ namespace Vertigo.Wheel.Gameplay
                 if (_configLoads[i].IsValid()) Addressables.Release(_configLoads[i]);
             _configLoads.Clear();
         }
+        #endregion
     }
 }

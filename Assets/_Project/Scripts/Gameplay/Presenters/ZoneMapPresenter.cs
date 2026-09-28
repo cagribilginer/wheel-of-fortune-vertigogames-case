@@ -10,33 +10,23 @@ using Vertigo.Wheel.UI.Views;
 namespace Vertigo.Wheel.Gameplay.Presenters
 {
     /// <summary>
-    /// The horizontal zone strip: one pooled tile per zone in the visible window, scrolled so the current
-    /// zone stays centred, over a single solid dark bar.
-    /// <para>
-    /// The window is built <em>ahead</em> of the player rather than growing tile-by-tile as each zone is
-    /// reached — a designer wants to be able to see zone 30's marker while still standing on zone 1. A
-    /// zone's number and type never change between runs, so tiles are never released on a reset either: the
-    /// strip only ever grows, and a reset just moves the highlight back to zone 1.
-    /// </para>
-    /// <para>
-    /// A tile has no card of its own — the reference strip is a plain dark bar of numbers. Which tile is
-    /// "current" is carried entirely by the raised white marker + a dark bold number (<see cref="ApplyStyle"/>).
-    /// Number colour depends only on zone type, not on passed/upcoming: green for safe zones, gold for
-    /// super zones, muted grey for the rest.
-    /// </para>
+    /// The horizontal zone strip: one pooled tile per zone in a window built ahead of the player and scrolled to
+    /// keep the current zone centred. The strip only grows; a reset just moves the highlight back to zone 1.
+    /// Number colour follows zone type only.
     /// </summary>
     public sealed class ZoneMapPresenter
     {
         private const int LOOKAHEAD_ZONES = 15;
         private const int MINIMUM_WINDOW = 30;
 
-        // Colour is driven by zone type only, never by whether a zone is passed or upcoming: green is
-        // reserved strictly for safe zones (5, 10, 15…), gold for super zones, muted grey for everything
-        // else. A passed normal zone therefore looks exactly like an upcoming one.
-        private static readonly Color CurrentTextColor = new Color(0.12f, 0.13f, 0.16f);
-        private static readonly Color SafeTextColor = new Color(0.40f, 0.95f, 0.45f);
-        private static readonly Color SuperTextColor = new Color(1f, 0.82f, 0.30f);
-        private static readonly Color NormalTextColor = new Color(0.62f, 0.64f, 0.70f);
+        // The scroll target that puts a tile in the middle of the viewport.
+        private const float VIEWPORT_CENTER = 0.5f;
+
+        // Colour follows zone type only: green for safe, gold for super, grey for the rest, passed or not.
+        private static readonly Color CURRENT_TEXT_COLOR = new Color(0.12f, 0.13f, 0.16f);
+        private static readonly Color SAFE_TEXT_COLOR = new Color(0.40f, 0.95f, 0.45f);
+        private static readonly Color SUPER_TEXT_COLOR = new Color(1f, 0.82f, 0.30f);
+        private static readonly Color NORMAL_TEXT_COLOR = new Color(0.62f, 0.64f, 0.70f);
 
         private readonly ZoneMapView _view;
         private readonly IZoneClassifier _classifier;
@@ -58,6 +48,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 tile => Object.Destroy(tile.gameObject));
         }
 
+        #region Window
         public void ShowZone(int zone, System.Action onComplete)
         {
             _view.SetMilestoneTargets(
@@ -80,12 +71,14 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             tile.transform.SetSiblingIndex(_active.Count);
             _active.Add(tile);
         }
+        #endregion
 
+        #region Style and scroll
         private void ApplyStyle(ZoneMapTileView tile, int zoneNumber, int currentZone)
         {
             if (zoneNumber == currentZone)
             {
-                tile.SetCurrent(CurrentTextColor);
+                tile.SetCurrent(CURRENT_TEXT_COLOR);
                 tile.Rect.localScale = Vector3.one * _juice.CurrentZoneTileScale;
                 return;
             }
@@ -95,13 +88,13 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             switch (_classifier.Classify(zoneNumber))
             {
                 case ZoneType.Super:
-                    tile.SetPlain(SuperTextColor, bold: true);
+                    tile.SetPlain(SUPER_TEXT_COLOR, bold: true);
                     break;
                 case ZoneType.Safe:
-                    tile.SetPlain(SafeTextColor, bold: true);
+                    tile.SetPlain(SAFE_TEXT_COLOR, bold: true);
                     break;
                 default:
-                    tile.SetPlain(NormalTextColor, bold: false);
+                    tile.SetPlain(NORMAL_TEXT_COLOR, bold: false);
                     break;
             }
         }
@@ -116,15 +109,16 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             float viewportWidth = _view.Scroll.viewport.rect.width;
             float contentWidth = _view.Content.rect.width;
 
-            float target = viewportWidth * 0.5f - tileRect.anchoredPosition.x;
+            float target = viewportWidth * VIEWPORT_CENTER - tileRect.anchoredPosition.x;
             float minX = Mathf.Min(0f, viewportWidth - contentWidth);
             target = Mathf.Clamp(target, minX, 0f);
 
-            _view.Content.DOKill();
+            _view.Content.DOComplete();
             _view.Content.DOAnchorPosX(target, _juice.ZoneScrollDuration)
                 .SetEase(Ease.OutCubic)
                 .SetLink(_view.Content.gameObject, LinkBehaviour.KillOnDestroy)
                 .OnComplete(() => onComplete());
         }
+        #endregion
     }
 }

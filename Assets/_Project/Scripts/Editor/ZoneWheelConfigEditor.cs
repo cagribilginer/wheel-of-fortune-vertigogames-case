@@ -2,17 +2,13 @@ using UnityEditor;
 using UnityEngine;
 using Vertigo.Wheel.Core.Spin;
 using Vertigo.Wheel.Data.Configs;
+using Vertigo.Wheel.UI.Views;
 
 namespace Vertigo.Wheel.Editor
 {
     /// <summary>
-    /// Draws the authored wheel as the ring it actually is, with each slice's icon in its real slot.
-    /// <para>
-    /// The list of eight entries already satisfies "slice content changeable from the editor", but a flat
-    /// list makes a reviewer reconstruct the wheel in their head. Showing the ring makes a mis-authored
-    /// wheel — two bombs, a missing reward, a slot in the wrong place — visible at a glance instead of on
-    /// a play-through.
-    /// </para>
+    /// Draws the authored wheel as the ring it is, with each icon in its real slot, so a mis-authored wheel
+    /// (two bombs, a missing reward) shows at a glance instead of on a play-through.
     /// </summary>
     [CustomEditor(typeof(ZoneWheelConfig))]
     public sealed class ZoneWheelConfigEditor : UnityEditor.Editor
@@ -21,6 +17,7 @@ namespace Vertigo.Wheel.Editor
         private const float SLOT_RADIUS_FACTOR = 0.34f;
         private const float SLOT_SIZE = 54f;
 
+        #region Inspector
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
@@ -35,14 +32,16 @@ namespace Vertigo.Wheel.Editor
 
             DrawSummary(config);
         }
+        #endregion
 
+        #region Drawing
         private static void DrawRing(Rect area, ZoneWheelConfig config)
         {
             Vector2 centre = area.center;
             float radius = Mathf.Min(area.width, area.height) * SLOT_RADIUS_FACTOR;
 
-            Sprite baseSprite = config.Theme != null ? config.Theme.BaseSprite : null;
-            if (baseSprite != null && baseSprite.texture != null)
+            Sprite baseSprite = config.Theme ? config.Theme.BaseSprite : null;
+            if (baseSprite && baseSprite.texture)
             {
                 float plate = Mathf.Min(area.width, area.height);
                 var plateRect = new Rect(centre.x - plate / 2f, centre.y - plate / 2f, plate, plate);
@@ -92,7 +91,7 @@ namespace Vertigo.Wheel.Editor
                 return;
             }
 
-            if (entry.Reward == null)
+            if (!entry.Reward)
             {
                 EditorGUI.DrawRect(rect, new Color(1f, 0.6f, 0f, 0.5f));
                 EditorGUI.LabelField(rect, $"{index}\nempty", EditorStyles.centeredGreyMiniLabel);
@@ -102,11 +101,11 @@ namespace Vertigo.Wheel.Editor
             EditorGUI.DrawRect(rect, new Color(0f, 0f, 0f, 0.35f));
 
             Sprite icon = entry.Reward.Icon;
-            if (icon != null && icon.texture != null)
+            if (icon && icon.texture)
                 GUI.DrawTexture(rect, icon.texture, ScaleMode.ScaleToFit);
 
             var label = new Rect(rect.x, rect.yMax - 14f, rect.width, 14f);
-            EditorGUI.LabelField(label, $"x{entry.ResolveBaseAmount()}", EditorStyles.whiteMiniLabel);
+            EditorGUI.LabelField(label, AmountFormat.Text(entry.ResolveBaseAmount()), EditorStyles.whiteMiniLabel);
         }
 
         private static void DrawSummary(ZoneWheelConfig config)
@@ -147,5 +146,6 @@ namespace Vertigo.Wheel.Editor
                     $"Bomb chance at these weights: {bombWeight / (float)weight:P1}", MessageType.Info);
             }
         }
+        #endregion
     }
 }

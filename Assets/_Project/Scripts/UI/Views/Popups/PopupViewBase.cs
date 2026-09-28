@@ -1,30 +1,31 @@
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
+using Vertigo.Wheel.Data.Configs;
 
 namespace Vertigo.Wheel.UI.Views.Popups
 {
-    /// <summary>
-    /// The scale/fade choreography every popup opens and closes with. Shared here because all three popups
-    /// use the exact same shape — backdrop fade plus card scale — differing only in which backdrop and
-    /// which <c>_anim</c> card each one passes.
-    /// </summary>
+    /// <summary>The backdrop fade and card scale every popup opens and closes with, tuned by <see cref="JuiceConfig"/>.</summary>
     public abstract class PopupViewBase : UIViewBase
     {
-        // Named rather than passed through a config: this choreography is shared, self-contained View
-        // plumbing (all three popups use the exact same shape), not a presenter-level tuning knob like
-        // JuiceConfig's values — a subclass overrides just the one value it needs (see BombPopupView's
-        // own BACKDROP_ALPHA) instead of every popup needing a config reference for a fade curve.
-        private const float DEFAULT_BACKDROP_ALPHA = 0.82f;
+        private JuiceConfig _juice;
 
-        // Protected: BombPopupView's own vignette fade (a second, unrelated element on the same screen)
-        // reuses this so its dismiss duration can't drift out of sync with the backdrop's.
-        protected const float FADE_DURATION = 0.2f;
+        protected JuiceConfig Juice
+        {
+            get { return _juice; }
+        }
 
-        private const float CLOSED_SCALE = 0.85f;
-        private const float OPEN_SCALE_DURATION = 0.3f;
+        public void Configure(JuiceConfig juice)
+        {
+            _juice = juice;
+        }
 
-        protected void PlayOpen(Image backdrop, RectTransform card, float backdropAlpha = DEFAULT_BACKDROP_ALPHA)
+        protected void PlayOpen(Image backdrop, RectTransform card)
+        {
+            PlayOpen(backdrop, card, _juice.PopupBackdropAlpha);
+        }
+
+        protected void PlayOpen(Image backdrop, RectTransform card, float backdropAlpha)
         {
             gameObject.SetActive(true);
 
@@ -33,10 +34,10 @@ namespace Vertigo.Wheel.UI.Views.Popups
 
             Color c = backdrop.color;
             backdrop.color = new Color(c.r, c.g, c.b, 0f);
-            backdrop.DOFade(backdropAlpha, FADE_DURATION).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
+            backdrop.DOFade(backdropAlpha, _juice.PopupFadeDuration).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
 
-            card.localScale = Vector3.one * CLOSED_SCALE;
-            card.DOScale(1f, OPEN_SCALE_DURATION).SetEase(Ease.OutBack).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
+            card.localScale = Vector3.one * _juice.PopupClosedScale;
+            card.DOScale(1f, _juice.PopupOpenDuration).SetEase(Ease.OutBack).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
         }
 
         protected void PlayClose(Image backdrop, RectTransform card)
@@ -44,8 +45,8 @@ namespace Vertigo.Wheel.UI.Views.Popups
             backdrop.DOKill();
             card.DOKill();
 
-            backdrop.DOFade(0f, FADE_DURATION).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
-            card.DOScale(CLOSED_SCALE, FADE_DURATION)
+            backdrop.DOFade(0f, _juice.PopupFadeDuration).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
+            card.DOScale(_juice.PopupClosedScale, _juice.PopupFadeDuration)
                 .SetEase(Ease.InBack)
                 .SetLink(gameObject, LinkBehaviour.KillOnDestroy)
                 .OnComplete(() => gameObject.SetActive(false));

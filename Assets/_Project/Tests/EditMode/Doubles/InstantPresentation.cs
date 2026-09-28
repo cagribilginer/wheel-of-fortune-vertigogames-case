@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Vertigo.Wheel.Core.Rewards;
+using Vertigo.Wheel.Core.Run;
 using Vertigo.Wheel.Core.Spin;
 using Vertigo.Wheel.Core.States;
 using Vertigo.Wheel.Core.Zones;
@@ -56,10 +57,10 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             onComplete?.Invoke();
         }
 
-        public virtual void SetInputState(bool canSpin, bool canLeave)
+        public virtual void SetInputState(InputState state)
         {
-            CanSpin = canSpin;
-            CanLeave = canLeave;
+            CanSpin = state.CanSpin;
+            CanLeave = state.CanLeave;
         }
 
         public virtual void PlaySpin(int slotIndex, Action onComplete)
@@ -93,8 +94,8 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             ContinueOffered = summary.GoldReviveOffered;
             ContinueCostShown = summary.GoldReviveCost;
             AdReviveOffered = summary.AdReviveOffered;
-            PlayerGoldShown = summary.PlayerGold;
-            PlayerCashShown = summary.PlayerCash;
+            PlayerGoldShown = summary.Wallet.Gold;
+            PlayerCashShown = summary.Wallet.Cash;
 
             LostHaulShown.Clear();
             IReadOnlyList<BankEntry> lostHaul = summary.LostHaul;
@@ -106,12 +107,12 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             GameOverVisible = false;
         }
 
-        public virtual void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared, int playerGold, int playerCash)
+        public virtual void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared, WalletBalances wallet)
         {
             CashOutVisible = true;
             CashOutZonesCleared = zonesCleared;
-            CashOutGoldShown = playerGold;
-            CashOutCashShown = playerCash;
+            CashOutGoldShown = wallet.Gold;
+            CashOutCashShown = wallet.Cash;
             CashOutHaul.Clear();
             for (int i = 0; i < haul.Count; i++) CashOutHaul.Add(haul[i]);
         }
@@ -121,11 +122,11 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             CashOutVisible = false;
         }
 
-        public virtual void ClaimCashOut(int playerGold, int playerCash, Action onComplete)
+        public virtual void ClaimCashOut(WalletBalances wallet, Action onComplete)
         {
             CashOutVisible = false;
-            ClaimGoldShown = playerGold;
-            ClaimCashShown = playerCash;
+            ClaimGoldShown = wallet.Gold;
+            ClaimCashShown = wallet.Cash;
             onComplete?.Invoke();
         }
 

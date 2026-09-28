@@ -10,9 +10,7 @@ namespace Vertigo.Wheel.UI.Views
     /// </summary>
     public sealed class WheelSlotView : UIViewBase
     {
-        // Layout inside the wheel hole (~115 units across on the 720 wheel, measured off the base art), in
-        // screen-upright space around the slot centre. Upright, not slot-local: the slot is rotated to its
-        // angle on the ring, so a slot-local offset would push the content outward on every slot instead.
+        // Offsets inside the wheel hole, in screen-upright space around the slot centre (slot-local would push content outward).
         private static readonly Vector2 ICON_AREA_SIZE = new Vector2(70f, 52f);
         private static readonly Vector2 ICON_CENTER = new Vector2(0f, 10f);
         private static readonly Vector2 TEXT_CENTER = new Vector2(0f, -32f);
@@ -20,9 +18,19 @@ namespace Vertigo.Wheel.UI.Views
         [SerializeField] private Image _ui_image_slot_icon_value;
         [SerializeField] private TextMeshProUGUI _ui_text_slot_amount_value;
 
+        private RectTransform _rect;
+
+        // The slot rotation the icon/text were last placed for. Zero-w is not a valid rotation, so the
+        // first LateUpdate always places them.
+        private Quaternion _placedForRotation = new Quaternion(0f, 0f, 0f, 0f);
+
         public RectTransform Rect
         {
-            get { return (RectTransform)transform; }
+            get
+            {
+                if (!_rect) _rect = (RectTransform)transform;
+                return _rect;
+            }
         }
 
         protected override void CacheReferences()
@@ -38,7 +46,13 @@ namespace Vertigo.Wheel.UI.Views
         /// </summary>
         private void LateUpdate()
         {
-            Quaternion toSlotSpace = Quaternion.Inverse(Rect.rotation);
+            // Only the rotor's spin changes the slot's rotation (about Z), so an idle wheel skips all eight
+            // slots instead of rewriting eight icons and labels — and dirtying the canvas — every frame.
+            Quaternion slotRotation = Rect.rotation;
+            if (slotRotation.z == _placedForRotation.z && slotRotation.w == _placedForRotation.w) return;
+            _placedForRotation = slotRotation;
+
+            Quaternion toSlotSpace = Quaternion.Inverse(slotRotation);
             RectTransform iconRect = _ui_image_slot_icon_value.rectTransform;
             RectTransform textRect = _ui_text_slot_amount_value.rectTransform;
 
@@ -69,22 +83,20 @@ namespace Vertigo.Wheel.UI.Views
             SetIcon(icon);
             _ui_text_slot_amount_value.gameObject.SetActive(true);
             _ui_text_slot_amount_value.color = Color.white;
-            _ui_text_slot_amount_value.SetText("x{0}", amount);
+            AmountFormat.Apply(_ui_text_slot_amount_value, amount);
         }
 
         /// <summary>
-        /// A null sprite here means the caller (usually <c>RewardCatalog.IconFor</c>) failed to resolve one —
-        /// that's the one condition that leaves a slot showing nothing but the wheel's own painted-in slot
-        /// art behind it, i.e. exactly the "black hole" symptom. Logging it turns that into a named cause
-        /// instead of a silent blank.
+        /// A null sprite means the caller (usually <c>RewardCatalog.IconFor</c>) failed to resolve an icon, leaving the
+        /// "black hole" slot. Logging it names the cause instead of leaving a silent blank.
         /// </summary>
         private void SetIcon(Sprite icon)
         {
-            if (icon == null)
+            if (!icon)
                 Debug.LogWarning($"[Vertigo] {name}: no icon sprite resolved; the slot will render blank.", this);
 
             _ui_image_slot_icon_value.sprite = icon;
-            _ui_image_slot_icon_value.enabled = icon != null;
+            _ui_image_slot_icon_value.enabled = icon;
             _ui_image_slot_icon_value.preserveAspect = true;
             _ui_image_slot_icon_value.maskable = false; // never inside a mask — the wheel itself isn't clipped
             _ui_image_slot_icon_value.color = Color.white;

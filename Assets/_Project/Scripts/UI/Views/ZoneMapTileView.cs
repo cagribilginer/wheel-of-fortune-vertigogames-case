@@ -5,22 +5,23 @@ using UnityEngine.UI;
 namespace Vertigo.Wheel.UI.Views
 {
     /// <summary>
-    /// One pooled tile in the zone-map strip. Purely passive: the presenter decides a tile's number, its
-    /// text colour/weight and whether it is the current zone; this view only ever renders what it is told.
-    /// <para>
-    /// The strip itself is a single solid dark bar in the scene, so a tile has no
-    /// per-tile card of its own any more — just the number, plus one raised white "current zone" marker
-    /// with a downward notch that is shown on exactly one tile at a time.
-    /// </para>
+    /// One pooled tile in the zone strip. Purely passive: the presenter decides its number, colour, weight and whether
+    /// it is current. The strip is one dark bar, so a tile is just the number plus a raised white marker on one tile.
     /// </summary>
     public sealed class ZoneMapTileView : UIViewBase
     {
         [SerializeField] private Image _ui_image_zonemap_tile_marker_value;
         [SerializeField] private TextMeshProUGUI _ui_text_zonemap_tile_number_value;
 
+        private RectTransform _rect;
+
         public RectTransform Rect
         {
-            get { return (RectTransform)transform; }
+            get
+            {
+                if (!_rect) _rect = (RectTransform)transform;
+                return _rect;
+            }
         }
 
         protected override void CacheReferences()

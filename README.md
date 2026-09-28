@@ -54,8 +54,10 @@ scene, a camera, or the UI assembly.
   `BankPresenter`, `PopupPresenter`, `AudioPresenter`, …). Presenters own all
   Unity/DOTween/animation concerns.
 
-The seam between Core and Presentation is the **`IWheelPresentation`** interface. It contains no
-Unity types. Animating calls take an `Action onComplete` callback, so the state machine only
+The seam between Core and Presentation is **`IWheelPresentation`**, a composition of five role
+interfaces (`IZonePresentation`, `IInputPresentation`, `ISpinPresentation`, `IGameOverPresentation`,
+`ICashOutPresentation`); each state depends only on the role it uses. None contain Unity types.
+Animating calls take an `Action onComplete` callback, so the state machine only
 advances when the presentation reports it is done. This is what makes the whole game loop testable
 headlessly (see §5).
 
@@ -93,7 +95,7 @@ and checked by `Tools ▸ Vertigo ▸ Validate Game Configs`:
 
 | Asset | Drives |
 | --- | --- |
-| `ZoneProgressionConfig` | Safe/Super intervals, per-band wheel tier and overrides |
+| `ZoneProgressionConfig` | Safe/Super intervals, one wheel per special zone type, per-band overrides |
 | `ZoneWheelConfig` / `WheelSpinConfig` | Slice layout, weights, bomb placement per zone type |
 | `WheelThemeConfig` (Bronze / Silver / Golden) | Wheel sprite set, accent + glow colours, tick SFX |
 | `RewardCatalog` + `RewardDefinition` | The only bridge from a Core `RewardId` to a sprite / display name; also names which rewards are the gold and cash currencies |
@@ -148,7 +150,7 @@ something."_ The EXIT button's interactable state is a reflection of this, never
 ## 5. Testing Suite
 
 ```
-Assets/_Project/Tests/EditMode    224 tests           pure logic + full flow
+Assets/_Project/Tests/EditMode    226 tests           pure logic + full flow
 Assets/_Project/Tests/PlayMode      1 test            composition-root smoke test
 ```
 

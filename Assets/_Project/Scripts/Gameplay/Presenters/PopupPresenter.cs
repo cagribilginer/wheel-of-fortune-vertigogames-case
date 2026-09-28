@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Pool;
-using UnityEngine.UI;
 using Vertigo.Wheel.Core.Rewards;
+using Vertigo.Wheel.Core.Run;
 using Vertigo.Wheel.Core.States;
 using Vertigo.Wheel.Data.Configs;
 using Vertigo.Wheel.UI.Views;
@@ -16,12 +14,9 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     {
         private readonly BombPopupView _bomb;
         private readonly CollectPopupView _collect;
-        private readonly RewardCatalog _catalog;
         private readonly AudioPresenter _audio;
-        private readonly ObjectPool<BankEntryView> _listPool;
-        private readonly List<BankEntryView> _activeList = new List<BankEntryView>();
-        private readonly ObjectPool<BankEntryView> _bombListPool;
-        private readonly List<BankEntryView> _activeBombList = new List<BankEntryView>();
+        private readonly HaulList _bombHaul;
+        private readonly HaulList _collectHaul;
         private GameStateMachine _machine;
 
         public PopupPresenter(
@@ -30,28 +25,17 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         {
             _bomb = bomb;
             _collect = collect;
-            _catalog = catalog;
             _audio = audio;
-
-            _listPool = new ObjectPool<BankEntryView>(
-                () => UnityEngine.Object.Instantiate(entryPrefab, _collect.Content),
-                e => e.gameObject.SetActive(true),
-                e => e.gameObject.SetActive(false),
-                e => UnityEngine.Object.Destroy(e.gameObject));
-
-            _bombListPool = new ObjectPool<BankEntryView>(
-                () => UnityEngine.Object.Instantiate(entryPrefab, _bomb.Content),
-                e => e.gameObject.SetActive(true),
-                e => e.gameObject.SetActive(false),
-                e => UnityEngine.Object.Destroy(e.gameObject));
+            _bombHaul = new HaulList(entryPrefab, bomb.Content, catalog);
+            _collectHaul = new HaulList(entryPrefab, collect.Content, catalog);
         }
 
+        #region Input
         public void WireInput(GameStateMachine machine)
         {
             _machine = machine;
 
-            // "Give up" forfeits the haul and drops back to zone one — the machine already models that as a
-            // restart, so the bomb screen's give-up button raises the same input the old "TRY AGAIN" did.
+            // Give up is a restart: the bomb screen raises the same input the old "TRY AGAIN" did.
             _bomb.GiveUpClicked += machine.RequestRestart;
             _bomb.ContinueClicked += machine.RequestContinue;
             _bomb.AdContinueClicked += machine.RequestAdContinue;
@@ -69,78 +53,48 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _collect.ConfirmClicked -= _machine.Confirm;
             _collect.CancelClicked -= _machine.Cancel;
         }
+        #endregion
 
+        #region Game over
         public void ShowGameOver(GameOverSummary summary)
         {
-            for (int i = 0; i < _activeBombList.Count; i++) _bombListPool.Release(_activeBombList[i]);
-            _activeBombList.Clear();
-
-            IReadOnlyList<BankEntry> lostHaul = summary.LostHaul;
-            for (int i = 0; i < lostHaul.Count; i++)
-            {
-                BankEntryView entry = _bombListPool.Get();
-                entry.SetEntry(_catalog.IconFor(lostHaul[i].Reward), lostHaul[i].Amount);
-                entry.transform.SetSiblingIndex(i);
-                _activeBombList.Add(entry);
-            }
-
-            // Resolve the horizontal row now so the ScrollRect knows its content width before the popup
-            // opens and accepts a swipe on the first frame.
-            LayoutRebuilder.ForceRebuildLayoutImmediate(_bomb.Content);
+            _bombHaul.Show(summary.LostHaul);
 
             _audio.PlayPopupOpen();
             _audio.PlayDefeatAmbience();
 
-            // The corner HUD shows the actual wallet — the same two numbers ShowCashOut shows — not a
-            // score built from the lost haul's value. The view stays Core-agnostic, so the summary is
-            // unpacked into plain values here rather than passed through.
-            _bomb.Show(
-                summary.ZoneReached, lostHaul.Count, summary.PlayerCash, summary.PlayerGold,
-                summary.GoldReviveOffered, summary.GoldReviveCost, summary.AdReviveOffered);
+            // The corner HUD shows the actual wallet, not a score built from the lost haul.
+            _bomb.Show(summary);
         }
 
         public void HideGameOver()
         {
-            // No dismiss sting here: every route out is an action button, and each already fires the
-            // shared button-click cue via UIButtonPunch.
+            // No dismiss sting: every route out is a button that already plays the click cue.
             _bomb.Hide();
         }
+        #endregion
 
-        public void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared, int playerGold, int playerCash)
+        #region Cash out
+        public void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared, WalletBalances wallet)
         {
-            for (int i = 0; i < _activeList.Count; i++) _listPool.Release(_activeList[i]);
-            _activeList.Clear();
-
-            for (int i = 0; i < haul.Count; i++)
-            {
-                BankEntryView entry = _listPool.Get();
-                entry.SetEntry(_catalog.IconFor(haul[i].Reward), haul[i].Amount);
-                entry.transform.SetSiblingIndex(i);
-                _activeList.Add(entry);
-            }
-
-            // Resolve the grid + ContentSizeFitter now so the ScrollRect sees the real content height on
-            // the frame the cash-out summary opens.
-            LayoutRebuilder.ForceRebuildLayoutImmediate(_collect.Content);
+            _collectHaul.Show(haul);
 
             _audio.PlayPopupOpen();
-            _collect.Show(zonesCleared, playerCash, playerGold);
+            _collect.Show(zonesCleared, wallet);
         }
 
         public void HideCashOut()
         {
-            // Dismissing the cash-out summary is the corner X only, and it already fires the shared
-            // button-click cue via UIButtonPunch — exactly what the Safe/Super milestone popup's close X
-            // plays, so the two dismiss the same way.
+            // The corner X only; it already plays the shared click cue via UIButtonPunch.
             _collect.Hide();
         }
 
-        public void ClaimCashOut(int playerGold, int playerCash, System.Action onComplete)
+        public void ClaimCashOut(WalletBalances wallet, System.Action onComplete)
         {
-            // No close sound when the popup goes: onComplete starts the next zone, whose wheel-transition
-            // swoosh fires on the same frame and already covers the exit.
+            // No close sound: the next zone's wheel swoosh fires on the same frame and covers the exit.
             _audio.PlayClaim();
-            _collect.PlayClaim(playerCash, playerGold, onComplete);
+            _collect.PlayClaim(wallet, onComplete);
         }
+        #endregion
     }
 }

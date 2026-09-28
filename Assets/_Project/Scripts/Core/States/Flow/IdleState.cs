@@ -3,12 +3,8 @@ using Vertigo.Wheel.Core.Run;
 namespace Vertigo.Wheel.Core.States.Flow
 {
     /// <summary>
-    /// The only state that accepts player input.
-    /// <para>
-    /// Note that it asks <see cref="RunModel"/> (and through it CashOutPolicy) whether each action is
-    /// legal rather than deciding for itself, so the button states and the guard clauses can never drift
-    /// apart — they are the same rule read twice.
-    /// </para>
+    /// The only state that accepts player input. It asks the run whether each action is legal instead of
+    /// deciding itself, so the buttons and the guards read the same rule.
     /// </summary>
     public sealed class IdleState : GameStateBase
     {
@@ -17,14 +13,13 @@ namespace Vertigo.Wheel.Core.States.Flow
         public override void Enter()
         {
             Context.Run.Phase = RunPhase.Idle;
-            Context.Presentation.SetInputState(
-                canSpin: Context.Run.CanSpin,
-                canLeave: Context.Run.CanLeave);
+            Context.Input.SetInputState(
+                new InputState(canSpin: Context.Run.CanSpin, canLeave: Context.Run.CanLeave));
         }
 
         public override void Exit()
         {
-            Context.Presentation.SetInputState(canSpin: false, canLeave: false);
+            Context.Input.SetInputState(InputState.Locked);
         }
 
         public override void OnSpinRequested()

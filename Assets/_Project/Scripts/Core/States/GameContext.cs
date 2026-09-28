@@ -21,14 +21,26 @@ namespace Vertigo.Wheel.Core.States
             WheelFactory = wheelFactory ?? throw new ArgumentNullException(nameof(wheelFactory));
             SpinService = spinService ?? throw new ArgumentNullException(nameof(spinService));
             ContinueService = continueService ?? throw new ArgumentNullException(nameof(continueService));
-            Presentation = presentation ?? throw new ArgumentNullException(nameof(presentation));
+            if (presentation == null) throw new ArgumentNullException(nameof(presentation));
+
+            Zone = presentation;
+            Input = presentation;
+            Spin = presentation;
+            GameOver = presentation;
+            CashOut = presentation;
         }
 
         public RunModel Run { get; }
         public ZoneWheelFactory WheelFactory { get; }
         public SpinService SpinService { get; }
         public ContinueService ContinueService { get; }
-        public IWheelPresentation Presentation { get; }
+
+        // One screen behind the composition root, seen through the narrow role each state actually needs.
+        public IZonePresentation Zone { get; }
+        public IInputPresentation Input { get; }
+        public ISpinPresentation Spin { get; }
+        public IGameOverPresentation GameOver { get; }
+        public ICashOutPresentation CashOut { get; }
 
         public GameStateMachine Machine { get; internal set; }
 

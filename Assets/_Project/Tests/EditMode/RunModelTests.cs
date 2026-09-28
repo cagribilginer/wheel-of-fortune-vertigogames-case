@@ -1,5 +1,6 @@
 using System;
 using NUnit.Framework;
+using Vertigo.Wheel.Core.Rewards;
 using Vertigo.Wheel.Core.Run;
 using Vertigo.Wheel.Core.Spin;
 using Vertigo.Wheel.Core.Zones;
@@ -134,6 +135,20 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
+        public void CashOut_CreditsEveryCurrencyTheRunWasGiven()
+        {
+            var gems = new RewardId("gems");
+            var run = new RunModel(new ZoneClassifier(), _wallet, TestWheels.Gold, TestWheels.Cash, new[] { gems });
+
+            run.Grant(new SpinOutcome(1, SliceKind.Reward, gems, 7));
+            run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Pistol, 999));
+            run.CashOut();
+
+            Assert.That(_wallet.BalanceOf(gems), Is.EqualTo(7), "A third currency must not vanish at cash-out.");
+            Assert.That(_wallet.BalanceOf(TestWheels.Pistol), Is.Zero);
+        }
+
+        [Test]
         public void CashOut_OnlyBanksGoldAndCash()
         {
             // Pistol is neither of the two wallet currencies, so it must survive the run's end without
@@ -225,6 +240,16 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.That(_run.Bank.AmountOf(TestWheels.Pistol), Is.EqualTo(5));
             Assert.That(_run.AdRevivesUsedThisRun, Is.EqualTo(1));
             Assert.That(_run.GoldRevivesUsedThisRun, Is.Zero);
+        }
+
+        [Test]
+        public void Balances_PairsEachCurrencyWithItsOwnBalance()
+        {
+            _wallet.Add(TestWheels.Gold, 100);
+            _wallet.Add(TestWheels.Cash, 25);
+
+            Assert.That(_run.Balances.Gold, Is.EqualTo(100));
+            Assert.That(_run.Balances.Cash, Is.EqualTo(25));
         }
 
         [Test]

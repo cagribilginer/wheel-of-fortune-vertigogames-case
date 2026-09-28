@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using Vertigo.Wheel.Core.Rewards;
+using Vertigo.Wheel.Core.Run;
 using Vertigo.Wheel.Core.Spin;
 using Vertigo.Wheel.Core.States;
 using Vertigo.Wheel.Core.Zones;
@@ -25,8 +26,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly ZoneProgressionConfig _progression;
         private readonly JuiceConfig _juice;
 
-        // The bomb-impact hold has no single view to SetLink to (it just delays onComplete), so its
-        // lifetime is guaranteed by hand: killed before a new one starts, and on Dispose.
+        // The bomb-impact hold has no view to SetLink to, so it is killed before a new one starts and on Dispose.
         private Tween _bombDelay;
 
         public ScreenPresentation(
@@ -45,22 +45,21 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _juice = juice;
         }
 
+        #region Zone and spin
         public void ShowZone(int zone, ZoneType zoneType, WheelModel wheel, Action onComplete)
         {
             _bank.Refresh();
 
-            // The wheel exits downward, re-themes and re-populates its slots off-screen, then rides back
-            // up — only then does the zone strip scroll and the flow reach Idle. One swoosh covers the
-            // whole move, tier swaps included (a Bronze->Silver change always rides a zone transition).
+            // The wheel exits, re-themes off-screen and returns; then the strip scrolls and the flow reaches Idle.
             _audio.PlayWheelTransition();
             _wheel.PlayZoneTransition(
                 wheel, _progression.ThemeFor(zone, zoneType), () => _zoneMap.ShowZone(zone, onComplete));
         }
 
-        public void SetInputState(bool canSpin, bool canLeave)
+        public void SetInputState(InputState state)
         {
-            _wheel.SetInteractable(canSpin);
-            _actionBar.SetInputState(canLeave);
+            _wheel.SetInteractable(state.CanSpin);
+            _actionBar.SetInputState(state.CanLeave);
         }
 
         public void PlaySpin(int slotIndex, Action onComplete)
@@ -70,9 +69,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void PlayReveal(SpinOutcome outcome, ZoneType zoneType, Action onComplete)
         {
-            // Fire-and-forget: both play alongside the highlight tween, not gating onComplete, since
-            // nothing downstream needs to wait on a purely cosmetic flourish. The chime plays on every
-            // reward landing; the glow burst is reserved for the ones worth calling out visually.
+            // Fire-and-forget alongside the highlight: the chime plays on every landing, the glow burst on notable ones.
             if (!outcome.IsBomb)
             {
                 _audio.PlayReward();
@@ -92,18 +89,17 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         {
             _vfx.PlayBombImpact();
             _audio.PlayBombImpact();
-            // The bank panel is deliberately NOT refreshed here: the pre-bomb haul stays on screen behind
-            // the defeat vignette so a revive restores it seamlessly. HideGameOver refreshes once the
-            // player has actually chosen (revive keeps it, give-up/restart empties it).
+            // The bank stays as it was behind the vignette; HideGameOver refreshes it once the player chooses.
             _bombDelay?.Kill();
 
-            // Dropped on kill: with recycling on (GameInstaller), a finished delay's object gets reused, and
-            // killing it through a stale reference would kill whatever tween now owns it.
+            // Dropped on kill: with recycling on, a stale reference would kill whichever tween reuses the object.
             Tween delay = DOVirtual.DelayedCall(_juice.BombImpactHoldDuration, () => onComplete());
             delay.OnKill(() => { if (_bombDelay == delay) _bombDelay = null; });
             _bombDelay = delay;
         }
+        #endregion
 
+        #region Popups
         public void ShowGameOver(GameOverSummary summary)
         {
             _popups.ShowGameOver(summary);
@@ -111,15 +107,14 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void HideGameOver()
         {
-            // A revive restored the haul and a give-up wiped it — either way the board the player returns to
-            // needs the current bank, and no ShowZone runs on the revive path to do it.
+            // A revive restores the haul and a give-up wipes it; either way no ShowZone runs to refresh the bank.
             _bank.Refresh();
             _popups.HideGameOver();
         }
 
-        public void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared, int playerGold, int playerCash)
+        public void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared, WalletBalances wallet)
         {
-            _popups.ShowCashOut(haul, zonesCleared, playerGold, playerCash);
+            _popups.ShowCashOut(haul, zonesCleared, wallet);
         }
 
         public void HideCashOut()
@@ -127,14 +122,17 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _popups.HideCashOut();
         }
 
-        public void ClaimCashOut(int playerGold, int playerCash, Action onComplete)
+        public void ClaimCashOut(WalletBalances wallet, Action onComplete)
         {
-            _popups.ClaimCashOut(playerGold, playerCash, onComplete);
+            _popups.ClaimCashOut(wallet, onComplete);
         }
+        #endregion
 
+        #region Lifetime
         public void Dispose()
         {
             _bombDelay?.Kill();
         }
+        #endregion
     }
 }

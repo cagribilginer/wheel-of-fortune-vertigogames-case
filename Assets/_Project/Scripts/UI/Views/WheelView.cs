@@ -6,12 +6,8 @@ using UnityEngine.UI;
 namespace Vertigo.Wheel.UI.Views
 {
     /// <summary>
-    /// The wheel hub: rotor, indicator, spin button and the eight fixed slots.
-    /// <para>
-    /// Only <see cref="Rotor"/> ever gets a rotation tween — never this view's own root and never a
-    /// LayoutGroup-controlled node — which is the concrete reason every animated part of the tree lives on
-    /// its own dedicated <c>_anim</c>/<c>_rotor</c>/<c>_indicator</c> transform instead of a shared one.
-    /// </para>
+    /// The wheel hub: rotor, indicator, spin button and the eight fixed slots. Only <see cref="Rotor"/> gets a
+    /// rotation tween, and every animated part lives on its own dedicated transform, never a shared or laid-out one.
     /// </summary>
     public sealed class WheelView : UIViewBase
     {
@@ -31,9 +27,16 @@ namespace Vertigo.Wheel.UI.Views
         /// The panel root. Nothing else repositions it, so the zone-advance transition is free to slide it
         /// off-screen and back — unlike <see cref="Rotor"/>, which owns the spin rotation.
         /// </summary>
+        private RectTransform _root;
+
+        #region References
         public RectTransform Root
         {
-            get { return (RectTransform)transform; }
+            get
+            {
+                if (!_root) _root = (RectTransform)transform;
+                return _root;
+            }
         }
 
         public RectTransform Rotor
@@ -54,7 +57,9 @@ namespace Vertigo.Wheel.UI.Views
         }
 
         public event Action SpinClicked;
+        #endregion
 
+        #region Binding
         protected override void CacheReferences()
         {
             Bind(ref _ui_image_wheel_glow, "ui_image_wheel_glow");
@@ -65,9 +70,9 @@ namespace Vertigo.Wheel.UI.Views
             Bind(ref _ui_image_wheel_indicator_value, "ui_image_wheel_indicator_value");
             Bind(ref _ui_button_wheel_spin, "ui_button_wheel_spin");
 
-            _slots = _ui_group_wheel_slots == null
-                ? Array.Empty<WheelSlotView>()
-                : _ui_group_wheel_slots.GetComponentsInChildren<WheelSlotView>(includeInactive: true);
+            _slots = _ui_group_wheel_slots
+                ? _ui_group_wheel_slots.GetComponentsInChildren<WheelSlotView>(includeInactive: true)
+                : Array.Empty<WheelSlotView>();
         }
 
         private void OnEnable()
@@ -82,7 +87,9 @@ namespace Vertigo.Wheel.UI.Views
         {
             SpinClicked?.Invoke();
         }
+        #endregion
 
+        #region Presentation
         public void SetTheme(Sprite baseSprite, Sprite indicatorSprite, Color accent, Color glow)
         {
             _ui_image_wheel_base_value.sprite = baseSprite;
@@ -126,7 +133,7 @@ namespace Vertigo.Wheel.UI.Views
         {
             CacheReferences();
 
-            if (_ui_transform_wheel_rotor == null || _slots.Length == 0)
+            if (!_ui_transform_wheel_rotor || _slots.Length == 0)
             {
                 Debug.LogWarning("[Vertigo] WheelSlotLayout: rotor or slots not found. Run OnValidate first.", this);
                 return;
@@ -139,5 +146,6 @@ namespace Vertigo.Wheel.UI.Views
             Debug.Log($"[Vertigo] Laid out {_slots.Length} wheel slots for a {wheelSize:F0} wheel.", this);
         }
 #endif
+        #endregion
     }
 }

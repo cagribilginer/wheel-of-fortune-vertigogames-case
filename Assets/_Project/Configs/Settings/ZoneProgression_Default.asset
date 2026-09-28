@@ -15,8 +15,11 @@ MonoBehaviour:
   _safeZoneInterval: 5
   _superZoneInterval: 30
   _defaultNormalWheel: {fileID: 11400000, guid: 72239d3e9d5fd4bd0a6a8ed93218f8e9, type: 2}
-  _safeWheel: {fileID: 11400000, guid: 7a4df9c1dc1f54186af2950d578cdaaa, type: 2}
-  _superWheel: {fileID: 11400000, guid: c9fc77327cf3c4e6ba53e45f5bd71197, type: 2}
+  _typeWheels:
+  - _zoneType: 1
+    _wheel: {fileID: 11400000, guid: 7a4df9c1dc1f54186af2950d578cdaaa, type: 2}
+  - _zoneType: 2
+    _wheel: {fileID: 11400000, guid: c9fc77327cf3c4e6ba53e45f5bd71197, type: 2}
   _bandOverrides:
   - _fromZone: 10
     _wheel: {fileID: 11400000, guid: cdc9e84b26a9d437ba4c513697b8bfb9, type: 2}

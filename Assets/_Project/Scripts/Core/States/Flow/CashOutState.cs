@@ -23,12 +23,9 @@ namespace Vertigo.Wheel.Core.States.Flow
             // genuine no-op.
             Context.Run.Phase = RunPhase.CashOut;
 
-            // Zones are 1-indexed and CurrentZone is the one the player is standing on but has not
-            // finished, so the number of *cleared* zones is one less. The wallet balances shown are the
-            // ones before this claim lands — ClaimCashOut's count-up is what shows them climbing.
-            Context.Presentation.ShowCashOut(
-                Context.Run.Bank.Entries, Context.Run.CurrentZone - 1,
-                Context.Run.GoldBalance, Context.Run.CashBalance);
+            // CurrentZone is the one being stood on, so cleared zones are one fewer. The wallet shows as before the claim.
+            Context.CashOut.ShowCashOut(
+                Context.Run.Bank.Entries, Context.Run.CurrentZone - 1, Context.Run.Balances);
         }
 
         public override void OnConfirmed()
@@ -36,11 +33,9 @@ namespace Vertigo.Wheel.Core.States.Flow
             if (_claiming) return;
             _claiming = true;
 
-            // Credit the wallet now, then read the resulting balances back out so the summary's own
-            // cash/gold row can count up to them during the claim celebration. The run itself is not reset
-            // until that celebration finishes.
+            // Credit the wallet, then read the new balances back for the count-up. The run resets after the celebration.
             Context.Run.CashOut();
-            Context.Presentation.ClaimCashOut(Context.Run.GoldBalance, Context.Run.CashBalance, () =>
+            Context.CashOut.ClaimCashOut(Context.Run.Balances, () =>
             {
                 Context.Run.ResetRun();
                 Machine.Change<ZoneSetupState>();
@@ -51,7 +46,7 @@ namespace Vertigo.Wheel.Core.States.Flow
         {
             if (_claiming) return;
 
-            Context.Presentation.HideCashOut();
+            Context.CashOut.HideCashOut();
             Context.Run.Phase = RunPhase.Idle;
             Machine.Change<IdleState>();
         }

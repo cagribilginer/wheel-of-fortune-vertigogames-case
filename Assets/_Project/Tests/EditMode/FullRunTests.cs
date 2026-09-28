@@ -201,7 +201,7 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             public int ClaimsStarted { get; private set; }
 
-            public override void ClaimCashOut(int playerGold, int playerCash, System.Action onComplete)
+            public override void ClaimCashOut(WalletBalances wallet, System.Action onComplete)
             {
                 ClaimsStarted++;
                 _pendingClaim = onComplete;

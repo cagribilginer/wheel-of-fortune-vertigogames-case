@@ -1,18 +1,15 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using Vertigo.Wheel.Core.Rewards;
 using Vertigo.Wheel.Core.Run;
 using Vertigo.Wheel.Data.Configs;
 
 namespace Vertigo.Wheel.Editor
 {
     /// <summary>
-    /// Clears the persistent wallet so a reviewer can start from a genuinely fresh state.
-    /// <para>
-    /// Deliberately an editor menu item rather than an in-game button: an in-game reset would be UI that
-    /// exists only for the grader. It also deletes just the wallet keys, never PlayerPrefs wholesale, so it
-    /// cannot take unrelated editor preferences with it. The currencies come from the RewardCatalog, the
-    /// same place <see cref="Vertigo.Wheel.Gameplay.GameInstaller"/> reads them from.
-    /// </para>
+    /// Clears the persistent wallet so a reviewer can start fresh. An editor menu item rather than in-game UI,
+    /// and it deletes only the wallet keys, never PlayerPrefs wholesale. Currencies come from the RewardCatalog.
     /// </summary>
     internal static class ResetSaveMenuItem
     {
@@ -27,13 +24,16 @@ namespace Vertigo.Wheel.Editor
             }
 
             var catalog = AssetDatabase.LoadAssetAtPath<RewardCatalog>(AssetDatabase.GUIDToAssetPath(guids[0]));
-            string goldKey = Wallet.SaveKeyFor(catalog.GoldCurrency);
-            string cashKey = Wallet.SaveKeyFor(catalog.CashCurrency);
-            PlayerPrefs.DeleteKey(goldKey);
-            PlayerPrefs.DeleteKey(cashKey);
+            var keys = new List<string>();
+            foreach (RewardId currency in catalog.CurrencyIds)
+            {
+                string key = Wallet.SaveKeyFor(currency);
+                PlayerPrefs.DeleteKey(key);
+                keys.Add(key);
+            }
             PlayerPrefs.Save();
 
-            Debug.Log($"[Vertigo] Save reset: '{goldKey}' and '{cashKey}' cleared. Wallet is back to 0.");
+            Debug.Log($"[Vertigo] Save reset: {keys.Count} wallet key(s) cleared ({string.Join(", ", keys)}). Wallet is back to 0.");
         }
     }
 }

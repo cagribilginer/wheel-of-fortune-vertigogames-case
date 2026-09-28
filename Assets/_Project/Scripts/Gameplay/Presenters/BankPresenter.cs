@@ -12,15 +12,9 @@ using Vertigo.Wheel.UI.Views;
 namespace Vertigo.Wheel.Gameplay.Presenters
 {
     /// <summary>
-    /// The collected-rewards grid: a pooled <see cref="BankEntryView"/> per stacked reward, rebuilt from
-    /// <see cref="RewardBank"/> whenever it changes, plus the ghost that visibly carries a fresh reward from
-    /// the wheel into its grid cell.
-    /// <para>
-    /// The ghost is a single reused Image parented on the canvas root — never inside the
-    /// GridLayoutGroup-controlled content, because a layout rebuild would fight any tween applied to one of
-    /// its own children — toggled active/inactive rather than instantiated and destroyed per grant, since
-    /// only one ever flies at a time.
-    /// </para>
+    /// The collected-rewards grid: a pooled <see cref="BankEntryView"/> per stacked reward, plus one reused ghost that
+    /// carries a fresh reward from the wheel into its cell. The ghost sits on the canvas root, outside the layout
+    /// group, so a layout rebuild cannot fight its tween.
     /// </summary>
     public sealed class BankPresenter
     {
@@ -33,9 +27,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly ObjectPool<BankEntryView> _pool;
         private readonly List<BankEntryView> _active = new List<BankEntryView>();
 
-        // Lazily created, then reused for every fly-in — only one ever flies at a time (the state machine
-        // waits on FlyIn's onComplete before another spin can grant a reward), so there is nothing to pool
-        // here beyond keeping this single instance alive instead of Instantiate/Destroy-ing it per grant.
+        // Created lazily and reused: only one reward flies at a time.
         private RectTransform _ghostRect;
         private Image _ghostImage;
 
@@ -57,6 +49,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 e => UnityEngine.Object.Destroy(e.gameObject));
         }
 
+        #region Bank grid
         public void Refresh()
         {
             for (int i = 0; i < _active.Count; i++) _pool.Release(_active[i]);
@@ -73,9 +66,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
             _view.SetEmpty(entries.Count == 0);
 
-            // Force the grid + ContentSizeFitter to resolve now so the ScrollRect sees the real content
-            // height this frame — otherwise a freshly populated bank does not accept a drag until the next
-            // layout pass.
+            // Resolve the layout now so the ScrollRect sees the real content height this frame.
             LayoutRebuilder.ForceRebuildLayoutImmediate(_view.Content);
         }
 
@@ -97,7 +88,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             targetEntry.SetAmount(startAmount);
 
             EnsureGhost();
-            _ghostRect.DOKill();
+            _ghostRect.DOComplete();
             _ghostRect.gameObject.SetActive(true);
             _ghostRect.position = fromWorldPosition;
             _ghostImage.sprite = _catalog.IconFor(outcome.Reward);
@@ -126,14 +117,16 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                     });
             });
         }
+        #endregion
 
+        #region Ghost and lookup
         // Matches BankEntryView's own icon box closely enough that the ghost doesn't visibly resize when
         // it lands (that box is 88x88, but the ghost also needs headroom to fly over other UI unclipped).
         private static readonly Vector2 GHOST_SIZE = new Vector2(72f, 72f);
 
         private void EnsureGhost()
         {
-            if (_ghostRect != null) return;
+            if (_ghostRect) return;
 
             var ghostGo = new GameObject("bank_fly_ghost", typeof(RectTransform), typeof(Image));
             _ghostRect = (RectTransform)ghostGo.transform;
@@ -152,5 +145,6 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 if (entries[i].Reward.Equals(reward)) return i;
             return -1;
         }
+        #endregion
     }
 }

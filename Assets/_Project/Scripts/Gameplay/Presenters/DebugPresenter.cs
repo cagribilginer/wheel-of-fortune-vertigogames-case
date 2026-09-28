@@ -16,6 +16,11 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     public sealed class DebugPresenter : IDisposable
     {
         private const int GOLD_GRANT = 1000;
+        private const int SAFE_ZONE_JUMP = 5;
+        private const int SUPER_ZONE_JUMP = 30;
+
+        // Debug "+items" adds the catalogue's base amount plus up to this much extra, so the bank shows a mix.
+        private const int EXTRA_ITEM_AMOUNT_RANGE = 40;
         private const int ITEM_GRANT_COUNT = 40;
 
         private readonly RunModel _run;
@@ -40,6 +45,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _bank = bank;
         }
 
+        #region Input and lifetime
         public void WireInput(DebugOverlayView view)
         {
             _view = view;
@@ -52,7 +58,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void Dispose()
         {
-            if (_view == null) return;
+            if (!_view) return;
 
             _view.JumpToZone5Clicked -= JumpToZone5;
             _view.JumpToZone30Clicked -= JumpToZone30;
@@ -60,14 +66,16 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _view.GrantGoldClicked -= GrantGold;
             _view.GrantItemsClicked -= GrantItems;
         }
+        #endregion
 
+        #region Cheats
         private void JumpToZone5()
         {
-            JumpToZone(5);
+            JumpToZone(SAFE_ZONE_JUMP);
         }
         private void JumpToZone30()
         {
-            JumpToZone(30);
+            JumpToZone(SUPER_ZONE_JUMP);
         }
         private void GrantGold()
         {
@@ -90,9 +98,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _machine.Change<BombHitState>();
         }
 
-        // Stuffs the run bank with a full, varied haul so the multi-item grid, the defeat-popup scroll and
-        // the claim sequence can all be exercised in one press. Only between spins, and the grid is refreshed
-        // by hand because nothing else redraws the bank outside of zone setup.
+        // Fills the bank with a varied haul. Between spins only; the grid is refreshed by hand.
         private void GrantItems()
         {
             if (!_machine.IsIn<IdleState>()) return;
@@ -103,10 +109,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             for (int i = 0; i < ITEM_GRANT_COUNT; i++)
             {
                 RewardDefinition definition = _catalog.All[i % count];
-                if (definition == null) continue;
+                if (!definition) continue;
 
                 // Same per-drop rules as a real wheel slice: unique drops are always one, shards stay capped.
-                int amount = definition.IsStackable ? definition.DefaultBaseAmount + _rng.Next(0, 40) : 1;
+                int amount = definition.IsStackable ? definition.DefaultBaseAmount + _rng.Next(0, EXTRA_ITEM_AMOUNT_RANGE) : 1;
                 if (definition.MaxAmountPerDrop > 0) amount = Math.Min(amount, definition.MaxAmountPerDrop);
 
                 _run.Bank.Add(definition.RewardId, amount);
@@ -117,5 +123,6 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             // Re-enter idle so the EXIT button picks up the now non-empty bank without needing a spin first.
             _machine.Change<IdleState>();
         }
+        #endregion
     }
 }

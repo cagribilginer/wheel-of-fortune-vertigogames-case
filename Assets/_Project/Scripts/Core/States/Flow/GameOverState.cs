@@ -1,13 +1,8 @@
 namespace Vertigo.Wheel.Core.States.Flow
 {
     /// <summary>
-    /// Offers the ways out of a bomb: give up (forfeit the haul, restart from zone one), revive with gold,
-    /// or revive by watching an ad. Either revive pours the snapshotted haul back into the bank and resumes
-    /// the same zone.
-    /// <para>
-    /// The gold revive is offered whenever the player can afford its (doubling) price — no per-run cap. The
-    /// ad revive is the one free escape and is capped per run.
-    /// </para>
+    /// The ways out of a bomb: give up and restart at zone one, or revive with gold or an ad, which restores
+    /// the snapshotted haul on the same zone. Gold has no per-run cap; the ad revive does.
     /// </summary>
     public sealed class GameOverState : GameStateBase
     {
@@ -19,23 +14,20 @@ namespace Vertigo.Wheel.Core.States.Flow
             int goldUsed = Context.Run.GoldRevivesUsedThisRun;
             int adUsed = Context.Run.AdRevivesUsedThisRun;
 
-            Context.Presentation.ShowGameOver(new GameOverSummary(
+            Context.GameOver.ShowGameOver(new GameOverSummary(
                 zoneReached,
                 Context.Run.LostHaul,
-                Context.Run.GoldBalance,
-                Context.Run.CashBalance,
+                Context.Run.Balances,
                 Context.ContinueService.IsGoldReviveOffered(zoneReached, goldUsed),
                 Context.ContinueService.CostFor(zoneReached, goldUsed),
                 Context.ContinueService.IsAdReviveOffered(adUsed)));
         }
 
-        // "Give up" on the bomb screen forfeits the haul and drops back to zone one — mechanically a restart.
-        // The model is reset before the screen closes so the bank the screen refreshes on its way out is
-        // already the empty one the player restarts with.
+        // Give up is a restart. The model resets before the screen closes, so the bank it refreshes is already empty.
         public override void OnRestartRequested()
         {
             Context.Run.ResetRun();
-            Context.Presentation.HideGameOver();
+            Context.GameOver.HideGameOver();
             Machine.Change<ZoneSetupState>();
         }
 
@@ -63,7 +55,7 @@ namespace Vertigo.Wheel.Core.States.Flow
         {
             // ApplyGold/AdRevive has already restored the haul, so the bank HideGameOver refreshes on its
             // way out shows the rewards the player just kept, not the empty bank the bomb left behind.
-            Context.Presentation.HideGameOver();
+            Context.GameOver.HideGameOver();
             Machine.Change<IdleState>();
         }
     }

@@ -26,6 +26,7 @@ namespace Vertigo.Wheel.Data.Configs
 
         private Dictionary<string, RewardDefinition> _byId;
 
+        #region Lookup
         public IReadOnlyList<RewardDefinition> All
         {
             get { return _all; }
@@ -40,9 +41,23 @@ namespace Vertigo.Wheel.Data.Configs
             get { return CurrencyId(_cashCurrency, "cash"); }
         }
 
+        /// <summary>Every reward in the Currency category: what a cash-out banks into the wallet.</summary>
+        public IReadOnlyCollection<RewardId> CurrencyIds
+        {
+            get
+            {
+                var ids = new List<RewardId>();
+                for (int i = 0; i < _all.Count; i++)
+                {
+                    if (_all[i] && _all[i].Category == RewardCategory.Currency) ids.Add(_all[i].RewardId);
+                }
+                return ids;
+            }
+        }
+
         private RewardId CurrencyId(RewardDefinition currency, string role)
         {
-            if (currency == null)
+            if (!currency)
                 throw new InvalidOperationException($"Catalog '{name}' has no {role} currency assigned.");
 
             return currency.RewardId;
@@ -66,7 +81,7 @@ namespace Vertigo.Wheel.Data.Configs
         public Sprite IconFor(RewardId id)
         {
             RewardDefinition definition = Find(id);
-            return definition != null ? definition.Icon : null;
+            return definition ? definition.Icon : null;
         }
 
         private void EnsureIndex()
@@ -77,7 +92,7 @@ namespace Vertigo.Wheel.Data.Configs
             for (int i = 0; i < _all.Count; i++)
             {
                 RewardDefinition definition = _all[i];
-                if (definition == null) continue;
+                if (!definition) continue;
 
                 _byId[definition.Id] = definition;
             }
@@ -89,7 +104,9 @@ namespace Vertigo.Wheel.Data.Configs
         {
             _byId = null;
         }
+        #endregion
 
+        #region Validation
 #if UNITY_EDITOR
         private void OnValidate()
         {
@@ -99,7 +116,7 @@ namespace Vertigo.Wheel.Data.Configs
             for (int i = 0; i < _all.Count; i++)
             {
                 RewardDefinition definition = _all[i];
-                if (definition == null)
+                if (!definition)
                 {
                     Debug.LogError($"[Vertigo] Catalog '{name}' entry {i} is empty.", this);
                     continue;
@@ -117,7 +134,7 @@ namespace Vertigo.Wheel.Data.Configs
 
         private void ValidateCurrency(RewardDefinition currency, string role)
         {
-            if (currency == null)
+            if (!currency)
                 Debug.LogError($"[Vertigo] Catalog '{name}' has no {role} currency assigned.", this);
             else if (currency.Category != RewardCategory.Currency)
                 Debug.LogError(
@@ -129,5 +146,6 @@ namespace Vertigo.Wheel.Data.Configs
                     "in the catalog, so it has no icon lookup.", this);
         }
 #endif
+        #endregion
     }
 }
