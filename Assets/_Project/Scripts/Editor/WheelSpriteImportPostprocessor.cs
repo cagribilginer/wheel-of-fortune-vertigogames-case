@@ -29,7 +29,7 @@ namespace Vertigo.Wheel.Editor
         /// <para>
         /// A frame's border must cover its whole corner arc, or the arc's tail is stretched along the edges
         /// into big blurred corners. The "4px"/"12px" in the frame filenames is the stroke width, not the
-        /// corner: the arcs measure 12px and 24px respectively.
+        /// corner: the arcs measure 12px and 24px respectively. The gradient frame's corner brackets reach 28px.
         /// </para>
         /// <para>
         /// The zone panels are 64x64 <em>vertical gradients</em>: colour is constant along X, so stretching
@@ -44,7 +44,7 @@ namespace Vertigo.Wheel.Editor
                 { "UI_button_grey_standard",     new Vector4(40, 30, 40, 30) },
                 { "ui_card_frame_12px_neutral",  new Vector4(24, 24, 24, 24) },
                 { "ui_card_frame_4px_zone",      new Vector4(12, 12, 12, 12) },
-                { "ui_card_frame_gardient",      new Vector4(12, 12, 12, 12) },
+                { "ui_card_frame_gardient",      new Vector4(28, 28, 28, 28) },
                 // Four L-shaped corner brackets, arms reaching to ~pixel 28 of 64 — an 8px border sliced
                 // through the arms and smeared them across the stretched middle; 29 clears them entirely.
                 { "ui_card_zone_map_frame",      new Vector4(29, 29, 29, 29) },
