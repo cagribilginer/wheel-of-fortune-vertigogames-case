@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Vertigo.Wheel.Core.Rewards;
@@ -16,11 +17,35 @@ namespace Vertigo.Wheel.Data.Configs
     {
         [SerializeField] private List<RewardDefinition> _all = new List<RewardDefinition>();
 
+        // Referenced, not named: the wallet, cash-out and revive pricing key off these two rewards' ids, and
+        // an asset reference survives a rename or an Id edit that a hard-coded id string would silently miss.
+        [Tooltip("Cash-out converts this reward into the persistent gold balance; gold revives are paid in it.")]
+        [SerializeField] private RewardDefinition _goldCurrency;
+        [Tooltip("Cash-out converts this reward into the persistent cash balance.")]
+        [SerializeField] private RewardDefinition _cashCurrency;
+
         private Dictionary<string, RewardDefinition> _byId;
 
         public IReadOnlyList<RewardDefinition> All
         {
             get { return _all; }
+        }
+
+        public RewardId GoldCurrency
+        {
+            get { return CurrencyId(_goldCurrency, "gold"); }
+        }
+        public RewardId CashCurrency
+        {
+            get { return CurrencyId(_cashCurrency, "cash"); }
+        }
+
+        private RewardId CurrencyId(RewardDefinition currency, string role)
+        {
+            if (currency == null)
+                throw new InvalidOperationException($"Catalog '{name}' has no {role} currency assigned.");
+
+            return currency.RewardId;
         }
 
         public RewardDefinition Find(RewardId id)
@@ -85,6 +110,23 @@ namespace Vertigo.Wheel.Data.Configs
                         $"[Vertigo] Catalog '{name}' has two rewards with id '{definition.Id}'. " +
                         "Ids must be unique or icon lookup becomes ambiguous.", this);
             }
+
+            ValidateCurrency(_goldCurrency, "gold");
+            ValidateCurrency(_cashCurrency, "cash");
+        }
+
+        private void ValidateCurrency(RewardDefinition currency, string role)
+        {
+            if (currency == null)
+                Debug.LogError($"[Vertigo] Catalog '{name}' has no {role} currency assigned.", this);
+            else if (currency.Category != RewardCategory.Currency)
+                Debug.LogError(
+                    $"[Vertigo] Catalog '{name}' uses '{currency.Id}' as its {role} currency, but it is a " +
+                    $"{currency.Category}, not a Currency.", this);
+            else if (!_all.Contains(currency))
+                Debug.LogError(
+                    $"[Vertigo] Catalog '{name}' uses '{currency.Id}' as its {role} currency, but it is not " +
+                    "in the catalog, so it has no icon lookup.", this);
         }
 #endif
     }

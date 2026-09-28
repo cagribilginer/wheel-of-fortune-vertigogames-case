@@ -102,8 +102,8 @@ namespace Vertigo.Wheel.Gameplay
             var wheelFactory = new ZoneWheelFactory(
                 classifier, progression, progression.Scaling, new UnityRandomProvider());
             var spinService = new SpinService(new WeightedSliceResolver(new UnityRandomProvider()));
-            var goldRewardId = new RewardId("Reward_Gold");
-            var cashRewardId = new RewardId("Reward_Cash");
+            RewardId goldRewardId = catalog.GoldCurrency;
+            RewardId cashRewardId = catalog.CashCurrency;
             var wallet = new Wallet(new PlayerPrefsSaveService());
             var continueService = new ContinueService(wallet, goldRewardId, continueConfig.ToSettings());
             var runModel = new RunModel(classifier, wallet, goldRewardId, cashRewardId);

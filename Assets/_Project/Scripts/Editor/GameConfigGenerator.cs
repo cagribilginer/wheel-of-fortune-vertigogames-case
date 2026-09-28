@@ -39,11 +39,10 @@ namespace Vertigo.Wheel.Editor
         private const string SCALING_FOLDER = CONFIG_ROOT + "/Scaling";
         private const string SETTINGS_FOLDER = CONFIG_ROOT + "/Settings";
 
-        /// <summary>
-        /// The currency the run bank converts into the persistent wallet on cash-out. The composition root
-        /// must use this same id, so it lives in one place.
-        /// </summary>
-        public const string GOLD_REWARD_ID = "Reward_Gold";
+        // The two rewards cash-out converts into the persistent wallet. Only the generator names them; the
+        // game itself reads them off RewardCatalog's gold/cash references, assigned in GenerateCatalog.
+        private const string GOLD_REWARD_ID = "Reward_Gold";
+        private const string CASH_REWARD_ID = "Reward_Cash";
 
         // ------------------------------------------------------------------ authoring tables
 
@@ -75,7 +74,7 @@ namespace Vertigo.Wheel.Editor
             new RewardSpec("Reward_VestPoints",       "Vest Points",      "UI_Icons_Vest_Points",        RewardCategory.Points,      1),
             new RewardSpec("Reward_ShotgunPoints",    "Shotgun Points",   "UI_Icons_Shotgun_Points",     RewardCategory.Points,      1),
             new RewardSpec("Reward_Tier1Shotgun",     "Shotgun",          "UI_Icon_Renders_tier1_shotgun", RewardCategory.Weapon,    1),
-            new RewardSpec("Reward_Cash",             "Cash",             "UI_icon_cash",                RewardCategory.Currency,   50),
+            new RewardSpec(CASH_REWARD_ID,             "Cash",             "UI_icon_cash",                RewardCategory.Currency,   50),
 
             // --- band 2 pool: zones 10-19 -----------------------------------------------
             new RewardSpec("Reward_SmgPoints",        "SMG Points",       "UI_Icons_SMG_Points",         RewardCategory.Points,      1),
@@ -114,25 +113,25 @@ namespace Vertigo.Wheel.Editor
         private static readonly string[] Band1Pool =
         {
             "Reward_PistolPoints", "Reward_KnifePoints", "Reward_ArmorPoints", "Reward_VestPoints",
-            "Reward_ShotgunPoints", "Reward_Tier1Shotgun", "Reward_Cash",
+            "Reward_ShotgunPoints", "Reward_Tier1Shotgun", CASH_REWARD_ID,
         };
 
         private static readonly string[] Band2Pool =
         {
             "Reward_SmgPoints", "Reward_RiflePoints", "Reward_Tier2Rifle", "Reward_Tier2Mle",
-            "Reward_GrenadeM67", "Reward_Healthshot", "Reward_Cash",
+            "Reward_GrenadeM67", "Reward_Healthshot", CASH_REWARD_ID,
         };
 
         private static readonly string[] Band3Pool =
         {
             "Reward_SniperPoints", "Reward_SubmachinePoints", "Reward_Tier3Sniper", "Reward_Tier3Smg",
-            "Reward_Molotov", GOLD_REWARD_ID, "Reward_Cash",
+            "Reward_Molotov", GOLD_REWARD_ID, CASH_REWARD_ID,
         };
 
         private static readonly string[] SafePool =
         {
             "Reward_ChestSilver", "Reward_ChestStandard", "Reward_SniperPoints", "Reward_SubmachinePoints",
-            "Reward_Tier3Smg", "Reward_Molotov", GOLD_REWARD_ID, "Reward_Cash",
+            "Reward_Tier3Smg", "Reward_Molotov", GOLD_REWARD_ID, CASH_REWARD_ID,
         };
 
         private static readonly string[] SuperPool =
@@ -404,6 +403,11 @@ namespace Vertigo.Wheel.Editor
                 all.GetArrayElementAtIndex(i).objectReferenceValue = definition;
             }
 
+            rewards.TryGetValue(GOLD_REWARD_ID, out RewardDefinition gold);
+            rewards.TryGetValue(CASH_REWARD_ID, out RewardDefinition cash);
+            so.FindProperty("_goldCurrency").objectReferenceValue = gold;
+            so.FindProperty("_cashCurrency").objectReferenceValue = cash;
+
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -562,11 +566,18 @@ namespace Vertigo.Wheel.Editor
                     Debug.LogWarning($"[Vertigo] {withoutIcon} catalog entr(ies) have no icon assigned.");
                 }
 
-                if (catalog.Find(GOLD_REWARD_ID) == null)
+                try
                 {
-                    Debug.LogError(
-                        $"[Vertigo] The catalog has no '{GOLD_REWARD_ID}'. Cash-out could not convert gold " +
-                        "into the persistent wallet.");
+                    // Both currencies must resolve to catalog entries, or cash-out has nothing to convert.
+                    if (catalog.Find(catalog.GoldCurrency) == null || catalog.Find(catalog.CashCurrency) == null)
+                    {
+                        Debug.LogError("[Vertigo] A catalog currency is not one of the catalog's own rewards.");
+                        problems++;
+                    }
+                }
+                catch (InvalidOperationException e)
+                {
+                    Debug.LogError($"[Vertigo] {e.Message} Cash-out could not convert it into the wallet.");
                     problems++;
                 }
             }
