@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Vertigo.Wheel.Core.Spin;
@@ -49,13 +50,20 @@ namespace Vertigo.Wheel.Data.Configs
         {
             if (_cachedBlueprint != null) return _cachedBlueprint;
 
+            // Every slice maps to one fixed slot in the artwork, so a skipped entry would shift the rest
+            // off their slots and spin the wheel to the wrong wedge. An authoring slip fails here, by name.
+            if (_slices.Count != WheelModel.STANDARD_SLICE_COUNT)
+                throw new InvalidOperationException(
+                    $"Wheel '{name}' has {_slices.Count} slices; the artwork has {WheelModel.STANDARD_SLICE_COUNT} slots.");
+
             var blueprints = new List<SliceBlueprint>(_slices.Count);
 
             for (int i = 0; i < _slices.Count; i++)
             {
                 WheelSliceEntry entry = _slices[i];
-                if (entry == null) continue;
-                if (!entry.IsBomb && entry.Reward == null) continue;
+                if (entry == null || (!entry.IsBomb && entry.Reward == null))
+                    throw new InvalidOperationException(
+                        $"Wheel '{name}' slice {i} is empty; assign a RewardDefinition or make it the bomb.");
 
                 blueprints.Add(entry.ToBlueprint());
             }
