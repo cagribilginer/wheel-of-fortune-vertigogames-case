@@ -24,7 +24,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         private InstantPresentation _view;
         private GameStateMachine _machine;
 
-        private void Build(IRandomProvider random, int bombWeight = 1)
+        private void Build(IRandomProvider random, int bombWeight = 1, InstantPresentation view = null)
         {
             _save = new InMemorySaveService();
             _wallet = new Wallet(_save);
@@ -33,7 +33,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             _blueprints = new StubBlueprintProvider(bombIndex: 0) { BombWeight = bombWeight };
             var factory = new ZoneWheelFactory(new ZoneClassifier(), _blueprints, new LinearRewardScaling());
 
-            _view = new InstantPresentation();
+            _view = view ?? new InstantPresentation();
 
             var context = new GameContext(
                 _run, factory, new SpinService(new WeightedSliceResolver(random)),
@@ -147,6 +147,71 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.EqualTo(bankedGold));
             Assert.That(_run.CurrentZone, Is.EqualTo(1));
             Assert.That(_run.Bank.IsEmpty, Is.True);
+        }
+
+        [Test]
+        public void SecondConfirmDuringTheClaim_CreditsTheWalletOnce()
+        {
+            var view = new DeferredClaimPresentation();
+            OpenCashOutWithGold(view, gold: 100);
+
+            _machine.Confirm();
+            _machine.Confirm();
+            view.FinishClaim();
+
+            Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.EqualTo(100));
+            Assert.That(view.ClaimsStarted, Is.EqualTo(1));
+            Assert.That(_run.Bank.IsEmpty, Is.True);
+            Assert.That(_machine.IsIn<IdleState>(), Is.True);
+        }
+
+        [Test]
+        public void CancelDuringTheClaim_IsIgnored()
+        {
+            var view = new DeferredClaimPresentation();
+            OpenCashOutWithGold(view, gold: 100);
+
+            _machine.Confirm();
+            _machine.Cancel();
+
+            Assert.That(_machine.IsIn<CashOutState>(), Is.True, "A claim that already paid out can't be cancelled.");
+
+            view.FinishClaim();
+
+            Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.EqualTo(100));
+            Assert.That(_run.CurrentZone, Is.EqualTo(1));
+            Assert.That(_run.Bank.IsEmpty, Is.True);
+        }
+
+        // Zone 1 is safe, so banking gold there makes leaving legal straight away.
+        private void OpenCashOutWithGold(InstantPresentation view, int gold)
+        {
+            Build(new SystemRandomProvider(1), bombWeight: 0, view: view);
+            _run.Bank.Add(TestWheels.Gold, gold);
+
+            _machine.RequestLeave();
+            Assert.That(_machine.IsIn<CashOutState>(), Is.True);
+        }
+
+        /// <summary>Holds the claim celebration open until the test finishes it, like the real 0.8s tween.</summary>
+        private sealed class DeferredClaimPresentation : InstantPresentation
+        {
+            private System.Action _pendingClaim;
+
+            public int ClaimsStarted { get; private set; }
+
+            public override void ClaimCashOut(int playerGold, int playerCash, System.Action onComplete)
+            {
+                ClaimsStarted++;
+                _pendingClaim = onComplete;
+            }
+
+            public void FinishClaim()
+            {
+                System.Action finish = _pendingClaim;
+                _pendingClaim = null;
+                finish?.Invoke();
+            }
         }
 
         [Test]
