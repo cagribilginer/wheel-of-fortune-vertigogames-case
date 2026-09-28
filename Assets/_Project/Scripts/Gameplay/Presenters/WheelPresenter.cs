@@ -166,10 +166,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 _slotsLaidOut = true;
             }
 
-            // Dialed in against the real render, not the flat art's own hole positions — the source art
-            // measures ~0.2958, but the slot content reads as centred at a slightly different radius once
-            // the icon/text are locked screen-upright by WheelSlotView.LateUpdate.
-            float radius = 0.3f * wheelSize;
+            float radius = WheelView.SLOT_RING_RADIUS * wheelSize;
             float slotAngle = 360f / _view.Slots.Count;
 
             for (int i = 0; i < _view.Slots.Count; i++)
@@ -208,8 +205,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                         $"[Vertigo] WheelPresenter: RewardCatalog has no icon for '{slice.Reward}' " +
                         $"(slot {i}) — check the RewardDefinition asset's Icon field.");
                 }
-                _view.Slots[i].SetReward(
-                    icon, slice.Amount, _catalog.IconScaleFor(slice.Reward), _catalog.IconOffsetFor(slice.Reward));
+                _view.Slots[i].SetReward(icon, slice.Amount);
             }
         }
 

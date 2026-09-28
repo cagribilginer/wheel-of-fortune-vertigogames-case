@@ -10,17 +10,12 @@ namespace Vertigo.Wheel.UI.Views
     /// </summary>
     public sealed class WheelSlotView : UIViewBase
     {
-        // The authored centre-to-centre distance between icon and text (see MainSceneBuilder.
-        // BuildWheelSlotPrefab: icon.y=6.1, text.y=-35.9), reapplied in world space every frame so the
-        // text stays directly under the icon instead of sliding off to whichever direction the slot's own
-        // rotation happens to point "down". Keep this in sync with that prefab's two Y offsets.
-        private const float TEXT_OFFSET_BELOW_ICON = 42f;
-
-        // The authored icon anchor (see MainSceneBuilder.BuildWheelSlotPrefab: icon.y=6.1) that every
-        // reward's IconOffset is added on top of — box centring alone isn't enough once different icon
-        // artwork has different visual weight (a wide weapon render vs. a tall bottle vs. a chest lid all
-        // read as "centred" at different actual anchor points), so this is the per-reward correction hook.
-        private static readonly Vector2 ICON_BASE_ANCHORED_POSITION = new Vector2(0f, 6.1f);
+        // Layout inside the wheel hole (~115 units across on the 720 wheel, measured off the base art), in
+        // screen-upright space around the slot centre. Upright, not slot-local: the slot is rotated to its
+        // angle on the ring, so a slot-local offset would push the content outward on every slot instead.
+        public static readonly Vector2 ICON_AREA_SIZE = new Vector2(70f, 52f);
+        public static readonly Vector2 ICON_CENTER = new Vector2(0f, 10f);
+        public static readonly Vector2 TEXT_CENTER = new Vector2(0f, -32f);
 
         [SerializeField] private Image _ui_image_slot_icon_value;
         [SerializeField] private TextMeshProUGUI _ui_text_slot_amount_value;
@@ -37,20 +32,21 @@ namespace Vertigo.Wheel.UI.Views
         }
 
         /// <summary>
-        /// The slot is rotated to sit correctly on the polar ring (see <c>WheelPresenter.LayoutSlots</c>),
-        /// which would otherwise carry the icon and text sideways/upside-down with it. Locking rotation
-        /// alone isn't enough for the text — its authored offset would still swing to whichever direction
-        /// the slot's "down" now points — so its position is re-anchored below the icon in world space too.
+        /// The slot is rotated to its angle on the ring and the rotor spins it further, so every frame the
+        /// icon and text are turned upright and their offsets are mapped back through the slot's rotation —
+        /// the same content then sits identically in every hole, at any rotor angle.
         /// </summary>
         private void LateUpdate()
         {
+            Quaternion toSlotSpace = Quaternion.Inverse(Rect.rotation);
             RectTransform iconRect = _ui_image_slot_icon_value.rectTransform;
             RectTransform textRect = _ui_text_slot_amount_value.rectTransform;
 
             iconRect.rotation = Quaternion.identity;
+            iconRect.localPosition = toSlotSpace * (Vector3)ICON_CENTER;
 
             textRect.rotation = Quaternion.identity;
-            textRect.position = iconRect.position + new Vector3(0f, -TEXT_OFFSET_BELOW_ICON, 0f);
+            textRect.localPosition = toSlotSpace * (Vector3)TEXT_CENTER;
         }
 
         /// <summary>
@@ -61,16 +57,16 @@ namespace Vertigo.Wheel.UI.Views
         public void SetBomb(Sprite bombIcon)
         {
             gameObject.SetActive(true);
-            SetIcon(bombIcon, 1f, Vector2.zero);
+            SetIcon(bombIcon);
             _ui_text_slot_amount_value.gameObject.SetActive(true);
             _ui_text_slot_amount_value.color = Color.white;
             _ui_text_slot_amount_value.SetText(string.Empty);
         }
 
-        public void SetReward(Sprite icon, int amount, float iconScale = 1f, Vector2 iconOffset = default)
+        public void SetReward(Sprite icon, int amount)
         {
             gameObject.SetActive(true);
-            SetIcon(icon, iconScale, iconOffset);
+            SetIcon(icon);
             _ui_text_slot_amount_value.gameObject.SetActive(true);
             _ui_text_slot_amount_value.color = Color.white;
             _ui_text_slot_amount_value.SetText("x{0}", amount);
@@ -80,11 +76,9 @@ namespace Vertigo.Wheel.UI.Views
         /// A null sprite here means the caller (usually <c>RewardCatalog.IconFor</c>) failed to resolve one —
         /// that's the one condition that leaves a slot showing nothing but the wheel's own painted-in slot
         /// art behind it, i.e. exactly the "black hole" symptom. Logging it turns that into a named cause
-        /// instead of a silent blank. <paramref name="iconScale"/> corrects for how much of the source
-        /// sprite's own canvas the artwork fills, and <paramref name="offset"/> for where its visual weight
-        /// sits within that canvas — see <see cref="Vertigo.Wheel.Data.Configs.RewardDefinition"/>.
+        /// instead of a silent blank.
         /// </summary>
-        private void SetIcon(Sprite icon, float iconScale, Vector2 offset)
+        private void SetIcon(Sprite icon)
         {
             if (icon == null)
                 Debug.LogWarning($"[Vertigo] {name}: no icon sprite resolved; the slot will render blank.", this);
@@ -94,8 +88,7 @@ namespace Vertigo.Wheel.UI.Views
             _ui_image_slot_icon_value.preserveAspect = true;
             _ui_image_slot_icon_value.maskable = false; // never inside a mask — the wheel itself isn't clipped
             _ui_image_slot_icon_value.color = Color.white;
-            _ui_image_slot_icon_value.rectTransform.localScale = Vector3.one * iconScale;
-            _ui_image_slot_icon_value.rectTransform.anchoredPosition = ICON_BASE_ANCHORED_POSITION + offset;
+            _ui_image_slot_icon_value.rectTransform.sizeDelta = ICON_AREA_SIZE;
         }
     }
 }

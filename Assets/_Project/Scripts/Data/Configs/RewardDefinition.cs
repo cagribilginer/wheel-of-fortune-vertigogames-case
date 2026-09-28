@@ -18,20 +18,8 @@ namespace Vertigo.Wheel.Data.Configs
         [SerializeField] private string _id;
 
         [SerializeField] private string _displayName;
+        [Tooltip("PNG cropped to its visible content — icon boxes fit and centre the sprite's full rect.")]
         [SerializeField] private Sprite _icon;
-
-        [Tooltip(
-            "Corrects for how much of the source PNG's own canvas the artwork actually fills — a tightly " +
-            "cropped icon and one with lots of transparent padding render at very different sizes inside " +
-            "the same fixed box otherwise. 1 = no correction.")]
-        [Range(0.5f, 2f)]
-        [SerializeField] private float _iconScale = 1f;
-
-        [Tooltip(
-            "Nudges the icon within its fixed box. A box centred on its own bounding rect still reads as " +
-            "off-centre for artwork whose visual weight sits unevenly in its canvas (a wide weapon render, " +
-            "a chest lid, a bottle) — this corrects that per reward. 0,0 = no correction.")]
-        [SerializeField] private Vector2 _iconOffset = Vector2.zero;
 
         [SerializeField] private RewardCategory _category = RewardCategory.Points;
 
@@ -54,14 +42,6 @@ namespace Vertigo.Wheel.Data.Configs
         public Sprite Icon
         {
             get { return _icon; }
-        }
-        public float IconScale
-        {
-            get { return _iconScale; }
-        }
-        public Vector2 IconOffset
-        {
-            get { return _iconOffset; }
         }
         public RewardCategory Category
         {

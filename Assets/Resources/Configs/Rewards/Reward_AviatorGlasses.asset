@@ -15,7 +15,5 @@ MonoBehaviour:
   _id: Reward_AviatorGlasses
   _displayName: Aviator Glasses
   _icon: {fileID: 21300000, guid: a3dde4e6b03144d358640f43eff4f732, type: 3}
-  _iconScale: 1.8
   _category: 3
   _defaultBaseAmount: 1
-  _estimatedValue: 100

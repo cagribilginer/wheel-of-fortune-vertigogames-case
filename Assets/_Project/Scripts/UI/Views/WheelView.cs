@@ -15,6 +15,9 @@ namespace Vertigo.Wheel.UI.Views
     /// </summary>
     public sealed class WheelView : UIViewBase
     {
+        /// <summary>Hole centres as a fraction of the wheel's width, measured off the bronze/silver/golden base art.</summary>
+        public const float SLOT_RING_RADIUS = 0.2955f;
+
         [SerializeField] private Image _ui_image_wheel_glow;
         [SerializeField] private RectTransform _ui_transform_wheel_rotor;
         [SerializeField] private Image _ui_image_wheel_base_value;
@@ -111,9 +114,7 @@ namespace Vertigo.Wheel.UI.Views
             }
 
             float wheelSize = _ui_transform_wheel_rotor.rect.width;
-            // Keep in sync with WheelPresenter.LayoutSlots: 0.3 is the value dialed in against the real
-            // render, not the flat art's own hole positions — see that method's comment for why they differ.
-            float radius = 0.3f * wheelSize;
+            float radius = SLOT_RING_RADIUS * wheelSize;
             float slotAngle = 360f / _slots.Length;
 
             for (int i = 0; i < _slots.Length; i++)

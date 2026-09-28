@@ -15,7 +15,5 @@ MonoBehaviour:
   _id: Reward_PumpkinHelmet
   _displayName: Pumpkin Helmet
   _icon: {fileID: 21300000, guid: 937a5a31b307145d0bc16e1762141a5a, type: 3}
-  _iconScale: 1.32
   _category: 3
   _defaultBaseAmount: 1
-  _estimatedValue: 100

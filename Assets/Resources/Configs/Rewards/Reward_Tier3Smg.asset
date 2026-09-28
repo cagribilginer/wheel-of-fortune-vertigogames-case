@@ -15,7 +15,6 @@ MonoBehaviour:
   _id: Reward_Tier3Smg
   _displayName: Submachine Gun
   _icon: {fileID: 21300000, guid: 40dab70fd4c38408ab9e85b251742255, type: 3}
-  _iconScale: 1.024
   _category: 1
   _defaultBaseAmount: 1
   _estimatedValue: 80

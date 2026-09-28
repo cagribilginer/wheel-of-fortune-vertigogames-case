@@ -144,20 +144,14 @@ namespace Vertigo.Wheel.Editor
             rt.pivot = new Vector2(0.5f, 0.5f);
             rt.sizeDelta = new Vector2(90f, 90f);
 
-            // Icon shrunk to 50x50 (from 55x55) to open a guaranteed 5-unit gap to the text — the old 55x55
-            // icon and text boxes overlapped by 9.5 units regardless of any shared shift, hidden only on
-            // icons with enough internal transparent padding to spare (e.g. not the "restricted" badge).
-            // The Y offsets (icon 6.1, text -35.9 — 42 units apart, matching WheelSlotView's
-            // TEXT_OFFSET_BELOW_ICON) are dialed in against the real render, not solved on paper: the
-            // algebraic "centred in the 90-tall slot" pair (14.5 / -27.5) still read low once the wheel's
-            // own radius was corrected to sit each slot dead-centre in its hole. Individual icons can still
-            // read a little off-centre depending on their own artwork's shape — see RewardDefinition.IconOffset.
+            // Positions are the upright-frame values WheelSlotView re-applies every frame; authored here too
+            // so the prefab previews correctly in edit mode.
             Image icon = AddImage(NewNode("ui_image_slot_icon_value", rt), null);
             icon.preserveAspect = true;
-            FixedCentered((RectTransform)icon.transform, new Vector2(0f, 6.1f), new Vector2(50f, 50f));
+            FixedCentered((RectTransform)icon.transform, WheelSlotView.ICON_CENTER, WheelSlotView.ICON_AREA_SIZE);
 
             TextMeshProUGUI amount = AddText(NewNode("ui_text_slot_amount_value", rt), "x25", 17f);
-            FixedCentered((RectTransform)amount.transform, new Vector2(0f, -35.9f), new Vector2(84f, 24f));
+            FixedCentered((RectTransform)amount.transform, WheelSlotView.TEXT_CENTER, new Vector2(84f, 24f));
 
             var view = root.AddComponent<WheelSlotView>();
             view.RebindReferences();

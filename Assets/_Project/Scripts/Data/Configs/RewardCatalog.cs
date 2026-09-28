@@ -44,18 +44,6 @@ namespace Vertigo.Wheel.Data.Configs
             return definition != null ? definition.Icon : null;
         }
 
-        public float IconScaleFor(RewardId id)
-        {
-            RewardDefinition definition = Find(id);
-            return definition != null ? definition.IconScale : 1f;
-        }
-
-        public Vector2 IconOffsetFor(RewardId id)
-        {
-            RewardDefinition definition = Find(id);
-            return definition != null ? definition.IconOffset : Vector2.zero;
-        }
-
         private void EnsureIndex()
         {
             if (_byId != null) return;

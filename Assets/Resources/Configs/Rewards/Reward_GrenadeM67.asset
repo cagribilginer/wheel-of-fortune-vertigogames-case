@@ -15,7 +15,5 @@ MonoBehaviour:
   _id: Reward_GrenadeM67
   _displayName: M67 Grenade
   _icon: {fileID: 21300000, guid: f3863a854439745b69279b331b4e37ba, type: 3}
-  _iconScale: 1.052
   _category: 2
   _defaultBaseAmount: 3
-  _estimatedValue: 8
