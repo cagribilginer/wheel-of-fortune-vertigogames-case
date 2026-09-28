@@ -478,8 +478,10 @@ namespace Vertigo.Wheel.Editor
         // Full stretch (the old behaviour) leaves a large empty bottom half at tall aspects like 4:3, since
         // the panel always fills the entire side column regardless of how many reward rows it actually
         // holds. Capping the height and centring it in that column reads as intentional at every aspect —
-        // this value matches what the uncapped stretch already looked like at the 1920x1080 reference.
-        private const float BANK_MAX_HEIGHT = 780f;
+        // At the 1920x1080 reference this puts the panel's top where the uncapped stretch had it and its
+        // bottom 13 units above the EXIT button.
+        private const float BANK_MAX_HEIGHT = 766f;
+        private const float BANK_CENTER_Y = 44f;
 
         private static BankView BuildBank(RectTransform sidePanel, BankEntryView bankEntryPrefab)
         {
@@ -487,7 +489,7 @@ namespace Vertigo.Wheel.Editor
             bank.anchorMin = new Vector2(0f, 0.5f);
             bank.anchorMax = new Vector2(1f, 0.5f);
             bank.pivot = new Vector2(0.5f, 0.5f);
-            bank.anchoredPosition = new Vector2(0f, 37f); // half the 74px bottom margin reserved for actions
+            bank.anchoredPosition = new Vector2(0f, BANK_CENTER_Y);
             bank.sizeDelta = new Vector2(0f, BANK_MAX_HEIGHT);
 
             // Fill is an opaque 9-slice tinted near-black; the rim is a 4px transparent-centre outline so
@@ -531,7 +533,7 @@ namespace Vertigo.Wheel.Editor
 
             var grid = content.gameObject.AddComponent<GridLayoutGroup>();
             grid.cellSize = new Vector2(140f, 160f);
-            grid.spacing = new Vector2(12f, 12f);
+            grid.spacing = new Vector2(6f, 6f);
             grid.constraint = GridLayoutGroup.Constraint.Flexible;
             // Fill left-to-right and wrap, last row left-aligned under the first. GridEdgePadding then keeps
             // the left/right padding equal and sized so the row block is centred — mirrored margins without
