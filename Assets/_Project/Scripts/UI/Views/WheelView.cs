@@ -8,7 +8,7 @@ namespace Vertigo.Wheel.UI.Views
     /// <summary>
     /// The wheel hub: rotor, indicator, spin button and the eight fixed slots.
     /// <para>
-    /// Only <see cref="Rotor"/> ever gets a rotation tween (Day 4) — never this view's own root and never a
+    /// Only <see cref="Rotor"/> ever gets a rotation tween — never this view's own root and never a
     /// LayoutGroup-controlled node — which is the concrete reason every animated part of the tree lives on
     /// its own dedicated <c>_anim</c>/<c>_rotor</c>/<c>_indicator</c> transform instead of a shared one.
     /// </para>

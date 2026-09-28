@@ -40,8 +40,8 @@ namespace Vertigo.Wheel.Core.States.Flow
         }
 
         /// <summary>
-        /// The single EXIT button's action: walk away with the haul. Legal from any zone now — the only
-        /// precondition is an idle wheel with something banked, which <see cref="RunModel.CanLeave"/> checks.
+        /// The single EXIT button's action: walk away with the haul. Legal only on a safe or super zone with
+        /// something banked and the wheel idle, which <see cref="RunModel.CanLeave"/> checks.
         /// </summary>
         public override void OnExitRequested()
         {

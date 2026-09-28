@@ -60,7 +60,7 @@ namespace Vertigo.Wheel.Editor
         }
 
         /// <summary>Matches §12 of the architecture plan: IL2CPP, ARMv7+ARM64, min API 22, Low stripping,
-        /// APK (not AAB), and the landscape-only orientation locked in since Day 1.</summary>
+        /// APK (not AAB), and the landscape-only orientation.</summary>
         private static void ApplyAndroidPlayerSettings()
         {
             PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.cagribilginer.wheeloffortune");

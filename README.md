@@ -14,14 +14,14 @@ bomb slice can wipe the run — unless they cash out first, or pay to revive.
 
 ## 1. Project Overview
 
-Each run starts on **Zone 1** (always safe) and moves one zone at a time:
+Each run starts on **Zone 1** and moves one zone at a time:
 
 | Concept | Rule |
 | --- | --- |
 | **Spin** | Weighted random slice on the current zone's wheel. Grants a reward, or detonates a bomb. |
 | **Bank** | Rewards accumulate per-run, stacked by id. This is what a bomb takes. |
-| **Zone type** | `Normal` carries a bomb; `Safe` (zone 1, then every _N_) and `Super` (every _M_) are bomb-free and pay more. |
-| **Cash out** | Leave at any idle zone with a non-empty bank. Banked gold and cash convert to the persistent wallet — the only way either balance ever grows. |
+| **Zone type** | `Normal` carries a bomb; `Safe` (every 5th zone) and `Super` (every 30th) are bomb-free and pay more. |
+| **Cash out** | Leave only on a `Safe` or `Super` zone, while the wheel is idle and the bank is non-empty. Banked gold and cash convert to the persistent wallet — the only way either balance ever grows. |
 | **Bomb** | The whole bank is lost and the run ends — but the lost haul is snapshotted first (see §4). |
 | **Revive** | Gold revive: uncapped, price doubles per use in a run. Ad revive: one free per run. Either restores the snapshotted haul. |
 
@@ -36,7 +36,7 @@ Vertigo.Wheel.Core      pure C#, no UnityEngine UI — rules, state machine, run
 Vertigo.Wheel.Data      ScriptableObject configs + save/audio services (references Core)
 Vertigo.Wheel.UI        MonoBehaviour Views + UI helpers (references Core)
 Vertigo.Wheel.Gameplay  Presenters + the composition root (references all of the above)
-Vertigo.Wheel.Editor    scene builder, config generator, hygiene validator, build pipeline
+Vertigo.Wheel.Editor    config + hygiene validators, build pipeline, sprite import rules
 Vertigo.Wheel.Tests.EditMode / .PlayMode
 ```
 
@@ -88,7 +88,7 @@ means the dependencies of any class are visible in its signature and trivially f
 
 ## 3. Data-Driven Design
 
-Everything tunable is a ScriptableObject under `Assets/Resources/Configs`, edited in the Inspector
+Everything tunable is a ScriptableObject under `Assets/_Project/Configs`, edited in the Inspector
 and checked by `Tools ▸ Vertigo ▸ Validate Game Configs`:
 
 | Asset | Drives |
@@ -102,8 +102,8 @@ and checked by `Tools ▸ Vertigo ▸ Validate Game Configs`:
 | `AudioLibrary` | Named SFX slots (`_buttonClick`, `_rewardChime`, `_bombExplosion`, …) |
 
 `ZoneClassifier` reads the intervals and classifies any zone by pure arithmetic
-(`zone % superInterval`, `zone % safeInterval`), with zone 1 special-cased to `Safe` so a run can
-never end on the first spin.
+(`zone % superInterval`, then `zone % safeInterval`), so zone 1 is an ordinary bronze zone with a bomb.
+The Super interval is tested first, which is why zone 30 is Super, not Safe.
 
 ---
 
@@ -140,16 +140,16 @@ finishes — resets the run.
 
 ### `CashOutPolicy`
 
-A pure static function: _"leave when the wheel is idle and the bank has something."_ The EXIT
-button's interactable state is a reflection of this, never a re-implementation.
+A pure static function: _"leave when the wheel is idle, the zone is Safe or Super, and the bank has
+something."_ The EXIT button's interactable state is a reflection of this, never a re-implementation.
 
 ---
 
 ## 5. Testing Suite
 
 ```
-Assets/_Project/Tests/EditMode    ~168 tests, ~0.2s   pure logic + full flow
-Assets/_Project/Tests/PlayMode      1 test,   ~1.1s   composition-root smoke test
+Assets/_Project/Tests/EditMode    224 tests           pure logic + full flow
+Assets/_Project/Tests/PlayMode      1 test            composition-root smoke test
 ```
 
 ### EditMode — logic and the whole loop, headless
@@ -186,7 +186,7 @@ else is proven faster in EditMode; this proves the composition root itself.
 
 ## 6. Juice & Polish
 
-- **DOTween pipelines** — wheel spin easing, chest `DOPunchScale` on claim, popup open/close
+- **DOTween pipelines** — wheel spin easing, `DOPunchScale` on buttons and the collect card, popup open/close
   scale+fade (`PopupViewBase`), reward tiles flying from the wheel slot into their bank cell
   (`BankPresenter.FlyIn`), the red bomb-alert vignette yoyo.
 - **Dynamic counters** — `CollectPopupView`'s cash/gold row counts up smoothly (`CountingLabel`,
@@ -239,7 +239,9 @@ Tools ▸ Vertigo ▸ Build Android APK
 # batch: -executeMethod Vertigo.Wheel.Editor.BuildPipelineRunner.BuildAndroid -quit
 ```
 
-`Main.unity` is passed to `BuildPlayer` directly rather than sitting in Build Settings.
+`Main.unity` is passed to `BuildPlayer` directly rather than sitting in Build Settings. The Addressables
+content (the six `Settings/` configs) is built as part of the player build — the project pins
+"Build Addressables on Player Build", so the result doesn't depend on a machine-local preference.
 
 ---
 
@@ -257,6 +259,6 @@ Assets/
       Editor/      BuildPipelineRunner, GameConfigValidator, UIHygieneValidator, ResetSaveMenuItem,
                    WheelSpriteImportPostprocessor, ZoneWheelConfigEditor
     Tests/         EditMode/ (+ Doubles/)  PlayMode/
+    Configs/       ScriptableObject instances (Settings/ Themes/ Rewards/ …), loaded via Addressables
     Art/Sprites/
-  Resources/Configs/             ScriptableObject instances (Settings/ Themes/ Rewards/ …)
 ```

@@ -8,9 +8,8 @@ namespace Vertigo.Wheel.Data.Configs
     /// theme is active. A single asset rather than one per clip, for the same reason <c>RewardCatalog</c> is
     /// one asset: there is exactly one of these in the whole game.
     /// <para>
-    /// No <c>demo_content</c> audio ships with this project (see the README's design-decisions section), so
-    /// every field here starts empty. <see cref="Services.AudioService"/> and <c>AudioPresenter</c> are both
-    /// null-safe against that — dropping clips in later is a pure content change, never a code change.
+    /// <see cref="Services.AudioService"/> and <c>AudioPresenter</c> are null-safe against an unassigned
+    /// slot, so a clip can be dropped in or swapped later as a pure content change, never a code change.
     /// </para>
     /// </summary>
     [CreateAssetMenu(menuName = "Vertigo/Config/Audio Library", fileName = "AudioLibrary")]

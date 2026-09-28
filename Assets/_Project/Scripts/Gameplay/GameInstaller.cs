@@ -88,9 +88,7 @@ namespace Vertigo.Wheel.Gameplay
             AudioHub.Initialize(audioService, audioLibrary);
             var audioPresenter = new AudioPresenter(audioService, audioLibrary);
 
-            // Skipped when the scene predates the milestone popup — a rebuild adds it.
-            if (_milestonePopup != null)
-                _milestonePreviewPresenter = new MilestonePreviewPresenter(_zoneMap, _milestonePopup);
+            _milestonePreviewPresenter = new MilestonePreviewPresenter(_zoneMap, _milestonePopup);
             var wheelPresenter = new WheelPresenter(_wheel, spinConfig, catalog, _bombSlotIcon, audioService, juice);
             var zoneMapPresenter = new ZoneMapPresenter(_zoneMap, _zoneMapTilePrefab, classifier, juice);
             var bankPresenter = new BankPresenter(

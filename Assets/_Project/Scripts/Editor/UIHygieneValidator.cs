@@ -12,14 +12,9 @@ using Vertigo.Wheel.UI.Views;
 namespace Vertigo.Wheel.Editor
 {
     /// <summary>
-    /// Walks the loaded scene(s) plus every prefab under <c>Assets/_Project/Prefabs</c>, checking the first
-    /// five UI hygiene rules from the architecture plan.
-    /// <para>
-    /// Day 3 ships only rules 1-5 (raycast target, TMP raycast target, the Maskable trap in both
-    /// directions, and Sliced-vs-bordered-sprite). Inspector-binding and legacy-Text checks (rules 7-8) need
-    /// nothing to run against yet since no OnClick bindings or legacy Text exist; the naming and scale
-    /// checks (9-10) are a later pass once presenters start touching transforms.
-    /// </para>
+    /// Walks the loaded scene(s) plus every prefab under <c>Assets/_Project/Prefabs</c>, checking the UI
+    /// hygiene rules from the architecture plan: raycast target, TMP raycast target, the Maskable trap in
+    /// both directions, and Sliced-vs-bordered-sprite.
     /// <para>
     /// The rule that makes this worth having: <see cref="MaskableGraphic.maskable"/> == false also disables
     /// <see cref="RectMask2D"/> clipping, not only stencil <see cref="Mask"/>. A single flipped checkbox on

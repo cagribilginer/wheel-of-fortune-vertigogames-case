@@ -52,20 +52,14 @@ namespace Vertigo.Wheel.UI.Views
 
         private void OnEnable()
         {
-            // Null-guarded because a scene built before the badges became buttons still deserialises here
-            // with these refs empty; a rebuild wires them.
-            if (_ui_card_zonemap_milestone_safe != null)
-                _ui_card_zonemap_milestone_safe.onClick.AddListener(RaiseSafe);
-            if (_ui_card_zonemap_milestone_super != null)
-                _ui_card_zonemap_milestone_super.onClick.AddListener(RaiseSuper);
+            _ui_card_zonemap_milestone_safe.onClick.AddListener(RaiseSafe);
+            _ui_card_zonemap_milestone_super.onClick.AddListener(RaiseSuper);
         }
 
         private void OnDisable()
         {
-            if (_ui_card_zonemap_milestone_safe != null)
-                _ui_card_zonemap_milestone_safe.onClick.RemoveListener(RaiseSafe);
-            if (_ui_card_zonemap_milestone_super != null)
-                _ui_card_zonemap_milestone_super.onClick.RemoveListener(RaiseSuper);
+            _ui_card_zonemap_milestone_safe.onClick.RemoveListener(RaiseSafe);
+            _ui_card_zonemap_milestone_super.onClick.RemoveListener(RaiseSuper);
         }
 
         private void RaiseSafe()

@@ -11,8 +11,8 @@ namespace Vertigo.Wheel.UI.Views
     /// precisely because it is invisible in a diff and in a code review.
     /// <para>
     /// Interactable state is set by the presenter from <c>CashOutPolicy</c>; this view never decides
-    /// legality itself, only reflects it. Which of "cash out" or "give up" EXIT actually triggers is a
-    /// state-machine decision (<c>IdleState.OnExitRequested</c>), not this view's concern either.
+    /// legality itself, only reflects it. What EXIT triggers is a state-machine decision
+    /// (<c>IdleState.OnExitRequested</c>), not this view's concern either.
     /// </para>
     /// </summary>
     public sealed class ActionBarView : UIViewBase
