@@ -98,8 +98,8 @@ namespace Vertigo.Wheel.Tests.EditMode
             }
 
             CollectionAssert.AreEqual(new[] { 30 }, superZonesSeen);
-            Assert.That(safeZonesSeen, Is.EqualTo(11),
-                "Zone 1, then 5..55 step 5, excluding 30 which is super.");
+            Assert.That(safeZonesSeen, Is.EqualTo(10),
+                "5..55 step 5, excluding 30 which is super.");
             Assert.That(_run.CurrentZone, Is.EqualTo(60));
             Assert.That(_view.BombsPlayed, Is.Zero);
         }
@@ -183,10 +183,11 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.That(_run.Bank.IsEmpty, Is.True);
         }
 
-        // Zone 1 is safe, so banking gold there makes leaving legal straight away.
+        // Leaving is only legal from a safe zone, so park the run on zone 5 first.
         private void OpenCashOutWithGold(InstantPresentation view, int gold)
         {
             Build(new SystemRandomProvider(1), bombWeight: 0, view: view);
+            _run.JumpToZone(5);
             _run.Bank.Add(TestWheels.Gold, gold);
 
             _machine.RequestLeave();

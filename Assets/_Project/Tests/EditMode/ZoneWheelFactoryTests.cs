@@ -20,6 +20,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             _factory = new ZoneWheelFactory(new ZoneClassifier(), _blueprints, new LinearRewardScaling());
         }
 
+        [TestCase(1)]
         [TestCase(2)]
         [TestCase(4)]
         [TestCase(29)]
@@ -42,7 +43,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.That(_factory.Build(zone).BombCount, Is.Zero);
         }
 
-        [TestCase(1, WheelTier.Silver)]
+        [TestCase(1, WheelTier.Bronze)]
         [TestCase(2, WheelTier.Bronze)]
         [TestCase(5, WheelTier.Silver)]
         [TestCase(30, WheelTier.Golden)]
@@ -63,8 +64,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void SliceAmounts_AreScaledForTheZone()
         {
-            // Base 10 on a normal zone (zone 1 is safe now, so start at zone 2):
-            // zone 2 = 1 + 0.25 * 1 = 1.25x, zone 4 = 1 + 0.25 * 3 = 1.75x.
+            // Base 10 on a normal zone: zone 2 = 1 + 0.25 * 1 = 1.25x, zone 4 = 1 + 0.25 * 3 = 1.75x.
             WheelModel zone2 = _factory.Build(2);
             WheelModel zone4 = _factory.Build(4);
 

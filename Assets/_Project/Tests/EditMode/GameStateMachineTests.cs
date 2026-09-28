@@ -61,8 +61,8 @@ namespace Vertigo.Wheel.Tests.EditMode
             _machine.RequestSpin();
 
             Assert.That(_run.CurrentZone, Is.EqualTo(2));
-            // Zone 1 is a safe zone: the stub pays Rifle x20 there, unscaled at zone 1.
-            Assert.That(_run.Bank.AmountOf(TestWheels.Rifle), Is.EqualTo(20));
+            // Zone 1 is a normal zone: the stub pays Pistol x10 there, unscaled at zone 1.
+            Assert.That(_run.Bank.AmountOf(TestWheels.Pistol), Is.EqualTo(10));
             Assert.That(_machine.IsIn<IdleState>(), Is.True);
             Assert.That(_view.SpinsPlayed, Is.EqualTo(1));
         }
@@ -90,7 +90,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void RestartAfterBomb_ReturnsToZoneOneWithAnEmptyBank()
         {
-            AdvanceToZone(2);                             // zone 1 is safe; the bomb only bites from zone 2
+            AdvanceToZone(2);                             // bank something first, so the bomb has a haul to take
             _resolver.LandOn(BOMB_SLOT);
             _machine.RequestSpin();
             _machine.RequestRestart();
@@ -183,7 +183,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void ContinueIsNotOfferedWithAnEmptyWallet()
         {
-            AdvanceToZone(2);                             // zone 1 is safe; the bomb only bites from zone 2
+            AdvanceToZone(2);                             // bank something first, so the bomb has a haul to take
             _resolver.LandOn(BOMB_SLOT);
             _machine.RequestSpin();
 

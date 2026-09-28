@@ -230,9 +230,10 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void CanLeave_TracksWhetherTheBankHasAnything()
         {
+            _run.JumpToZone(5);
             Assert.That(_run.CanLeave, Is.False, "empty bank");
 
-            _run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Pistol, 10));
+            _run.Grant(new SpinOutcome(5, SliceKind.Reward, TestWheels.Pistol, 10));
 
             Assert.That(_run.CanLeave, Is.True, "bank has a reward");
         }
