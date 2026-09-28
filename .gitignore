@@ -53,3 +53,7 @@ crashlytics-build.properties
 
 # Documents
 *.pdf
+
+# Addressables build output and editor-generated profile data
+/Assets/AddressableAssetsData/OSX*
+/Assets/AddressableAssetsData/ProfileDataSourceSettings.asset*
