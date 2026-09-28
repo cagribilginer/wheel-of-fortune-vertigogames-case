@@ -3,14 +3,8 @@ using UnityEngine;
 namespace Vertigo.Wheel.Data.Services
 {
     /// <summary>
-    /// The one seam every SFX call in the game goes through.
-    /// <para>
-    /// Lives in Data rather than as a Core port, unlike <see cref="Core.Run.ISaveService"/> or
-    /// <see cref="Core.Spin.IRandomProvider"/> — an audio call inherently carries an
-    /// <see cref="AudioClip"/>, and Core's <c>noEngineReferences</c> rejects any Unity type on sight.
-    /// Nothing in Core needs to trigger audio anyway: every call site is a Presenter or a View, the same
-    /// layer that already owns VFX.
-    /// </para>
+    /// The one seam every SFX call goes through. It lives in Data rather than as a Core port because a call
+    /// carries an <see cref="AudioClip"/>, which Core rejects; only presenters and views play sound.
     /// </summary>
     public interface IAudioService
     {

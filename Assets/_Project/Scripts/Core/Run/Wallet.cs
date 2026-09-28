@@ -4,14 +4,8 @@ using Vertigo.Wheel.Core.Rewards;
 namespace Vertigo.Wheel.Core.Run
 {
     /// <summary>
-    /// The reward values that survive a run, one balance per <see cref="RewardId"/> the composition root
-    /// treats as a currency. Multiple currencies share this one class rather than each getting its own
-    /// wallet type, because the only thing that differs between them is which save key they land on.
-    /// <para>
-    /// A bomb clears the <see cref="Rewards.RewardBank"/> but never touches the wallet — if it did, a bomb
-    /// could lock the player out of the very continue that is meant to answer it. A currency enters the
-    /// wallet only by successfully cashing out, which is what makes the continue a meta-reward for surviving.
-    /// </para>
+    /// The reward values that survive a run: one balance per currency <see cref="RewardId"/>. A bomb never
+    /// touches it, and a currency enters only by cashing out, which is what makes a revive worth having.
     /// </summary>
     public sealed class Wallet
     {

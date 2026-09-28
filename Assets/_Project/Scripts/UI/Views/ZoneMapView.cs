@@ -6,17 +6,9 @@ using UnityEngine.UI;
 namespace Vertigo.Wheel.UI.Views
 {
     /// <summary>
-    /// The horizontal zone strip. The view owns only the scroll rect and its content transform — tile
-    /// pooling and the scroll tween are the presenter's job, so this view stays a passive shell.
-    /// <para>
-    /// The viewport carries a bare <see cref="RectMask2D"/> with no Image: the strip is presenter-driven,
-    /// never dragged, so a raycastable viewport image would exist only to fail a hygiene check.
-    /// </para>
-    /// <para>
-    /// The two top-right milestone badges ("SUPER ZONE 30", "SAFE ZONE 10") are not static chrome any more:
-    /// their target numbers count up as the player advances, so the presenter re-labels them on every zone
-    /// change rather than once at startup.
-    /// </para>
+    /// The horizontal zone strip shell: it owns the scroll rect and content transform, the presenter owns pooling and
+    /// the scroll tween. The viewport is a bare RectMask2D with no Image, and the milestone badges are re-labelled
+    /// by the presenter on every zone change.
     /// </summary>
     public sealed class ZoneMapView : UIViewBase
     {

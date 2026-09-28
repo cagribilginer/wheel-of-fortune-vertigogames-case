@@ -3,14 +3,8 @@ using UnityEngine;
 namespace Vertigo.Wheel.Data.Configs
 {
     /// <summary>
-    /// The handful of SFX clips that aren't tied to a wheel tier (compare <see cref="WheelThemeConfig"/>'s
-    /// per-tier <c>Tick</c>) — one clip each, played the same way regardless of which zone or
-    /// theme is active. A single asset rather than one per clip, for the same reason <c>RewardCatalog</c> is
-    /// one asset: there is exactly one of these in the whole game.
-    /// <para>
-    /// <see cref="Services.AudioService"/> and <c>AudioPresenter</c> are null-safe against an unassigned
-    /// slot, so a clip can be dropped in or swapped later as a pure content change, never a code change.
-    /// </para>
+    /// The SFX clips not tied to a wheel tier, one clip each. A single asset because the game has exactly one;
+    /// AudioService and AudioPresenter tolerate an unassigned slot.
     /// </summary>
     [CreateAssetMenu(menuName = "Vertigo/Config/Audio Library", fileName = "AudioLibrary")]
     public sealed class AudioLibrary : ScriptableObject

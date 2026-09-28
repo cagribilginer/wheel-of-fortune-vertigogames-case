@@ -3,12 +3,8 @@ using Vertigo.Wheel.Core.Spin;
 namespace Vertigo.Wheel.Core.Zones
 {
     /// <summary>
-    /// Supplies the authored wheel for a given zone.
-    /// <para>
-    /// This is the port that keeps <see cref="Spin.ZoneWheelFactory"/> free of Unity: in the player it is
-    /// backed by the ZoneProgressionConfig asset (which resolves band overrides and the safe/super wheels),
-    /// and in tests by a couple of lines of stub.
-    /// </para>
+    /// Supplies the authored wheel for a zone. The port that keeps ZoneWheelFactory free of Unity:
+    /// ZoneProgressionConfig backs it in the player, a stub in tests.
     /// </summary>
     public interface IWheelBlueprintProvider
     {

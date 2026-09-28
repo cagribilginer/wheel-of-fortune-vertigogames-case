@@ -6,11 +6,8 @@ using UnityEngine.UI;
 namespace Vertigo.Wheel.UI.Views.Popups
 {
     /// <summary>
-    /// The teaser that opens when the player taps a top-right milestone badge: a row of preview cards on a
-    /// dark overlay, a title, and a one-line description of what that zone tier is worth. Purely
-    /// informational — it changes no game state — so it is driven by <c>MilestonePreviewPresenter</c>
-    /// straight off the badge clicks, not through <c>IWheelPresentation</c>.
-    /// <para>Tapping the backdrop or the corner X closes it.</para>
+    /// The teaser opened by a top-right milestone badge: preview cards and a one-line description of the zone tier.
+    /// Purely informational, so <c>MilestonePreviewPresenter</c> drives it straight off the badge clicks.
     /// </summary>
     public sealed class MilestonePreviewPopupView : PopupViewBase
     {

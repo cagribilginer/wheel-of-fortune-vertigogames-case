@@ -6,12 +6,8 @@ using Vertigo.Wheel.Core.Zones;
 namespace Vertigo.Wheel.Core.Spin
 {
     /// <summary>
-    /// Builds the wheel for a zone: classify the zone, fetch the authored blueprint for it, then scale
-    /// every slice's amount to that depth.
-    /// <para>
-    /// Assembling a wheel is neither the state machine's job nor the config asset's, so it gets its own
-    /// class with exactly one reason to change.
-    /// </para>
+    /// Builds the wheel for a zone: classify it, fetch the authored blueprint, scale every slice to that depth.
+    /// Its own class so it has one reason to change.
     /// </summary>
     public sealed class ZoneWheelFactory
     {
@@ -67,9 +63,7 @@ namespace Vertigo.Wheel.Core.Spin
             return new WheelModel(blueprint.Tier, slices);
         }
 
-        // Fisher-Yates over the materialised slices: same pool, new wedge order for this zone. Weight
-        // travels with each slice, so weighted resolution is unaffected; bomb count is unchanged, so the
-        // safe/super rule checked above still holds.
+        // Fisher-Yates over the slices: weight travels with each slice and the bomb count is unchanged.
         private void Shuffle(List<WheelSlice> slices)
         {
             for (int i = slices.Count - 1; i > 0; i--)

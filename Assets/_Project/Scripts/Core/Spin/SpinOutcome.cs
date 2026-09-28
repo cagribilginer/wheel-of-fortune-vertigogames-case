@@ -3,12 +3,8 @@ using Vertigo.Wheel.Core.Rewards;
 namespace Vertigo.Wheel.Core.Spin
 {
     /// <summary>
-    /// The decided result of a spin.
-    /// <para>
-    /// This is produced <em>before</em> any rotation is animated. The tween is then told which slot to stop
-    /// on, rather than the result being read back from wherever the wheel happened to land. Deriving the
-    /// outcome from a float rotation is how you get off-by-one landings and unreproducible failures.
-    /// </para>
+    /// The decided result of a spin, produced before any rotation is animated: the tween is told which slot
+    /// to stop on instead of reading the result back from a float angle.
     /// </summary>
     public readonly struct SpinOutcome
     {

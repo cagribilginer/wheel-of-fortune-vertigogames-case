@@ -7,24 +7,15 @@ using UnityEngine;
 namespace Vertigo.Wheel.Editor
 {
     /// <summary>
-    /// One-command Android build: locks in the Player Settings the case's target device needs, builds
-    /// straight to an installable APK (never an AAB — the brief asks for an APK, and
-    /// <see cref="EditorUserBuildSettings.buildAppBundle"/> is forced off here for exactly that reason), and
-    /// throws on anything short of success so a CLI invocation
-    /// (<c>-executeMethod Vertigo.Wheel.Editor.BuildPipelineRunner.BuildAndroid -quit</c>) returns a
-    /// non-zero exit code instead of silently producing nothing.
-    /// <para>
-    /// <see cref="ApplyAndroidPlayerSettings"/> sets these in code rather than relying on whatever the
-    /// Inspector currently shows, so the build is reproducible regardless of what a previous session left
-    /// behind. Code signing is deliberately untouched: a release keystore is a per-developer secret, not
-    /// something a build script should assume or generate.
-    /// </para>
+    /// One-command Android build: applies the Player Settings the target needs, builds an installable APK (never
+    /// an AAB) and throws on anything short of success, so a CLI run exits non-zero. Signing is left untouched:
+    /// a release keystore is a per-developer secret.
     /// </summary>
     public static class BuildPipelineRunner
     {
         private const string OUTPUT_DIRECTORY = "Builds/Android";
 
-        private static readonly string[] ScenePaths = { "Assets/_Project/Scenes/Main.unity" };
+        private static readonly string[] SCENE_PATHS = { "Assets/_Project/Scenes/Main.unity" };
 
         [MenuItem("Tools/Vertigo/Build Android APK")]
         public static void BuildAndroid()
@@ -37,7 +28,7 @@ namespace Vertigo.Wheel.Editor
 
             var options = new BuildPlayerOptions
             {
-                scenes = ScenePaths,
+                scenes = SCENE_PATHS,
                 locationPathName = outputPath,
                 target = BuildTarget.Android,
                 targetGroup = BuildTargetGroup.Android,

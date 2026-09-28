@@ -3,17 +3,9 @@ using UnityEngine;
 namespace Vertigo.Wheel.UI.Views
 {
     /// <summary>
-    /// Shrinks its RectTransform to <see cref="Screen.safeArea"/>, recomputing whenever the safe area
-    /// actually changes rather than only once in <c>Start</c>.
-    /// <para>
-    /// That recompute matters specifically because the build is landscape: a notch eats a horizontal inset,
-    /// and which side it eats from flips between Landscape Left and Landscape Right. A fitter that only ran
-    /// once would leave the wrong side pinned after a device rotation.
-    /// </para>
-    /// <para>
-    /// Attached to a direct child of the Canvas (<c>ui_panel_safearea</c>), not the Canvas itself — the
-    /// background sits outside it deliberately, so it can bleed under the notch instead of leaving a bar.
-    /// </para>
+    /// Shrinks its RectTransform to <see cref="Screen.safeArea"/> and recomputes when it changes, because a landscape
+    /// notch flips sides between Landscape Left and Right. It sits on a child of the Canvas, so the background can
+    /// still bleed under the notch.
     /// </summary>
     [RequireComponent(typeof(RectTransform))]
     public sealed class SafeAreaFitter : MonoBehaviour

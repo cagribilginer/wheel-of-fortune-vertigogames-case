@@ -5,18 +5,9 @@ using UnityEngine.UI;
 namespace Vertigo.Wheel.UI.Views
 {
     /// <summary>
-    /// A collapsible cheat bar for fast manual testing: jump zones, force the bomb defeat screen, top up
-    /// gold, stuff the bank. It raises intent events only — <c>DebugPresenter</c> owns what they do.
-    /// <para>
-    /// Present in every build of the scene but inert outside the editor and development builds: the whole
-    /// object switches itself off in <see cref="Awake"/> when neither applies, so a shipped build never
-    /// shows it and never wires it.
-    /// </para>
-    /// <para>
-    /// Even in the editor / a dev build it starts <em>hidden</em> so it never sits in a gameplay recording.
-    /// Press <see cref="TOGGLE_KEY"/> to reveal the DEBUG bar; press it again to hide the whole thing. The
-    /// root GameObject stays active while hidden so this component keeps polling for that key.
-    /// </para>
+    /// A collapsible cheat bar for manual testing. It only raises intent events; <c>DebugPresenter</c> owns what they
+    /// do. It switches itself off outside the editor and development builds and starts hidden, toggled with
+    /// <see cref="TOGGLE_KEY"/>.
     /// </summary>
     public sealed class DebugOverlayView : UIViewBase
     {
@@ -41,6 +32,7 @@ namespace Vertigo.Wheel.UI.Views
         private bool _shown;
         private bool _expanded;
 
+        #region Wiring
         protected override void CacheReferences()
         {
             Bind(ref _ui_button_debug_toggle, "ui_button_debug_toggle");
@@ -90,12 +82,14 @@ namespace Vertigo.Wheel.UI.Views
             _ui_button_debug_gold.onClick.RemoveListener(RaiseGold);
             _ui_button_debug_items.onClick.RemoveListener(RaiseItems);
         }
+        #endregion
 
+        #region Visibility
         // Whole-overlay visibility, driven by the hotkey. The root stays active either way.
         private void SetShown(bool shown)
         {
             _shown = shown;
-            if (_ui_button_debug_toggle != null) _ui_button_debug_toggle.gameObject.SetActive(shown);
+            if (_ui_button_debug_toggle) _ui_button_debug_toggle.gameObject.SetActive(shown);
             if (!shown) SetExpanded(false);
         }
 
@@ -107,9 +101,11 @@ namespace Vertigo.Wheel.UI.Views
         private void SetExpanded(bool expanded)
         {
             _expanded = expanded;
-            if (_ui_panel_debug_body != null) _ui_panel_debug_body.gameObject.SetActive(expanded);
+            if (_ui_panel_debug_body) _ui_panel_debug_body.gameObject.SetActive(expanded);
         }
+        #endregion
 
+        #region Events
         private void RaiseZone5()
         {
             JumpToZone5Clicked?.Invoke();
@@ -130,5 +126,6 @@ namespace Vertigo.Wheel.UI.Views
         {
             GrantItemsClicked?.Invoke();
         }
+        #endregion
     }
 }

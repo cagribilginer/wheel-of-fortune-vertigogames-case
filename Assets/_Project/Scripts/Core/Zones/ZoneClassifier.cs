@@ -3,12 +3,8 @@ using System;
 namespace Vertigo.Wheel.Core.Zones
 {
     /// <summary>
-    /// Interval-based zone classification.
-    /// <para>
-    /// The super interval is tested <em>before</em> the safe interval. Zone 30 is both a 5th and a 30th
-    /// zone, and Super is a strict superset of Safe (bomb-free, leaving allowed, better rewards), so
-    /// resolving the overlap in favour of Super costs the player nothing and gains them the special pool.
-    /// </para>
+    /// Interval-based zone classification. Super is tested before Safe: zone 30 is both, and Super is a
+    /// strict superset, so resolving the overlap that way costs the player nothing.
     /// </summary>
     public sealed class ZoneClassifier : IZoneClassifier
     {
@@ -58,11 +54,8 @@ namespace Vertigo.Wheel.Core.Zones
         }
 
         /// <summary>
-        /// The first zone after <paramref name="fromZone"/> that <see cref="Classify"/> calls
-        /// <paramref name="type"/>. Walks one zone at a time so a Safe search steps over the Super zones
-        /// (30, 60, …) that a raw "next multiple of 5" would wrongly land on. The scan is bounded by one
-        /// super interval plus one safe interval — far enough that a zone of any type is always found for
-        /// the shipped configuration.
+        /// The first zone after <paramref name="fromZone"/> that <see cref="Classify"/> calls <paramref name="type"/>.
+        /// Steps one zone at a time so a Safe search skips Super zones; bounded by one super plus one safe interval.
         /// </summary>
         public int NextZoneOfType(int fromZone, ZoneType type)
         {

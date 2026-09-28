@@ -6,14 +6,8 @@ using UnityEngine.UI;
 namespace Vertigo.Wheel.UI.Views
 {
     /// <summary>
-    /// The single EXIT action. Bound by <see cref="UIViewBase.Bind{T}"/> and wired with <c>AddListener</c>
-    /// here — never an Inspector OnClick binding, which the hygiene validator treats as a hard error
-    /// precisely because it is invisible in a diff and in a code review.
-    /// <para>
-    /// Interactable state is set by the presenter from <c>CashOutPolicy</c>; this view never decides
-    /// legality itself, only reflects it. What EXIT triggers is a state-machine decision
-    /// (<c>IdleState.OnExitRequested</c>), not this view's concern either.
-    /// </para>
+    /// The single EXIT action, wired with <c>AddListener</c>, never an Inspector OnClick. Interactable state comes
+    /// from the presenter (CashOutPolicy); what EXIT triggers is a state-machine decision.
     /// </summary>
     public sealed class ActionBarView : UIViewBase
     {

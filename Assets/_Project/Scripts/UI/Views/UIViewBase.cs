@@ -3,14 +3,8 @@ using UnityEngine;
 namespace Vertigo.Wheel.UI.Views
 {
     /// <summary>
-    /// Base for every view. Refs are found by child name and re-bound automatically whenever the object
-    /// is edited, so a view never ships with a broken drag-and-drop reference and never needs an Inspector
-    /// OnClick binding.
-    /// <para>
-    /// The naming convention (<c>ui_&lt;widget&gt;_&lt;region&gt;_&lt;detail&gt;</c>) is not just a style
-    /// rule here: it is the lookup key. <see cref="Bind{T}"/> is legitimate specifically because the case
-    /// mandates that convention, so the name in the hierarchy IS the contract a view binds against.
-    /// </para>
+    /// Base for every view: refs are found by child name and re-bound whenever the object is edited. The naming
+    /// convention (<c>ui_&lt;widget&gt;_&lt;region&gt;_&lt;detail&gt;</c>) is the lookup key <see cref="Bind{T}"/> relies on.
     /// </summary>
     public abstract class UIViewBase : MonoBehaviour
     {
@@ -37,7 +31,7 @@ namespace Vertigo.Wheel.UI.Views
         private void MarkDirtyDeferred()
         {
             UnityEditor.EditorApplication.delayCall -= MarkDirtyDeferred;
-            if (this == null) return; // destroyed while the callback was queued
+            if (!this) return; // destroyed while the callback was queued
 
             UnityEditor.EditorUtility.SetDirty(this);
 
@@ -54,7 +48,7 @@ namespace Vertigo.Wheel.UI.Views
         /// </summary>
         protected void Bind<T>(ref T field, string nodeName) where T : Component
         {
-            if (field != null && field.gameObject.name == nodeName) return;
+            if (field && field.gameObject.name == nodeName) return;
 
             T[] candidates = GetComponentsInChildren<T>(includeInactive: true);
             for (int i = 0; i < candidates.Length; i++)

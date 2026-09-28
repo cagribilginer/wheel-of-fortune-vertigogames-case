@@ -12,15 +12,9 @@ using Vertigo.Wheel.UI.Views;
 namespace Vertigo.Wheel.Editor
 {
     /// <summary>
-    /// Walks the loaded scene(s) plus every prefab under <c>Assets/_Project/Prefabs</c>, checking the UI
-    /// hygiene rules from the architecture plan: raycast target, TMP raycast target, the Maskable trap in
-    /// both directions, and Sliced-vs-bordered-sprite.
-    /// <para>
-    /// The rule that makes this worth having: <see cref="MaskableGraphic.maskable"/> == false also disables
-    /// <see cref="RectMask2D"/> clipping, not only stencil <see cref="Mask"/>. A single flipped checkbox on
-    /// a pooled item either breaks clipping or fails to clip at all, and neither failure is obvious from a
-    /// glance at the Game view until the list actually scrolls.
-    /// </para>
+    /// Walks the loaded scenes and every prefab under <c>Assets/_Project/Prefabs</c> against the UI hygiene rules.
+    /// Notably <c>maskable == false</c> also disables RectMask2D clipping, so a flipped checkbox on a pooled item
+    /// breaks scrolling without any obvious sign in the Game view.
     /// </summary>
     public sealed class UIHygieneValidator : EditorWindow
     {
@@ -43,6 +37,7 @@ namespace Vertigo.Wheel.Editor
             }
         }
 
+        #region Entry points
         [MenuItem("Tools/Vertigo/Validate UI Hygiene")]
         private static void Open()
         {
@@ -82,7 +77,9 @@ namespace Vertigo.Wheel.Editor
                 DestroyImmediate(window);
             }
         }
+        #endregion
 
+        #region Window
         private void OnEnable()
         {
             Scan();
@@ -114,7 +111,9 @@ namespace Vertigo.Wheel.Editor
         }
 
         // ------------------------------------------------------------------ scan (read-only, for display)
+        #endregion
 
+        #region Rules
         private void Scan()
         {
             _findings.Clear();
@@ -131,18 +130,16 @@ namespace Vertigo.Wheel.Editor
             foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { PREFAB_ROOT }))
             {
                 var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(guid));
-                if (prefab != null) CollectFindings(prefab.transform, checkMaskAncestor: false);
+                if (prefab) CollectFindings(prefab.transform, checkMaskAncestor: false);
             }
 
             Repaint();
         }
 
         /// <summary>
-        /// <paramref name="checkMaskAncestor"/> is false for a prefab asset scanned in isolation: its
-        /// eventual runtime parent (a masked scroll view, for the three pooled item prefabs) is not part of
-        /// the asset, so rules 3/4 cannot be evaluated meaningfully there and would only produce false
-        /// positives on children that are deliberately Maskable in anticipation of being pooled into a mask.
-        /// A scene hierarchy's ancestry is real and final, so both rules run there.
+        /// <paramref name="checkMaskAncestor"/> is false for a prefab scanned alone: its runtime parent (a masked scroll
+        /// view) is not part of the asset, so rules 3/4 would only give false positives. Scene ancestry is final, so
+        /// both rules run there.
         /// </summary>
         private void CollectFindings(Transform root, bool checkMaskAncestor)
         {
@@ -187,7 +184,7 @@ namespace Vertigo.Wheel.Editor
 
         private void CheckSlicedBorder(Image image)
         {
-            if (image.sprite == null || image.sprite.border == Vector4.zero) return;
+            if (!image.sprite || image.sprite.border == Vector4.zero) return;
             if (image.type == Image.Type.Sliced) return;
 
             _findings.Add(new Finding(5,
@@ -197,7 +194,9 @@ namespace Vertigo.Wheel.Editor
         }
 
         // ------------------------------------------------------------------ fix (mutating pass)
+        #endregion
 
+        #region Auto-fix
         private void FixAll()
         {
             for (int i = 0; i < SceneManager.sceneCount; i++)
@@ -254,7 +253,7 @@ namespace Vertigo.Wheel.Editor
                     }
                 }
 
-                if (graphic is Image image && image.sprite != null && image.sprite.border != Vector4.zero
+                if (graphic is Image image && image.sprite && image.sprite.border != Vector4.zero
                     && image.type != Image.Type.Sliced)
                 {
                     Undo.RecordObject(image, "UI Hygiene: Sliced");
@@ -269,10 +268,12 @@ namespace Vertigo.Wheel.Editor
         }
 
         // ------------------------------------------------------------------ helpers
+        #endregion
 
+        #region Helpers
         private static bool HasSelfSelectable(Graphic graphic)
         {
-            return graphic.GetComponent<Selectable>() != null;
+            return graphic.GetComponent<Selectable>();
         }
 
         /// <summary>
@@ -290,26 +291,27 @@ namespace Vertigo.Wheel.Editor
         private static bool HasInteractiveAncestor(Transform transform)
         {
             Transform parent = transform.parent;
-            if (parent == null) return false;
+            if (!parent) return false;
 
-            return parent.GetComponentInParent<Button>(true) != null
-                || parent.GetComponentInParent<ScrollRect>(true) != null;
+            return parent.GetComponentInParent<Button>(true)
+                || parent.GetComponentInParent<ScrollRect>(true);
         }
 
         private static bool HasMaskAncestor(Transform transform)
         {
             Transform parent = transform.parent;
-            if (parent == null) return false;
+            if (!parent) return false;
 
-            return parent.GetComponentInParent<RectMask2D>(true) != null
-                || parent.GetComponentInParent<Mask>(true) != null;
+            return parent.GetComponentInParent<RectMask2D>(true)
+                || parent.GetComponentInParent<Mask>(true);
         }
 
         private static string Path(Transform t)
         {
             string path = t.name;
-            for (Transform p = t.parent; p != null; p = p.parent) path = $"{p.name}/{path}";
+            for (Transform p = t.parent; p; p = p.parent) path = $"{p.name}/{path}";
             return path;
         }
+        #endregion
     }
 }

@@ -5,12 +5,8 @@ using System.Collections.ObjectModel;
 namespace Vertigo.Wheel.Core.Rewards
 {
     /// <summary>
-    /// What the player is holding for the current run.
-    /// <para>
-    /// Rewards stack by id, so winning 12 then 30 Pistol Points reads as a single "x42" row rather than two.
-    /// Order is first-acquisition order, so rows never rearrange under the player mid-run.
-    /// </para>
-    /// <para>This is the thing the bomb takes. It is deliberately per-run and never persisted.</para>
+    /// What the player holds for the current run, stacked by id in first-acquisition order.
+    /// The bomb takes all of it; it is per-run and never persisted.
     /// </summary>
     public sealed class RewardBank
     {

@@ -22,7 +22,7 @@ namespace Vertigo.Wheel.Editor
         {
             var progression = AssetDatabase.LoadAssetAtPath<ZoneProgressionConfig>(
                 $"{SETTINGS_FOLDER}/ZoneProgression_Default.asset");
-            if (progression == null)
+            if (!progression)
             {
                 Debug.LogError($"[Vertigo] No ZoneProgression_Default asset found in {SETTINGS_FOLDER}.");
                 return;
@@ -62,14 +62,14 @@ namespace Vertigo.Wheel.Editor
             }
 
             var catalog = AssetDatabase.LoadAssetAtPath<RewardCatalog>($"{SETTINGS_FOLDER}/RewardCatalog.asset");
-            if (catalog == null)
+            if (!catalog)
             {
                 Debug.LogError("[Vertigo] Reward catalog is missing.");
                 problems++;
             }
             else
             {
-                int withoutIcon = catalog.All.Count(r => r == null || r.Icon == null);
+                int withoutIcon = catalog.All.Count(r => !r || !r.Icon);
                 if (withoutIcon > 0)
                 {
                     Debug.LogWarning($"[Vertigo] {withoutIcon} catalog entr(ies) have no icon assigned.");
@@ -78,7 +78,7 @@ namespace Vertigo.Wheel.Editor
                 try
                 {
                     // Both currencies must resolve to catalog entries, or cash-out has nothing to convert.
-                    if (catalog.Find(catalog.GoldCurrency) == null || catalog.Find(catalog.CashCurrency) == null)
+                    if (!catalog.Find(catalog.GoldCurrency) || !catalog.Find(catalog.CashCurrency))
                     {
                         Debug.LogError("[Vertigo] A catalog currency is not one of the catalog's own rewards.");
                         problems++;

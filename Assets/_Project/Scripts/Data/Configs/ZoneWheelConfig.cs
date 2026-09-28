@@ -24,6 +24,7 @@ namespace Vertigo.Wheel.Data.Configs
         [Tooltip("Off by default: a fixed slot order makes this list a literal picture of the wheel.")]
         [SerializeField] private bool _shuffleSliceOrder;
 
+        #region Accessors
         public WheelTier Tier
         {
             get { return _tier; }
@@ -41,11 +42,11 @@ namespace Vertigo.Wheel.Data.Configs
             get { return _shuffleSliceOrder; }
         }
 
-        // Authored data never changes during play, so re-walking _slices on every zone transition (this
-        // asset lives for the whole run) is a pure waste — cache the immutable result and hand back the
-        // same instance every time instead.
+        // Authored data is immutable during play, so the built blueprint is cached and shared.
         private WheelBlueprint _cachedBlueprint;
+        #endregion
 
+        #region Blueprint and validation
         public WheelBlueprint ToBlueprint()
         {
             if (_cachedBlueprint != null) return _cachedBlueprint;
@@ -61,7 +62,7 @@ namespace Vertigo.Wheel.Data.Configs
             for (int i = 0; i < _slices.Count; i++)
             {
                 WheelSliceEntry entry = _slices[i];
-                if (entry == null || (!entry.IsBomb && entry.Reward == null))
+                if (entry == null || (!entry.IsBomb && !entry.Reward))
                     throw new InvalidOperationException(
                         $"Wheel '{name}' slice {i} is empty; assign a RewardDefinition or make it the bomb.");
 
@@ -101,7 +102,7 @@ namespace Vertigo.Wheel.Data.Configs
 
                 if (entry.IsBomb) { bombs++; continue; }
 
-                if (entry.Reward == null)
+                if (!entry.Reward)
                 {
                     Debug.LogError($"[Vertigo] Wheel '{name}' slice {i} is a reward with no RewardDefinition.", this);
                     continue;
@@ -125,9 +126,10 @@ namespace Vertigo.Wheel.Data.Configs
             if (totalWeight <= 0)
                 Debug.LogError($"[Vertigo] Wheel '{name}' has zero total weight; no slice could ever be drawn.", this);
 
-            if (_theme == null)
+            if (!_theme)
                 Debug.LogWarning($"[Vertigo] Wheel '{name}' has no theme assigned.", this);
         }
 #endif
+        #endregion
     }
 }

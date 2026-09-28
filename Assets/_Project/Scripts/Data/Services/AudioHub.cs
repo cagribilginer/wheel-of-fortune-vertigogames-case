@@ -21,7 +21,7 @@ namespace Vertigo.Wheel.Data.Services
 
         public static void PlayButtonClick()
         {
-            _service.PlayOneShot(_library != null ? _library.ButtonClick : null);
+            _service.PlayOneShot(_library ? _library.ButtonClick : null);
         }
     }
 }

@@ -4,13 +4,8 @@ using Vertigo.Wheel.Core.Rewards;
 namespace Vertigo.Wheel.Core.Spin
 {
     /// <summary>
-    /// One slice as <em>authored</em>: the base amount before zone scaling is applied.
-    /// <para>
-    /// The distinction from <see cref="WheelSlice"/> matters. A blueprint is what a designer typed into the
-    /// inspector and is the same at every zone; a <see cref="WheelSlice"/> is what this particular zone is
-    /// offering, with the amount already scaled. Keeping them separate is what lets the factory be a pure
-    /// function of (blueprint, zone) instead of something that mutates authored data.
-    /// </para>
+    /// One slice as authored: the base amount before zone scaling. Kept apart from <see cref="WheelSlice"/>
+    /// (this zone's scaled offer) so the factory stays a pure function of blueprint and zone.
     /// </summary>
     public readonly struct SliceBlueprint
     {

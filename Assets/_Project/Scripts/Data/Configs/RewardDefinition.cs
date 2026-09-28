@@ -56,12 +56,8 @@ namespace Vertigo.Wheel.Data.Configs
         public const int POINTS_CEILING = 5;
 
         /// <summary>
-        /// Stackability and per-drop ceiling, one row per category. Consumables, currencies and craft
-        /// shards (the "Points" rewards) stack — their amounts also grow with zone depth; a fully-built
-        /// weapon, a cosmetic or a chest is a single unique drop, count always 1, never scaled. A new
-        /// category is a deliberate design decision (what does it mean for this to stack, does it cap?),
-        /// so this stays a table designers can't accidentally skip a row on — not free-form per-reward
-        /// data a new Weapon asset could quietly mis-author as stackable.
+        /// Stackability and per-drop ceiling, one row per category. A new category must add a row here,
+        /// so no reward can be quietly authored as stackable.
         /// </summary>
         private static readonly Dictionary<RewardCategory, (bool Stackable, int MaxAmountPerDrop)> CATEGORY_RULES =
             new Dictionary<RewardCategory, (bool Stackable, int MaxAmountPerDrop)>
@@ -91,7 +87,7 @@ namespace Vertigo.Wheel.Data.Configs
         {
             if (string.IsNullOrWhiteSpace(_id)) _id = name;
 
-            if (_icon == null)
+            if (!_icon)
                 Debug.LogWarning($"[Vertigo] Reward '{name}' has no icon assigned.", this);
 
             // A unique drop is a single item by definition; a non-1 base amount here is a mistake and would

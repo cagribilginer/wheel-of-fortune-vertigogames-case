@@ -4,13 +4,8 @@ using Vertigo.Wheel.Core.Rewards;
 namespace Vertigo.Wheel.Core.Run
 {
     /// <summary>
-    /// The "survive the bomb" rules. Two independent paths:
-    /// <list type="bullet">
-    /// <item>Gold revive — pay to survive. No per-run cap; the price rises with how deep the run got and
-    /// doubles every time it is used again in the same run (×1, ×2, ×4 …), so a chain of revives gets
-    /// expensive fast.</item>
-    /// <item>Ad revive — watch a video to survive. Free, but capped per run (default once).</item>
-    /// </list>
+    /// The "survive the bomb" rules. Gold revive: a price that grows with depth and doubles on each reuse
+    /// in a run. Ad revive: free, capped per run (default once).
     /// </summary>
     public sealed class ContinueService
     {

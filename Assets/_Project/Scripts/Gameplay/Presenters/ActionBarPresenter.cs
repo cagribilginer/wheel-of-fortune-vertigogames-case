@@ -28,7 +28,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         /// <summary>
         /// EXIT only ever cashes out, so it is interactable exactly when leaving is legal — an idle wheel
-        /// with something banked.
+        /// and something banked on a safe or super zone.
         /// </summary>
         public void SetInputState(bool canLeave)
         {

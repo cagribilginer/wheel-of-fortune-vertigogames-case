@@ -5,13 +5,8 @@ using Vertigo.Wheel.Core.Spin;
 namespace Vertigo.Wheel.Data.Configs
 {
     /// <summary>
-    /// One authored slot on a wheel.
-    /// <para>
-    /// Deliberately a serializable class rather than its own asset. A slice is never shared or referenced
-    /// by identity, so an asset per slice would mean dozens of near-empty files that are painful to diff
-    /// and reorder. Nested like this, the wheel shows up in the inspector as an eight-row reorderable
-    /// list — which is exactly what "content of slices should be changeable from the editor" asks for.
-    /// </para>
+    /// One authored slot on a wheel: a serializable class rather than its own asset, so a wheel reads as an
+    /// eight-row reorderable list in the Inspector.
     /// </summary>
     [Serializable]
     public sealed class WheelSliceEntry
@@ -49,14 +44,14 @@ namespace Vertigo.Wheel.Data.Configs
         {
             // A unique drop is always a single item: neither an authored override nor zone scaling can
             // turn a built weapon, a cosmetic or a chest into a stack of five.
-            if (_reward != null && !_reward.IsStackable) return 1;
+            if (_reward && !_reward.IsStackable) return 1;
 
             int amount = _baseAmountOverride > 0 ? _baseAmountOverride
-                : _reward != null ? _reward.DefaultBaseAmount
+                : _reward ? _reward.DefaultBaseAmount
                 : 1;
 
             // Nor can it start above its category's per-drop ceiling (a Points shard caps at 5).
-            int ceiling = _reward != null ? _reward.MaxAmountPerDrop : 0;
+            int ceiling = _reward ? _reward.MaxAmountPerDrop : 0;
             return ceiling > 0 && amount > ceiling ? ceiling : amount;
         }
 

@@ -4,12 +4,8 @@ using System.Collections.Generic;
 namespace Vertigo.Wheel.Core.States
 {
     /// <summary>
-    /// Owns which state is current and routes player input to it.
-    /// <para>
-    /// Transitions are drained through a queue rather than recursing: a state that changes state from
-    /// inside <see cref="IGameState.Enter"/> (the boot chain does exactly this) would otherwise nest
-    /// Exit/Enter calls and make their ordering depend on call depth.
-    /// </para>
+    /// Owns the current state and routes input to it. Transitions drain through a queue, so a state that
+    /// changes state inside Enter (the boot chain) cannot nest Exit/Enter calls.
     /// </summary>
     public sealed class GameStateMachine
     {

@@ -6,18 +6,9 @@ using UnityEngine;
 namespace Vertigo.Wheel.Editor
 {
     /// <summary>
-    /// Applies the project's sprite import conventions automatically, so nobody has to remember them and
-    /// a re-import can never silently drop a 9-slice border.
-    /// <para>
-    /// The case requires Sliced sprites in Image components. A slice border lives in the <em>texture
-    /// importer</em>, not on the Image, so it is import-time data — which makes an AssetPostprocessor the
-    /// right owner rather than a checklist item.
-    /// </para>
-    /// <para>
-    /// Note the division of labour: this sets <em>import</em> state (type, mesh, mipmaps, borders).
-    /// <c>Image.preserveAspect</c> is a component property, not import data, so it is enforced by
-    /// UIHygieneValidator rule 6 instead.
-    /// </para>
+    /// Applies the sprite import conventions so a re-import can never drop a 9-slice border. Borders are
+    /// import-time data, hence an AssetPostprocessor; preserveAspect is a component property, enforced by
+    /// UIHygieneValidator rule 6.
     /// </summary>
     public sealed class WheelSpriteImportPostprocessor : AssetPostprocessor
     {
@@ -25,17 +16,9 @@ namespace Vertigo.Wheel.Editor
         private const float PIXELS_PER_UNIT = 100f;
 
         /// <summary>
-        /// Border is (left, bottom, right, top).
-        /// <para>
-        /// A frame's border must cover its whole corner arc, or the arc's tail is stretched along the edges
-        /// into big blurred corners. The "4px"/"12px" in the frame filenames is the stroke width, not the
-        /// corner: the arcs measure 12px and 24px respectively. The gradient frame's corner brackets reach 28px.
-        /// </para>
-        /// <para>
-        /// The zone panels are 64x64 <em>vertical gradients</em>: colour is constant along X, so stretching
-        /// horizontally is lossless, while a vertical 9-slice would repeat the middle row and flatten the
-        /// ramp. Hence horizontal-only borders — genuinely Sliced, without damaging the art.
-        /// </para>
+        /// Border is (left, bottom, right, top). It must cover a frame's whole corner arc (12px and 24px for the
+        /// "4px" and "12px" frames, 28px for the gradient one) or the arc stretches into blurred corners. Zone panels
+        /// are vertical gradients, so they slice horizontally only.
         /// </summary>
         private static readonly Dictionary<string, Vector4> BordersByAssetName =
             new Dictionary<string, Vector4>(StringComparer.OrdinalIgnoreCase)

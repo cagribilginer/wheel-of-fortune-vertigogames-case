@@ -4,13 +4,8 @@ using System.Collections.Generic;
 namespace Vertigo.Wheel.Core.Spin
 {
     /// <summary>
-    /// Weighted-random slot selection over a wheel's slices.
-    /// <para>
-    /// Every shipped slice carries <c>Weight = 1</c>, so the shipped behaviour is an honest uniform draw
-    /// (1/8 per slot, and therefore a 12.5% bomb on a normal wheel). The weight is exposed anyway so the
-    /// odds can be retuned from the Inspector without touching code — and so this class has something
-    /// worth unit-testing beyond "returns a number in range".
-    /// </para>
+    /// Weighted-random slot selection. Every shipped slice has weight 1 (an even 1/8 draw, a 12.5% bomb
+    /// on a normal wheel); weights stay exposed so the odds can be retuned in the Inspector.
     /// </summary>
     public sealed class WeightedSliceResolver : ISliceResolver
     {

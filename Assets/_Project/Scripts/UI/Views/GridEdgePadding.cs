@@ -5,24 +5,9 @@ using UnityEngine.UI;
 namespace Vertigo.Wheel.UI.Views
 {
     /// <summary>
-    /// Keeps a <see cref="GridLayoutGroup"/> filling left-to-right (UpperLeft) while still showing an equal
-    /// left and right margin. The horizontal padding is recomputed from the container's real width so a full
-    /// row of cells sits centred and any leftover width is split evenly between the two edges instead of
-    /// pooling on the right.
-    /// <para>
-    /// A plain <c>UpperCenter</c> alignment would also centre a half-full last row; this keeps every row —
-    /// including the last — left-aligned under the first, which reads as an acquisition-ordered list. The
-    /// recompute is needed because the grid's column count is only known once the layout system has given
-    /// the container its width, and under the landscape <c>Expand</c> canvas scaler that width grows past
-    /// the 1920 reference on wider displays.
-    /// </para>
-    /// <para>
-    /// The padding is written from <see cref="Update"/>, never from <see cref="OnRectTransformDimensionsChange"/>:
-    /// changing a layout property re-inside a layout pass gets dropped with an "already inside a rebuild
-    /// loop" warning, which left the <see cref="ContentSizeFitter"/> below it with a stale height and stopped
-    /// the parent <see cref="ScrollRect"/> from ever seeing the overflow. Same poll-then-apply shape as
-    /// <see cref="SafeAreaFitter"/>.
-    /// </para>
+    /// Keeps a <see cref="GridLayoutGroup"/> filling left-to-right with equal left and right margins, by recomputing
+    /// the padding from the container's real width. It writes from <see cref="Update"/>, not from a layout callback:
+    /// a layout change made inside a layout pass is dropped and leaves the ContentSizeFitter stale.
     /// </summary>
     [RequireComponent(typeof(GridLayoutGroup))]
     public sealed class GridEdgePadding : UIBehaviour
@@ -59,8 +44,8 @@ namespace Vertigo.Wheel.UI.Views
 
         private void Apply()
         {
-            if (_grid == null) _grid = GetComponent<GridLayoutGroup>();
-            if (_rect == null) _rect = (RectTransform)transform;
+            if (!_grid) _grid = GetComponent<GridLayoutGroup>();
+            if (!_rect) _rect = (RectTransform)transform;
 
             float width = _rect.rect.width;
             float step = _grid.cellSize.x + _grid.spacing.x;

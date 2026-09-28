@@ -38,9 +38,9 @@ namespace Vertigo.Wheel.Data.Configs
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            if (_baseSprite == null)
+            if (!_baseSprite)
                 Debug.LogWarning($"[Vertigo] Theme '{name}' has no base sprite.", this);
-            if (_indicatorSprite == null)
+            if (!_indicatorSprite)
                 Debug.LogWarning($"[Vertigo] Theme '{name}' has no indicator sprite.", this);
         }
 #endif

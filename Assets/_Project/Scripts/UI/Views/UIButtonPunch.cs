@@ -7,14 +7,8 @@ using Vertigo.Wheel.Data.Services;
 namespace Vertigo.Wheel.UI.Views
 {
     /// <summary>
-    /// Shared click feedback for every interactable button: a click SFX plus a quick scale punch on its
-    /// dedicated <c>_anim</c> child, never on the button's own root — the root carries the raycastable Image
-    /// and, on the spin button, an independent idle-breathe tween (see <c>WheelPresenter</c>); two tweens
-    /// sharing one transform's localScale would fight each other.
-    /// <para>
-    /// Wired with <c>AddListener</c> in <see cref="OnEnable"/>, never an Inspector OnClick binding, for the
-    /// same reason every other view in this project does it that way.
-    /// </para>
+    /// Shared click feedback: a click SFX plus a scale punch on the button's <c>_anim</c> child, never its root, which
+    /// can carry an independent tween (the spin button's breathe). Wired with <c>AddListener</c>, never OnClick.
     /// </summary>
     [RequireComponent(typeof(Button))]
     public sealed class UIButtonPunch : MonoBehaviour
@@ -33,7 +27,7 @@ namespace Vertigo.Wheel.UI.Views
         private void Awake()
         {
             _button = GetComponent<Button>();
-            if (_animTarget == null) _animTarget = FindAnimChild();
+            if (!_animTarget) _animTarget = FindAnimChild();
         }
 
         private void OnEnable()
@@ -44,14 +38,14 @@ namespace Vertigo.Wheel.UI.Views
         private void OnDisable()
         {
             _button.onClick.RemoveListener(Punch);
-            if (_animTarget != null) _animTarget.DOKill();
+            if (_animTarget) _animTarget.DOKill();
         }
 
         private void Punch()
         {
             AudioHub.PlayButtonClick();
 
-            if (_animTarget == null) return;
+            if (!_animTarget) return;
 
             _animTarget.DOKill();
             _animTarget.localScale = Vector3.one;
