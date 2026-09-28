@@ -53,6 +53,24 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
+        public void OnValidate_ClampsAShardBaseAmountToItsCeiling()
+        {
+            RewardDefinition shard = Make(RewardCategory.Points, baseAmount: 10);
+            Invoke(shard, "OnValidate");
+
+            Assert.That(shard.DefaultBaseAmount, Is.EqualTo(RewardDefinition.POINTS_CEILING));
+        }
+
+        [Test]
+        public void WheelSliceEntry_ClampsAShardOverrideToItsCeiling_SoTheBlueprintBuilds()
+        {
+            WheelSliceEntry entry = MakeEntry(Make(RewardCategory.Points, baseAmount: 1), baseAmountOverride: 12);
+
+            Assert.That(entry.ResolveBaseAmount(), Is.EqualTo(RewardDefinition.POINTS_CEILING));
+            Assert.That(entry.ToBlueprint().BaseAmount, Is.EqualTo(RewardDefinition.POINTS_CEILING));
+        }
+
+        [Test]
         public void WheelSliceEntry_ClampsANonStackableRewardToOne_EvenWithAnOverride()
         {
             WheelSliceEntry entry = MakeEntry(Make(RewardCategory.Weapon, baseAmount: 8), baseAmountOverride: 40);

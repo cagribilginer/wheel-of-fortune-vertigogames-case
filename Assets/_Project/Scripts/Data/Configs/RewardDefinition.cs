@@ -25,7 +25,7 @@ namespace Vertigo.Wheel.Data.Configs
 
         [Tooltip("Amount granted at zone 1, before zone scaling.")]
         [Min(1)]
-        [SerializeField] private int _defaultBaseAmount = 10;
+        [SerializeField] private int _defaultBaseAmount = 1;
 
         public string Id
         {
@@ -102,6 +102,13 @@ namespace Vertigo.Wheel.Data.Configs
                     $"[Vertigo] Reward '{name}' is {_category} (not stackable) but its base amount is " +
                     $"{_defaultBaseAmount}; forcing it to 1.", this);
                 _defaultBaseAmount = 1;
+            }
+            else if (MaxAmountPerDrop > 0 && _defaultBaseAmount > MaxAmountPerDrop)
+            {
+                Debug.LogWarning(
+                    $"[Vertigo] Reward '{name}' is {_category}, capped at {MaxAmountPerDrop} per drop, but its " +
+                    $"base amount is {_defaultBaseAmount}; clamping it to {MaxAmountPerDrop}.", this);
+                _defaultBaseAmount = MaxAmountPerDrop;
             }
         }
 #endif

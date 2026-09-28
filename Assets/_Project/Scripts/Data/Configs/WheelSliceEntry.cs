@@ -51,9 +51,13 @@ namespace Vertigo.Wheel.Data.Configs
             // turn a built weapon, a cosmetic or a chest into a stack of five.
             if (_reward != null && !_reward.IsStackable) return 1;
 
-            return _baseAmountOverride > 0 ? _baseAmountOverride
+            int amount = _baseAmountOverride > 0 ? _baseAmountOverride
                 : _reward != null ? _reward.DefaultBaseAmount
                 : 1;
+
+            // Nor can it start above its category's per-drop ceiling (a Points shard caps at 5).
+            int ceiling = _reward != null ? _reward.MaxAmountPerDrop : 0;
+            return ceiling > 0 && amount > ceiling ? ceiling : amount;
         }
 
         public SliceBlueprint ToBlueprint()
