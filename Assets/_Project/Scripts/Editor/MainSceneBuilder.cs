@@ -376,7 +376,7 @@ namespace Vertigo.Wheel.Editor
             card.anchoredPosition = anchoredPosition;
 
             // Opaque panel sprite for the near-transparent dark fill; ui_card_frame_4px_zone on top is a
-            // thin outline (4px 9-slice), for a sleek 1-2px-reading border instead of the old bevel.
+            // thin 4px outline, for a sleek 1-2px-reading border instead of the old bevel.
             Image bg = AddImage(NewNode(cardName + "_bg", card), "ui_card_panel_zone_bg");
             bg.type = Image.Type.Sliced;
             bg.color = fillColor;

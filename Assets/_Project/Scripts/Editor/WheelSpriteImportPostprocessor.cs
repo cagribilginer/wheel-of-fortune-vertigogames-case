@@ -11,9 +11,7 @@ namespace Vertigo.Wheel.Editor
     /// <para>
     /// The case requires Sliced sprites in Image components. A slice border lives in the <em>texture
     /// importer</em>, not on the Image, so it is import-time data — which makes an AssetPostprocessor the
-    /// right owner rather than a checklist item. The border sizes for the frame assets are published in
-    /// their own filenames (<c>ui_card_frame_12px_neutral</c>), so the table below is transcription, not
-    /// invention.
+    /// right owner rather than a checklist item.
     /// </para>
     /// <para>
     /// Note the division of labour: this sets <em>import</em> state (type, mesh, mipmaps, borders).
@@ -29,6 +27,11 @@ namespace Vertigo.Wheel.Editor
         /// <summary>
         /// Border is (left, bottom, right, top).
         /// <para>
+        /// A frame's border must cover its whole corner arc, or the arc's tail is stretched along the edges
+        /// into big blurred corners. The "4px"/"12px" in the frame filenames is the stroke width, not the
+        /// corner: the arcs measure 12px and 24px respectively.
+        /// </para>
+        /// <para>
         /// The zone panels are 64x64 <em>vertical gradients</em>: colour is constant along X, so stretching
         /// horizontally is lossless, while a vertical 9-slice would repeat the middle row and flatten the
         /// ramp. Hence horizontal-only borders — genuinely Sliced, without damaging the art.
@@ -39,8 +42,8 @@ namespace Vertigo.Wheel.Editor
             {
                 { "UI_button_orange_standard",   new Vector4(40, 30, 40, 30) },
                 { "UI_button_grey_standard",     new Vector4(40, 30, 40, 30) },
-                { "ui_card_frame_12px_neutral",  new Vector4(12, 12, 12, 12) },
-                { "ui_card_frame_4px_zone",      new Vector4(4, 4, 4, 4) },
+                { "ui_card_frame_12px_neutral",  new Vector4(24, 24, 24, 24) },
+                { "ui_card_frame_4px_zone",      new Vector4(12, 12, 12, 12) },
                 { "ui_card_frame_gardient",      new Vector4(12, 12, 12, 12) },
                 // Four L-shaped corner brackets, arms reaching to ~pixel 28 of 64 — an 8px border sliced
                 // through the arms and smeared them across the stretched middle; 29 clears them entirely.
