@@ -45,7 +45,8 @@ namespace Vertigo.Wheel.Core.Run
                 throw new ArgumentOutOfRangeException(nameof(amount), amount, "Cannot add negative currency; use TrySpend.");
             if (amount == 0) return;
 
-            Commit(currency, BalanceOf(currency) + amount);
+            // Saturates rather than wrapping: a persisted negative balance would lock out every revive for good.
+            Commit(currency, (int)Math.Min((long)BalanceOf(currency) + amount, int.MaxValue));
         }
 
         public bool CanAfford(RewardId currency, int cost)

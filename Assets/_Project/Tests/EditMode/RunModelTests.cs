@@ -39,6 +39,15 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
+        public void WalletAddPastIntMax_SaturatesInsteadOfWrapping()
+        {
+            _wallet.Add(TestWheels.Gold, int.MaxValue);
+            _wallet.Add(TestWheels.Gold, 1);
+
+            Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.EqualTo(int.MaxValue));
+        }
+
+        [Test]
         public void Grant_WithABombOutcome_Throws()
         {
             Assert.Throws<InvalidOperationException>(() =>

@@ -38,6 +38,15 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
+        public void StackingPastIntMax_SaturatesInsteadOfWrapping()
+        {
+            _bank.Add(Pistol, int.MaxValue);
+            _bank.Add(Pistol, 1);
+
+            Assert.That(_bank.AmountOf(Pistol), Is.EqualTo(int.MaxValue));
+        }
+
+        [Test]
         public void DifferentRewards_KeepFirstAcquisitionOrder()
         {
             _bank.Add(Rifle, 1);
