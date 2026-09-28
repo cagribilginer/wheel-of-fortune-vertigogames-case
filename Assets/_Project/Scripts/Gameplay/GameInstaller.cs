@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using Vertigo.Wheel.Core.Rewards;
 using Vertigo.Wheel.Core.Run;
 using Vertigo.Wheel.Core.Spin;
@@ -58,6 +60,8 @@ namespace Vertigo.Wheel.Gameplay
         private DebugPresenter _debugPresenter;
 #endif
 
+        private readonly List<AsyncOperationHandle> _configLoads = new List<AsyncOperationHandle>();
+
         /// <summary>Called once by the editor scene-build step; never touched by hand.</summary>
         public void Configure(
             WheelView wheel, ZoneMapView zoneMap, BankView bank, ActionBarView actionBar,
@@ -88,13 +92,11 @@ namespace Vertigo.Wheel.Gameplay
             DOTween.Init(recycleAllByDefault: true, useSafeMode: true, logBehaviour: LogBehaviour.ErrorsOnly)
                    .SetCapacity(tweenersCapacity: 120, sequencesCapacity: 40);
 
-            // .WaitForCompletion() keeps this synchronous like the Resources.Load it replaces, so Awake
-            // stays a plain method and the Play Mode smoke test's boot-to-Idle budget is unaffected.
-            var catalog = Addressables.LoadAssetAsync<RewardCatalog>("Configs/Settings/RewardCatalog").WaitForCompletion();
-            var spinConfig = Addressables.LoadAssetAsync<WheelSpinConfig>("Configs/Settings/WheelSpin_Default").WaitForCompletion();
-            var progression = Addressables.LoadAssetAsync<ZoneProgressionConfig>("Configs/Settings/ZoneProgression_Default").WaitForCompletion();
-            var continueConfig = Addressables.LoadAssetAsync<ContinueConfig>("Configs/Settings/Continue_Default").WaitForCompletion();
-            var juice = Addressables.LoadAssetAsync<JuiceConfig>("Configs/Settings/Juice_Default").WaitForCompletion();
+            var catalog = LoadConfig<RewardCatalog>("Configs/Settings/RewardCatalog");
+            var spinConfig = LoadConfig<WheelSpinConfig>("Configs/Settings/WheelSpin_Default");
+            var progression = LoadConfig<ZoneProgressionConfig>("Configs/Settings/ZoneProgression_Default");
+            var continueConfig = LoadConfig<ContinueConfig>("Configs/Settings/Continue_Default");
+            var juice = LoadConfig<JuiceConfig>("Configs/Settings/Juice_Default");
 
             IZoneClassifier classifier = progression.CreateClassifier();
             // The wheel factory gets its own RNG so a zone's slices are dealt onto different wedges each
@@ -108,7 +110,7 @@ namespace Vertigo.Wheel.Gameplay
             var continueService = new ContinueService(wallet, goldRewardId, continueConfig.ToSettings());
             var runModel = new RunModel(classifier, wallet, goldRewardId, cashRewardId);
 
-            var audioLibrary = Addressables.LoadAssetAsync<AudioLibrary>("Configs/Settings/AudioLibrary").WaitForCompletion();
+            var audioLibrary = LoadConfig<AudioLibrary>("Configs/Settings/AudioLibrary");
             IAudioService audioService = new AudioService(transform);
             AudioHub.Initialize(audioService, audioLibrary);
             var audioPresenter = new AudioPresenter(audioService, audioLibrary);
@@ -153,6 +155,22 @@ namespace Vertigo.Wheel.Gameplay
             GameFlow.Start(machine);
         }
 
+        // Synchronous (WaitForCompletion) like the Resources.Load it replaced, so Awake stays a plain method
+        // and the Play Mode smoke test's boot-to-Idle budget is unaffected. A missing address fails here, by
+        // name, instead of as a NullReferenceException wherever the config is first used.
+        private T LoadConfig<T>(string address) where T : Object
+        {
+            AsyncOperationHandle<T> handle = Addressables.LoadAssetAsync<T>(address);
+            T config = handle.WaitForCompletion();
+            _configLoads.Add(handle);
+
+            if (config == null)
+                throw new System.InvalidOperationException(
+                    $"[Vertigo] Addressable config '{address}' did not load ({handle.Status}); check the Addressables groups.");
+
+            return config;
+        }
+
         private void OnDestroy()
         {
             _milestonePreviewPresenter?.Dispose();
@@ -163,6 +181,11 @@ namespace Vertigo.Wheel.Gameplay
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             _debugPresenter?.Dispose();
 #endif
+
+            // Released last, once nothing that was built from these configs is still being torn down.
+            for (int i = 0; i < _configLoads.Count; i++)
+                if (_configLoads[i].IsValid()) Addressables.Release(_configLoads[i]);
+            _configLoads.Clear();
         }
     }
 }
