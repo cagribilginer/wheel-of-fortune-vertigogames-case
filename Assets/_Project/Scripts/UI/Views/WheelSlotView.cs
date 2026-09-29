@@ -11,9 +11,9 @@ namespace Vertigo.Wheel.UI.Views
     public sealed class WheelSlotView : UIViewBase
     {
         // Offsets inside the wheel hole, in screen-upright space around the slot centre (slot-local would push content outward).
-        private static readonly Vector2 ICON_AREA_SIZE = new Vector2(70f, 52f);
-        private static readonly Vector2 ICON_CENTER = new Vector2(0f, 10f);
-        private static readonly Vector2 TEXT_CENTER = new Vector2(0f, -32f);
+        private static readonly Vector2 ICON_AREA_SIZE = new(70f, 52f);
+        private static readonly Vector2 ICON_CENTER = new(0f, 10f);
+        private static readonly Vector2 TEXT_CENTER = new(0f, -32f);
 
         [SerializeField] private Image _ui_image_slot_icon_value;
         [SerializeField] private TextMeshProUGUI _ui_text_slot_amount_value;
@@ -22,7 +22,7 @@ namespace Vertigo.Wheel.UI.Views
 
         // The slot rotation the icon/text were last placed for. Zero-w is not a valid rotation, so the
         // first LateUpdate always places them.
-        private Quaternion _placedForRotation = new Quaternion(0f, 0f, 0f, 0f);
+        private Quaternion _placedForRotation = new(0f, 0f, 0f, 0f);
 
         public RectTransform Rect
         {

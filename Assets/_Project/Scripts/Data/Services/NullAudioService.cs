@@ -9,7 +9,7 @@ namespace Vertigo.Wheel.Data.Services
     /// </summary>
     public sealed class NullAudioService : IAudioService
     {
-        public static readonly NullAudioService Instance = new NullAudioService();
+        public static readonly NullAudioService Instance = new();
 
         private NullAudioService() { }
 

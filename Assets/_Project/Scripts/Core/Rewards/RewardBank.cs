@@ -10,9 +10,9 @@ namespace Vertigo.Wheel.Core.Rewards
     /// </summary>
     public sealed class RewardBank
     {
-        private readonly List<BankEntry> _entries = new List<BankEntry>();
+        private readonly List<BankEntry> _entries = new();
         private readonly ReadOnlyCollection<BankEntry> _entriesView;
-        private readonly Dictionary<RewardId, int> _indexByReward = new Dictionary<RewardId, int>();
+        private readonly Dictionary<RewardId, int> _indexByReward = new();
 
         public RewardBank()
         {

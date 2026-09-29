@@ -29,7 +29,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly RewardId _goldCurrency;
         private readonly RewardCatalog _catalog;
         private readonly BankPresenter _bank;
-        private readonly Random _rng = new Random();
+        private readonly Random _rng = new();
 
         private DebugOverlayView _view;
 

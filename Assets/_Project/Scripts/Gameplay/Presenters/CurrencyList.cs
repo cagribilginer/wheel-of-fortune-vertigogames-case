@@ -16,7 +16,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly CurrencyRowView _rowPrefab;
         private readonly RectTransform _content;
         private readonly RewardCatalog _catalog;
-        private readonly List<CurrencyRowView> _rows = new List<CurrencyRowView>();
+        private readonly List<CurrencyRowView> _rows = new();
 
         public CurrencyList(CurrencyRowView rowPrefab, RectTransform content, RewardCatalog catalog)
         {

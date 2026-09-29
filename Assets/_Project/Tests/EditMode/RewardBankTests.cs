@@ -8,9 +8,9 @@ namespace Vertigo.Wheel.Tests.EditMode
     [TestFixture]
     public sealed class RewardBankTests
     {
-        private static readonly RewardId Pistol = new RewardId("pistol_points");
-        private static readonly RewardId Rifle = new RewardId("rifle_points");
-        private static readonly RewardId Armor = new RewardId("armor_points");
+        private static readonly RewardId Pistol = new("pistol_points");
+        private static readonly RewardId Rifle = new("rifle_points");
+        private static readonly RewardId Armor = new("armor_points");
 
         private RewardBank _bank;
 

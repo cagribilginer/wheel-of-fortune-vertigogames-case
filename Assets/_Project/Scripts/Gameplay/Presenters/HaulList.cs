@@ -14,7 +14,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly RewardCatalog _catalog;
         private readonly RectTransform _content;
         private readonly ObjectPool<BankEntryView> _pool;
-        private readonly List<BankEntryView> _active = new List<BankEntryView>();
+        private readonly List<BankEntryView> _active = new();
 
         public HaulList(BankEntryView entryPrefab, RectTransform content, RewardCatalog catalog)
         {

@@ -8,16 +8,16 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
     /// <summary>Small builders so wheel-shaped fixtures do not dominate the tests that use them.</summary>
     public static class TestWheels
     {
-        public static readonly RewardId Pistol = new RewardId("pistol_points");
-        public static readonly RewardId Rifle = new RewardId("rifle_points");
-        public static readonly RewardId Gold = new RewardId("gold");
-        public static readonly RewardId Cash = new RewardId("cash");
+        public static readonly RewardId Pistol = new("pistol_points");
+        public static readonly RewardId Rifle = new("rifle_points");
+        public static readonly RewardId Gold = new("gold");
+        public static readonly RewardId Cash = new("cash");
 
         /// <summary>The wallet currencies a test run is built with, in display order.</summary>
         public static readonly RewardId[] Currencies = { Gold, Cash };
 
         /// <summary>The revive pricing the tests run against: 50 gold + 10 per zone, one free ad revive.</summary>
-        public static readonly ContinueSettings Continue = new ContinueSettings(50, 10, 1);
+        public static readonly ContinueSettings Continue = new(50, 10, 1);
 
         /// <summary>Seven reward slices plus one bomb at <paramref name="bombIndex"/>, all weight 1.</summary>
         public static WheelModel NormalWheel(int bombIndex = 0, int amount = 10)

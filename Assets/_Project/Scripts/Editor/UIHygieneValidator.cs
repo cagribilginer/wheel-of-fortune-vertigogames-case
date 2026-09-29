@@ -20,7 +20,7 @@ namespace Vertigo.Wheel.Editor
     {
         private const string PREFAB_ROOT = "Assets/_Project/Prefabs";
 
-        private readonly List<Finding> _findings = new List<Finding>();
+        private readonly List<Finding> _findings = new();
         private Vector2 _scroll;
 
         private readonly struct Finding

@@ -37,13 +37,13 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
         public int GameOverZoneShown { get; private set; }
         public bool AdReviveOffered { get; private set; }
         public WalletBalances PlayerBalancesShown { get; private set; }
-        public List<BankEntry> LostHaulShown { get; } = new List<BankEntry>();
+        public List<BankEntry> LostHaulShown { get; } = new();
 
         public bool CashOutVisible { get; private set; }
         public int CashOutZonesCleared { get; private set; }
         public WalletBalances CashOutBalancesShown { get; private set; }
         public WalletBalances ClaimBalancesShown { get; private set; }
-        public List<BankEntry> CashOutHaul { get; } = new List<BankEntry>();
+        public List<BankEntry> CashOutHaul { get; } = new();
 
         public virtual void ShowZone(int zone, ZoneType zoneType, WheelModel wheel, Action onComplete)
         {

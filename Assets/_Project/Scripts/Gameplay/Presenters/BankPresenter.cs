@@ -25,7 +25,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly AudioPresenter _audio;
         private readonly JuiceConfig _juice;
         private readonly ObjectPool<BankEntryView> _pool;
-        private readonly List<BankEntryView> _active = new List<BankEntryView>();
+        private readonly List<BankEntryView> _active = new();
 
         // Created lazily and reused: only one reward flies at a time.
         private RectTransform _ghostRect;
@@ -122,7 +122,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         #region Ghost and lookup
         // Matches BankEntryView's own icon box closely enough that the ghost doesn't visibly resize when
         // it lands (that box is 88x88, but the ghost also needs headroom to fly over other UI unclipped).
-        private static readonly Vector2 GHOST_SIZE = new Vector2(72f, 72f);
+        private static readonly Vector2 GHOST_SIZE = new(72f, 72f);
 
         private void EnsureGhost()
         {

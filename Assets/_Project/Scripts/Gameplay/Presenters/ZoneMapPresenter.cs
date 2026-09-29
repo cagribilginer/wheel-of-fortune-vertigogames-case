@@ -23,16 +23,16 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private const float VIEWPORT_CENTER = 0.5f;
 
         // Colour follows zone type only: green for safe, gold for super, grey for the rest, passed or not.
-        private static readonly Color CURRENT_TEXT_COLOR = new Color(0.12f, 0.13f, 0.16f);
-        private static readonly Color SAFE_TEXT_COLOR = new Color(0.40f, 0.95f, 0.45f);
-        private static readonly Color SUPER_TEXT_COLOR = new Color(1f, 0.82f, 0.30f);
-        private static readonly Color NORMAL_TEXT_COLOR = new Color(0.62f, 0.64f, 0.70f);
+        private static readonly Color CURRENT_TEXT_COLOR = new(0.12f, 0.13f, 0.16f);
+        private static readonly Color SAFE_TEXT_COLOR = new(0.40f, 0.95f, 0.45f);
+        private static readonly Color SUPER_TEXT_COLOR = new(1f, 0.82f, 0.30f);
+        private static readonly Color NORMAL_TEXT_COLOR = new(0.62f, 0.64f, 0.70f);
 
         private readonly ZoneMapView _view;
         private readonly IZoneClassifier _classifier;
         private readonly JuiceConfig _juice;
         private readonly ObjectPool<ZoneMapTileView> _pool;
-        private readonly List<ZoneMapTileView> _active = new List<ZoneMapTileView>();
+        private readonly List<ZoneMapTileView> _active = new();
 
         public ZoneMapPresenter(
             ZoneMapView view, ZoneMapTileView tilePrefab, IZoneClassifier classifier, JuiceConfig juice)

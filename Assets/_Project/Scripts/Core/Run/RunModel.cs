@@ -17,7 +17,7 @@ namespace Vertigo.Wheel.Core.Run
         private readonly Wallet _wallet;
 
         // Every reward that lands in the wallet on cash-out, in the order Balances reports them.
-        private readonly List<RewardId> _currencies = new List<RewardId>();
+        private readonly List<RewardId> _currencies = new();
 
         private int _currentZone = 1;
         private int _goldRevivesUsed;

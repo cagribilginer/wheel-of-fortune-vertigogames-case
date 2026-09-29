@@ -52,7 +52,7 @@ namespace Vertigo.Wheel.Editor
             importer.wrapMode = TextureWrapMode.Clamp;
             importer.filterMode = FilterMode.Bilinear;
 
-            TextureImporterSettings settings = new TextureImporterSettings();
+            TextureImporterSettings settings = new();
             importer.ReadTextureSettings(settings);
 
             // FullRect rather than Tight: a tight mesh silently breaks 9-slicing and makes

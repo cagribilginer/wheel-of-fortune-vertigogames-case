@@ -6,7 +6,7 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
     /// <summary>Non-persistent <see cref="ISaveService"/> double, so a test's wallet never touches PlayerPrefs.</summary>
     public sealed class InMemorySaveService : ISaveService
     {
-        private readonly Dictionary<string, int> _values = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> _values = new();
 
         public int GetInt(string key, int defaultValue = 0)
         {

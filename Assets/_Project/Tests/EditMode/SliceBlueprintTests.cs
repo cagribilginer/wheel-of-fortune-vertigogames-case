@@ -8,8 +8,8 @@ namespace Vertigo.Wheel.Tests.EditMode
     [TestFixture]
     public sealed class SliceBlueprintTests
     {
-        private static readonly RewardId Knife = new RewardId("knife_points");
-        private static readonly RewardId Cash = new RewardId("cash");
+        private static readonly RewardId Knife = new("knife_points");
+        private static readonly RewardId Cash = new("cash");
 
         [Test]
         public void StackableSlice_ScalesWithZoneDepth()

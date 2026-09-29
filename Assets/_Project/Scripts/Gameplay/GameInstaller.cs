@@ -54,7 +54,7 @@ namespace Vertigo.Wheel.Gameplay
         private DebugPresenter _debugPresenter;
 #endif
 
-        private readonly List<AsyncOperationHandle> _configLoads = new List<AsyncOperationHandle>();
+        private readonly List<AsyncOperationHandle> _configLoads = new();
 
         #region Composition
         private void Awake()

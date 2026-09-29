@@ -9,8 +9,8 @@ namespace Vertigo.Wheel.Core.States
     /// </summary>
     public sealed class GameStateMachine
     {
-        private readonly Dictionary<Type, IGameState> _states = new Dictionary<Type, IGameState>();
-        private readonly Queue<Type> _pending = new Queue<Type>();
+        private readonly Dictionary<Type, IGameState> _states = new();
+        private readonly Queue<Type> _pending = new();
         private bool _draining;
 
         public IGameState Current { get; private set; }
