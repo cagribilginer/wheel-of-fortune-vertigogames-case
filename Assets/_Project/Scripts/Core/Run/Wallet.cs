@@ -25,9 +25,6 @@ namespace Vertigo.Wheel.Core.Run
             return $"vertigo.wheel.wallet.{currency.Value}";
         }
 
-        /// <summary>Raised on any change, with the currency that changed and its new balance.</summary>
-        public event Action<RewardId, int> Changed;
-
         public int BalanceOf(RewardId currency)
         {
             return _save.GetInt(SaveKeyFor(currency));
@@ -68,7 +65,6 @@ namespace Vertigo.Wheel.Core.Run
         {
             _save.SetInt(SaveKeyFor(currency), newBalance);
             _save.Save();
-            Changed?.Invoke(currency, newBalance);
         }
     }
 }

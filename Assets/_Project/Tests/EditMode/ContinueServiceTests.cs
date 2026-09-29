@@ -116,17 +116,6 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void Wallet_RaisesChangedWithTheNewBalance()
-        {
-            int observed = -1;
-            _wallet.Changed += (currency, balance) => observed = balance;
-
-            _wallet.Add(TestWheels.Gold, 75);
-
-            Assert.That(observed, Is.EqualTo(75));
-        }
-
-        [Test]
         public void Wallet_KeepsDifferentCurrenciesSeparate()
         {
             _wallet.Add(TestWheels.Gold, 50);

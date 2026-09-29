@@ -19,9 +19,6 @@ namespace Vertigo.Wheel.Core.Rewards
             _entriesView = new ReadOnlyCollection<BankEntry>(_entries);
         }
 
-        /// <summary>Raised on any change to the bank's contents, including <see cref="Clear"/>.</summary>
-        public event Action Changed;
-
         /// <summary>A genuine read-only view: casting it back to a List and mutating it is not possible.</summary>
         public IReadOnlyList<BankEntry> Entries
         {
@@ -56,8 +53,6 @@ namespace Vertigo.Wheel.Core.Rewards
                 _indexByReward[reward] = _entries.Count;
                 _entries.Add(new BankEntry(reward, amount));
             }
-
-            Changed?.Invoke();
         }
 
         public int AmountOf(RewardId reward)
@@ -68,11 +63,8 @@ namespace Vertigo.Wheel.Core.Rewards
         /// <summary>Wipes the run's holdings. This is what a bomb does.</summary>
         public void Clear()
         {
-            if (_entries.Count == 0) return;
-
             _entries.Clear();
             _indexByReward.Clear();
-            Changed?.Invoke();
         }
     }
 }

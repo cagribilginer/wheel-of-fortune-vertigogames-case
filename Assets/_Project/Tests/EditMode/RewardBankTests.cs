@@ -62,42 +62,22 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void Clear_EmptiesBankAndRaisesChanged()
+        public void Clear_EmptiesTheBank()
         {
             _bank.Add(Pistol, 5);
-
-            int raised = 0;
-            _bank.Changed += () => raised++;
 
             _bank.Clear();
 
             Assert.That(_bank.IsEmpty, Is.True);
             Assert.That(_bank.AmountOf(Pistol), Is.Zero);
-            Assert.That(raised, Is.EqualTo(1));
         }
 
         [Test]
-        public void ClearOnEmptyBank_DoesNotRaiseChanged()
+        public void ClearOnEmptyBank_IsHarmless()
         {
-            int raised = 0;
-            _bank.Changed += () => raised++;
-
             _bank.Clear();
 
-            Assert.That(raised, Is.Zero);
-        }
-
-        [Test]
-        public void Add_RaisesChangedEachTime()
-        {
-            int raised = 0;
-            _bank.Changed += () => raised++;
-
-            _bank.Add(Pistol, 1);
-            _bank.Add(Pistol, 1);
-            _bank.Add(Rifle, 1);
-
-            Assert.That(raised, Is.EqualTo(3));
+            Assert.That(_bank.IsEmpty, Is.True);
         }
 
         [Test]

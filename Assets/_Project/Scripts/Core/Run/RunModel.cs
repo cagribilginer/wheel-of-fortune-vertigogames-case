@@ -26,7 +26,6 @@ namespace Vertigo.Wheel.Core.Run
         private readonly HashSet<RewardId> _currencies;
 
         private int _currentZone = 1;
-        private RunPhase _phase = RunPhase.Idle;
         private int _goldRevivesUsed;
         private int _adRevivesUsed;
 
@@ -48,8 +47,6 @@ namespace Vertigo.Wheel.Core.Run
         }
 
         #region Events and state
-        public event Action<int> ZoneChanged;
-        public event Action<RunPhase> PhaseChanged;
 
         public RewardBank Bank { get; }
 
@@ -99,26 +96,16 @@ namespace Vertigo.Wheel.Core.Run
             get { return _classifier.Classify(_currentZone); }
         }
 
-        public RunPhase Phase
-        {
-            get { return _phase; }
-            set
-            {
-                if (_phase == value) return;
-
-                _phase = value;
-                PhaseChanged?.Invoke(_phase);
-            }
-        }
+        public RunPhase Phase { get; set; } = RunPhase.Idle;
 
         public bool CanSpin
         {
-            get { return CashOutPolicy.CanSpin(_phase); }
+            get { return CashOutPolicy.CanSpin(Phase); }
         }
 
         public bool CanLeave
         {
-            get { return CashOutPolicy.CanLeave(_phase, !Bank.IsEmpty, CurrentZoneType); }
+            get { return CashOutPolicy.CanLeave(Phase, !Bank.IsEmpty, CurrentZoneType); }
         }
         #endregion
 
@@ -135,7 +122,6 @@ namespace Vertigo.Wheel.Core.Run
         public void AdvanceZone()
         {
             _currentZone++;
-            ZoneChanged?.Invoke(_currentZone);
         }
 
         /// <summary>
@@ -146,10 +132,8 @@ namespace Vertigo.Wheel.Core.Run
         public void JumpToZone(int zone)
         {
             if (zone < 1) throw new ArgumentOutOfRangeException(nameof(zone), zone, "Zones are 1-indexed.");
-            if (zone == _currentZone) return;
 
             _currentZone = zone;
-            ZoneChanged?.Invoke(_currentZone);
         }
 
         /// <summary>The bomb: the entire haul is lost and the run ends. The wallet is untouched.</summary>
@@ -226,11 +210,9 @@ namespace Vertigo.Wheel.Core.Run
             _adRevivesUsed = 0;
             _lostHaul = null;
 
-            bool zoneChanged = _currentZone != 1;
             _currentZone = 1;
 
             Phase = RunPhase.Idle;
-            if (zoneChanged) ZoneChanged?.Invoke(_currentZone);
         }
         #endregion
     }

@@ -56,15 +56,11 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
-        public void AdvanceZone_IncrementsAndNotifies()
+        public void AdvanceZone_Increments()
         {
-            int observed = 0;
-            _run.ZoneChanged += zone => observed = zone;
-
             _run.AdvanceZone();
 
             Assert.That(_run.CurrentZone, Is.EqualTo(2));
-            Assert.That(observed, Is.EqualTo(2));
         }
 
         [Test]
@@ -256,19 +252,6 @@ namespace Vertigo.Wheel.Tests.EditMode
             _run.Phase = RunPhase.Spinning;
 
             Assert.That(_run.CanLeave, Is.False);
-        }
-
-        [Test]
-        public void PhaseChanged_FiresOnlyOnActualChanges()
-        {
-            int raised = 0;
-            _run.PhaseChanged += _ => raised++;
-
-            _run.Phase = RunPhase.Spinning;
-            _run.Phase = RunPhase.Spinning;
-            _run.Phase = RunPhase.Idle;
-
-            Assert.That(raised, Is.EqualTo(2));
         }
 
         [Test]
