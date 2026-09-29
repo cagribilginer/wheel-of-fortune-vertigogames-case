@@ -174,7 +174,7 @@ no DOTween. Test doubles also cover the seams below Core:
 | `InstantPresentation` | `ScreenPresentation` (the whole Unity presentation layer) |
 | `BlockingPresentation` | overrides only `PlaySpin` to hold the machine mid-spin |
 | `FixedSliceResolver` | the weighted RNG — lands a scripted slice |
-| `ScriptedRandomProvider` | `UnityRandomProvider` |
+| `SystemRandomProvider` | `UnityRandomProvider` — seedable, so a run reproduces exactly |
 | `StubBlueprintProvider` | authored wheel configs — deterministic 7-reward + 1-bomb layouts |
 | `InMemorySaveService` | `PlayerPrefsSaveService` |
 

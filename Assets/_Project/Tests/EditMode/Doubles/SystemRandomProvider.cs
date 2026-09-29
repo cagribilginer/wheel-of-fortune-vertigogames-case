@@ -1,10 +1,11 @@
 using System;
+using Vertigo.Wheel.Core.Spin;
 
-namespace Vertigo.Wheel.Core.Spin
+namespace Vertigo.Wheel.Tests.EditMode.Doubles
 {
     /// <summary>
-    /// Default <see cref="IRandomProvider"/> backed by <see cref="Random"/>.
-    /// Accepts an optional seed so a run can be reproduced exactly — used by the golden-run test.
+    /// A seedable <see cref="IRandomProvider"/> backed by <see cref="Random"/>, so a test can reproduce a
+    /// run exactly. Production uses the engine RNG (<c>UnityRandomProvider</c>) instead.
     /// </summary>
     public sealed class SystemRandomProvider : IRandomProvider
     {
