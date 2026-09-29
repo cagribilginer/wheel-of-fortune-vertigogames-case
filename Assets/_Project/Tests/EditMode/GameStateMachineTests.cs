@@ -41,7 +41,7 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             var context = new GameContext(
                 _run, factory, new SpinService(_resolver),
-                new ContinueService(_wallet, TestWheels.Gold, ContinueSettings.Default), _view);
+                new ContinueService(_wallet, TestWheels.Gold, TestWheels.Continue), _view);
 
             _machine = GameFlow.Build(context);
             GameFlow.Start(_machine);
@@ -154,7 +154,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         {
             AdvanceToZone(5);                              // zone 5 is safe, so leaving is legal here
             int zoneBefore = _run.CurrentZone;
-            int bankedBefore = _run.Bank.DistinctRewardCount;
+            int bankedBefore = _run.Bank.Entries.Count;
 
             _machine.RequestExit();
             _machine.Cancel();
@@ -162,7 +162,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.That(_machine.IsIn<IdleState>(), Is.True);
             Assert.That(_view.CashOutVisible, Is.False);
             Assert.That(_run.CurrentZone, Is.EqualTo(zoneBefore));
-            Assert.That(_run.Bank.DistinctRewardCount, Is.EqualTo(bankedBefore));
+            Assert.That(_run.Bank.Entries.Count, Is.EqualTo(bankedBefore));
             Assert.That(bankedBefore, Is.GreaterThan(0));
         }
 
@@ -198,7 +198,7 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             _machine.RequestSpin();                       // zone 1 -> 2, banks a reward
             int zoneBefore = _run.CurrentZone;
-            int bankedBefore = _run.Bank.DistinctRewardCount;
+            int bankedBefore = _run.Bank.Entries.Count;
 
             _resolver.LandOn(BOMB_SLOT);
             _machine.RequestSpin();                       // bomb clears the bank
@@ -211,9 +211,9 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.That(_machine.IsIn<IdleState>(), Is.True);
             Assert.That(_run.CurrentZone, Is.EqualTo(zoneBefore), "Continue must resume the same zone.");
             Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.LessThan(walletBefore), "The continue must have been paid for.");
-            Assert.That(_run.ContinuesUsedThisRun, Is.EqualTo(1));
+            Assert.That(_run.GoldRevivesUsedThisRun, Is.EqualTo(1));
             Assert.That(bankedBefore, Is.GreaterThan(0));
-            Assert.That(_run.Bank.DistinctRewardCount, Is.EqualTo(bankedBefore), "the continue restores the lost haul");
+            Assert.That(_run.Bank.Entries.Count, Is.EqualTo(bankedBefore), "the continue restores the lost haul");
         }
 
         [Test]
@@ -278,7 +278,7 @@ namespace Vertigo.Wheel.Tests.EditMode
                 new RunModel(new ZoneClassifier(), _wallet, TestWheels.Currencies),
                 new ZoneWheelFactory(new ZoneClassifier(), new StubBlueprintProvider(BOMB_SLOT), new LinearRewardScaling()),
                 new SpinService(new FixedSliceResolver(REWARD_SLOT)),
-                new ContinueService(_wallet, TestWheels.Gold, ContinueSettings.Default),
+                new ContinueService(_wallet, TestWheels.Gold, TestWheels.Continue),
                 blocking);
 
             GameStateMachine machine = GameFlow.Build(context);

@@ -23,7 +23,6 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             Assert.That(wheel.SliceCount, Is.EqualTo(8));
             Assert.That(wheel.BombCount, Is.EqualTo(1));
-            Assert.That(wheel.HasBomb, Is.True);
         }
 
         [Test]
@@ -33,7 +32,6 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             Assert.That(wheel.SliceCount, Is.EqualTo(8));
             Assert.That(wheel.BombCount, Is.Zero);
-            Assert.That(wheel.HasBomb, Is.False);
         }
 
         [TestCase(0)]

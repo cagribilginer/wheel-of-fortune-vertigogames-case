@@ -17,7 +17,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         {
             _save = new InMemorySaveService();
             _wallet = new Wallet(_save);
-            _service = new ContinueService(_wallet, TestWheels.Gold, ContinueSettings.Default);
+            _service = new ContinueService(_wallet, TestWheels.Gold, TestWheels.Continue);
         }
 
         [TestCase(1, 0, 60)]
@@ -104,15 +104,6 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             var reloaded = new Wallet(_save);
             Assert.That(reloaded.BalanceOf(TestWheels.Gold), Is.EqualTo(120));
-        }
-
-        [Test]
-        public void WalletReset_ZeroesTheBalance()
-        {
-            _wallet.Add(TestWheels.Gold, 120);
-            _wallet.Reset(TestWheels.Gold);
-
-            Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.Zero);
         }
 
         [Test]

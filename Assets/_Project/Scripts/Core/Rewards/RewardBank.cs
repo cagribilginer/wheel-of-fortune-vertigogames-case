@@ -25,11 +25,6 @@ namespace Vertigo.Wheel.Core.Rewards
             get { return _entriesView; }
         }
 
-        public int DistinctRewardCount
-        {
-            get { return _entries.Count; }
-        }
-
         public bool IsEmpty
         {
             get { return _entries.Count == 0; }

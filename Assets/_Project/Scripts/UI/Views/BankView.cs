@@ -14,10 +14,6 @@ namespace Vertigo.Wheel.UI.Views
         [SerializeField] private RectTransform _ui_content_bank;
         [SerializeField] private TextMeshProUGUI _ui_text_bank_empty_value;
 
-        public ScrollRect Scroll
-        {
-            get { return _ui_scroll_bank; }
-        }
         public RectTransform Content
         {
             get { return _ui_content_bank; }

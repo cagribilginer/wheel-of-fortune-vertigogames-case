@@ -30,10 +30,5 @@ namespace Vertigo.Wheel.Core.Spin
         {
             get { return Kind == SliceKind.Bomb; }
         }
-
-        public override string ToString()
-        {
-            return IsBomb ? $"Slot {SlotIndex}: BOMB" : $"Slot {SlotIndex}: {Reward} x{Amount}";
-        }
     }
 }

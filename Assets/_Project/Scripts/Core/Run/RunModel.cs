@@ -62,12 +62,6 @@ namespace Vertigo.Wheel.Core.Run
             get { return _adRevivesUsed; }
         }
 
-        /// <summary>Total revives (gold + ad) taken this run.</summary>
-        public int ContinuesUsedThisRun
-        {
-            get { return _goldRevivesUsed + _adRevivesUsed; }
-        }
-
         /// <summary>
         /// What the pending bomb took, for the game-over screen to show as "what you stand to lose".
         /// Empty unless a bomb is currently waiting on a revive-or-restart decision.

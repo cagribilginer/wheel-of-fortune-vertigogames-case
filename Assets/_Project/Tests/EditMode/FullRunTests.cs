@@ -37,7 +37,7 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             var context = new GameContext(
                 _run, factory, new SpinService(new WeightedSliceResolver(random)),
-                new ContinueService(_wallet, TestWheels.Gold, ContinueSettings.Default), _view);
+                new ContinueService(_wallet, TestWheels.Gold, TestWheels.Continue), _view);
 
             _machine = GameFlow.Build(context);
             GameFlow.Start(_machine);
@@ -115,7 +115,7 @@ namespace Vertigo.Wheel.Tests.EditMode
                 Assert.That(_view.LastWheel[i].Amount, Is.GreaterThanOrEqualTo(0),
                     "A negative amount means the scaling cast wrapped.");
 
-            Assert.That(_run.Bank.DistinctRewardCount, Is.GreaterThan(0));
+            Assert.That(_run.Bank.Entries.Count, Is.GreaterThan(0));
         }
 
         /// <summary>

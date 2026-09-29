@@ -55,12 +55,6 @@ namespace Vertigo.Wheel.Core.Run
             return true;
         }
 
-        /// <summary>Backs the Tools/Vertigo/Reset Save editor menu item.</summary>
-        public void Reset(RewardId currency)
-        {
-            Commit(currency, 0);
-        }
-
         private void Commit(RewardId currency, int newBalance)
         {
             _save.SetInt(SaveKeyFor(currency), newBalance);

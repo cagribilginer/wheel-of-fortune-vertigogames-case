@@ -168,7 +168,8 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.That(_run.CurrentZone, Is.EqualTo(1));
             Assert.That(_run.Bank.IsEmpty, Is.True);
             Assert.That(_run.Phase, Is.EqualTo(RunPhase.Idle));
-            Assert.That(_run.ContinuesUsedThisRun, Is.Zero);
+            Assert.That(_run.GoldRevivesUsedThisRun, Is.Zero);
+            Assert.That(_run.AdRevivesUsedThisRun, Is.Zero);
         }
 
         [Test]

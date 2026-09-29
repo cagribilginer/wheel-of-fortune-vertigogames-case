@@ -54,11 +54,6 @@ namespace Vertigo.Wheel.Core.Spin
 
         public int BombCount { get; }
 
-        public bool HasBomb
-        {
-            get { return BombCount > 0; }
-        }
-
         public WheelSlice this[int index]
         {
             get { return _slices[index]; }

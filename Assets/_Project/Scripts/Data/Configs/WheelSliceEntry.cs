@@ -22,10 +22,6 @@ namespace Vertigo.Wheel.Data.Configs
         [Min(0)]
         [SerializeField] private int _weight = 1;
 
-        public SliceKind Kind
-        {
-            get { return _kind; }
-        }
         public RewardDefinition Reward
         {
             get { return _reward; }

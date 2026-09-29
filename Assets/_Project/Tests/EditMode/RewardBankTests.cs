@@ -33,7 +33,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             _bank.Add(Pistol, 12);
             _bank.Add(Pistol, 30);
 
-            Assert.That(_bank.DistinctRewardCount, Is.EqualTo(1));
+            Assert.That(_bank.Entries.Count, Is.EqualTo(1));
             Assert.That(_bank.AmountOf(Pistol), Is.EqualTo(42));
         }
 

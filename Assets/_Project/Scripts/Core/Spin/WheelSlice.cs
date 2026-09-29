@@ -7,7 +7,7 @@ namespace Vertigo.Wheel.Core.Spin
     /// One of the eight slots on a wheel, with its amount already scaled for the current zone.
     /// Immutable: a slice is a snapshot of what this zone is offering, not a mutable authoring record.
     /// </summary>
-    public readonly struct WheelSlice : IEquatable<WheelSlice>
+    public readonly struct WheelSlice
     {
         public readonly SliceKind Kind;
         public readonly RewardId Reward;
@@ -45,34 +45,6 @@ namespace Vertigo.Wheel.Core.Spin
         public bool IsBomb
         {
             get { return Kind == SliceKind.Bomb; }
-        }
-
-        public bool Equals(WheelSlice other)
-        {
-            return Kind == other.Kind && Reward.Equals(other.Reward) && Amount == other.Amount &&
-                Weight == other.Weight;
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is WheelSlice other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hash = (int)Kind;
-                hash = (hash * 397) ^ Reward.GetHashCode();
-                hash = (hash * 397) ^ Amount;
-                hash = (hash * 397) ^ Weight;
-                return hash;
-            }
-        }
-
-        public override string ToString()
-        {
-            return IsBomb ? $"[Bomb w{Weight}]" : $"[{Reward} x{Amount} w{Weight}]";
         }
     }
 }

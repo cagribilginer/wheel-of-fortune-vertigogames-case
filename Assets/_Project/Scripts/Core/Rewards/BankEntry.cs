@@ -11,10 +11,5 @@ namespace Vertigo.Wheel.Core.Rewards
             Reward = reward;
             Amount = amount;
         }
-
-        public override string ToString()
-        {
-            return $"{Reward} x{Amount}";
-        }
     }
 }

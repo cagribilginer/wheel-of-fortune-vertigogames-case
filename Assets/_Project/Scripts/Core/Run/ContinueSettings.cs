@@ -29,10 +29,5 @@ namespace Vertigo.Wheel.Core.Run
             CostPerZone = costPerZone;
             MaxAdRevivesPerRun = maxAdRevivesPerRun;
         }
-
-        public static ContinueSettings Default
-        {
-            get { return new ContinueSettings(50, 10, 1); }
-        }
     }
 }
