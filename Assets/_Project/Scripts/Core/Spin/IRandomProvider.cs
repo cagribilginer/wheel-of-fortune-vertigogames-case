@@ -8,8 +8,5 @@ namespace Vertigo.Wheel.Core.Spin
     {
         /// <summary>Returns a non-negative value strictly less than <paramref name="maxExclusive"/>.</summary>
         int Next(int maxExclusive);
-
-        /// <summary>Returns a value in [0, 1).</summary>
-        double NextDouble();
     }
 }

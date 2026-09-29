@@ -28,10 +28,5 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
 
             return _random.Next(maxExclusive);
         }
-
-        public double NextDouble()
-        {
-            return _random.NextDouble();
-        }
     }
 }

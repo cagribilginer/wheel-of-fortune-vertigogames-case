@@ -9,10 +9,5 @@ namespace Vertigo.Wheel.Data.Services
         {
             return UnityEngine.Random.Range(0, maxExclusive);
         }
-
-        public double NextDouble()
-        {
-            return UnityEngine.Random.value;
-        }
     }
 }
