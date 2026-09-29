@@ -115,21 +115,6 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.Zero);
         }
 
-        /// <summary>
-        /// The regression this guards: "gold"/"cash" shown anywhere in the UI must always mean the same
-        /// wallet balance. Before this, one screen computed its own haul-weighted score under the "cash"
-        /// label while another showed the actual currency amount — same name, two different numbers.
-        /// </summary>
-        [Test]
-        public void CashBalance_TracksItsOwnCurrencyIndependentlyOfGold()
-        {
-            _wallet.Add(TestWheels.Gold, 100);
-            _wallet.Add(TestWheels.Cash, 25);
-
-            Assert.That(_run.GoldBalance, Is.EqualTo(100));
-            Assert.That(_run.CashBalance, Is.EqualTo(25));
-        }
-
         [Test]
         public void CashOut_CreditsEveryCurrencyTheRunWasGiven()
         {
@@ -169,8 +154,8 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             _run.CashOut();
 
-            Assert.That(_run.GoldBalance, Is.EqualTo(40), "Gold should be credited.");
-            Assert.That(_run.CashBalance, Is.EqualTo(50), "Cash should be credited too.");
+            Assert.That(_run.Balances.Gold, Is.EqualTo(40), "Gold should be credited.");
+            Assert.That(_run.Balances.Cash, Is.EqualTo(50), "Cash should be credited too.");
         }
 
         [Test]
@@ -238,6 +223,11 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.That(_run.GoldRevivesUsedThisRun, Is.Zero);
         }
 
+        /// <summary>
+        /// The regression this guards: "gold"/"cash" shown anywhere in the UI must always mean the same
+        /// wallet balance. Before this, one screen computed its own haul-weighted score under the "cash"
+        /// label while another showed the actual currency amount — same name, two different numbers.
+        /// </summary>
         [Test]
         public void Balances_PairsEachCurrencyWithItsOwnBalance()
         {

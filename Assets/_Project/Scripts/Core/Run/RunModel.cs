@@ -16,10 +16,10 @@ namespace Vertigo.Wheel.Core.Run
         private readonly IZoneClassifier _classifier;
         private readonly Wallet _wallet;
 
-        // The currency GoldBalance reports and ContinueService prices revives in.
+        // The currency Balances reports as gold, and ContinueService prices revives in.
         private readonly RewardId _goldCurrency;
 
-        // The currency CashBalance reports — the same wallet balance shown everywhere as "cash".
+        // The currency Balances reports as cash — the same wallet balance shown everywhere as "cash".
         private readonly RewardId _cashCurrency;
 
         // Every reward that lands in the wallet on cash-out. Gold and cash are always members.
@@ -85,22 +85,13 @@ namespace Vertigo.Wheel.Core.Run
             get { return _lostHaul ?? (IReadOnlyList<BankEntry>)Array.Empty<BankEntry>(); }
         }
 
-        /// <summary>The persistent gold balance, surfaced here so a state can hand it to the presentation.</summary>
-        public int GoldBalance
-        {
-            get { return _wallet.BalanceOf(_goldCurrency); }
-        }
-
-        /// <summary>The persistent cash balance — same wallet, same rules, just a different id.</summary>
-        public int CashBalance
-        {
-            get { return _wallet.BalanceOf(_cashCurrency); }
-        }
-
-        /// <summary>Both balances as one value, for handing to the presentation.</summary>
+        /// <summary>
+        /// The persistent gold and cash balances as one value, for handing to the presentation. Same wallet,
+        /// same rules, just a different id per currency.
+        /// </summary>
         public WalletBalances Balances
         {
-            get { return new WalletBalances(GoldBalance, CashBalance); }
+            get { return new WalletBalances(_wallet.BalanceOf(_goldCurrency), _wallet.BalanceOf(_cashCurrency)); }
         }
 
         public ZoneType CurrentZoneType
