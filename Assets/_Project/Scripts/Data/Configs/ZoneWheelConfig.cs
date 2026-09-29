@@ -37,10 +37,6 @@ namespace Vertigo.Wheel.Data.Configs
         {
             get { return _slices; }
         }
-        public bool ShuffleSliceOrder
-        {
-            get { return _shuffleSliceOrder; }
-        }
 
         // Authored data is immutable during play, so the built blueprint is cached and shared.
         private WheelBlueprint _cachedBlueprint;

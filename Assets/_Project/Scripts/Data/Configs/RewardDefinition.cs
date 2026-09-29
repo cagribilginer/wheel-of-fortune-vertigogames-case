@@ -35,10 +35,6 @@ namespace Vertigo.Wheel.Data.Configs
         {
             get { return new RewardId(Id); }
         }
-        public string DisplayName
-        {
-            get { return string.IsNullOrEmpty(_displayName) ? name : _displayName; }
-        }
         public Sprite Icon
         {
             get { return _icon; }

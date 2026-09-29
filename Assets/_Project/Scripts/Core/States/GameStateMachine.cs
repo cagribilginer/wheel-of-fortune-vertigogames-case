@@ -15,8 +15,6 @@ namespace Vertigo.Wheel.Core.States
 
         public IGameState Current { get; private set; }
 
-        public event Action<IGameState> StateChanged;
-
         public void Register(IGameState state)
         {
             if (state == null) throw new ArgumentNullException(nameof(state));
@@ -51,7 +49,6 @@ namespace Vertigo.Wheel.Core.States
 
                     Current?.Exit();
                     Current = next;
-                    StateChanged?.Invoke(Current);
                     Current.Enter();
                 }
             }

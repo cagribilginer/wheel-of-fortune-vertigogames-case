@@ -25,15 +25,6 @@ namespace Vertigo.Wheel.Core.Zones
             _superInterval = superInterval;
         }
 
-        public int SafeInterval
-        {
-            get { return _safeInterval; }
-        }
-        public int SuperInterval
-        {
-            get { return _superInterval; }
-        }
-
         /// <summary>
         /// True when every super zone is also a safe zone. When this does not hold, some super zones would
         /// not be reachable as safe zones and the progression reads inconsistently to a designer.

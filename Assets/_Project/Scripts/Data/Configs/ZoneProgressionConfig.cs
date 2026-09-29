@@ -28,14 +28,6 @@ namespace Vertigo.Wheel.Data.Configs
         [Header("Economy")]
         [SerializeField] private ScalingStrategySO _scaling;
 
-        public int SafeZoneInterval
-        {
-            get { return _safeZoneInterval; }
-        }
-        public int SuperZoneInterval
-        {
-            get { return _superZoneInterval; }
-        }
         public ScalingStrategySO Scaling
         {
             get { return _scaling; }
