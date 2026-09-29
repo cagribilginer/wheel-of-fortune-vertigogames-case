@@ -27,11 +27,10 @@ namespace Vertigo.Wheel.Tests.PlayMode
         [UnityTest]
         public IEnumerator Scene_Loads_AndReachesIdle_WithinTwoSeconds()
         {
-            // Main.unity is deliberately not in Build Settings (BuildPipelineRunner passes it to
-            // BuildPlayer directly), so it has to be loaded by path rather than by build index. This editor
-            // API is the correct way to do that from inside a running Play Mode session; the on-device
-            // fallback below is untested since this project only ever runs Play Mode tests from the editor
-            // (§3 row 18 — CI, and by extension device test runs, is out of scope).
+            // Load by path rather than by build index. This editor API is the correct way to do that from
+            // inside a running Play Mode session; the on-device fallback below is untested since this
+            // project only ever runs Play Mode tests from the editor (§3 row 18 — CI, and by extension
+            // device test runs, is out of scope).
 #if UNITY_EDITOR
             EditorSceneManager.LoadSceneInPlayMode(SCENE_PATH, new LoadSceneParameters(LoadSceneMode.Single));
 #else
