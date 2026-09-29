@@ -47,9 +47,9 @@ namespace Vertigo.Wheel.Core.Rewards
 
             if (_indexByReward.TryGetValue(reward, out int index))
             {
-                BankEntry existing = _entries[index];
                 // Saturates, like RewardScalingMath does for one drop: an endless run must never wrap negative.
-                _entries[index] = new BankEntry(reward, (int)Math.Min((long)existing.Amount + amount, int.MaxValue));
+                long stacked = (long)_entries[index].Amount + amount;
+                _entries[index] = new BankEntry(reward, (int)Math.Min(stacked, int.MaxValue));
             }
             else
             {
