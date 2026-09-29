@@ -23,12 +23,12 @@ namespace Vertigo.Wheel.Core.States.Flow
                 Context.ContinueService.IsAdReviveOffered(adUsed)));
         }
 
-        // Give up is a restart. The model resets before the screen closes, so the bank it refreshes is already empty.
+        // Give up is a restart: close the screen and boot a fresh run. The bomb already emptied the bank, so the
+        // refresh on the way out shows it empty.
         public override void OnRestartRequested()
         {
-            Context.Run.ResetRun();
             Context.GameOver.HideGameOver();
-            Machine.Change<ZoneSetupState>();
+            Machine.Change<BootState>();
         }
 
         public override void OnContinueRequested()

@@ -33,13 +33,9 @@ namespace Vertigo.Wheel.Core.States.Flow
             if (_claiming) return;
             _claiming = true;
 
-            // Credit the wallet, then read the new balances back for the count-up. The run resets after the celebration.
+            // Credit the wallet, then read the new balances back for the count-up. A fresh run boots after the celebration.
             Context.Run.CashOut();
-            Context.CashOut.ClaimCashOut(Context.Run.Balances, () =>
-            {
-                Context.Run.ResetRun();
-                Machine.Change<ZoneSetupState>();
-            });
+            Context.CashOut.ClaimCashOut(Context.Run.Balances, () => Machine.Change<BootState>());
         }
 
         public override void OnCancelled()
