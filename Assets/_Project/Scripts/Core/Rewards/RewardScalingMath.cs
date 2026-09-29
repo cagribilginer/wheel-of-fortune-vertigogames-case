@@ -8,7 +8,7 @@ namespace Vertigo.Wheel.Core.Rewards
     /// </summary>
     internal static class RewardScalingMath
     {
-        internal static void ValidateZone(int zone)
+        private static void ValidateZone(int zone)
         {
             if (zone < 1)
                 throw new ArgumentOutOfRangeException(nameof(zone), zone, "Zones are 1-indexed; the first zone is 1.");

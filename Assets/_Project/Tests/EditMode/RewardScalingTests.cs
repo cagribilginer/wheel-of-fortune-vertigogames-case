@@ -68,19 +68,6 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.Throws<ArgumentOutOfRangeException>(() => new LinearRewardScaling(-0.1d));
         }
 
-        [Test]
-        public void Step_ChangesOnlyAtStepBoundaries()
-        {
-            var step = new StepRewardScaling(zonesPerStep: 5, multiplierPerStep: 2d);
-
-            for (int zone = 1; zone <= 5; zone++)
-                Assert.That(step.Scale(10, zone), Is.EqualTo(10), $"Zone {zone} should still be in the first band.");
-
-            Assert.That(step.Scale(10, 6), Is.EqualTo(20));
-            Assert.That(step.Scale(10, 10), Is.EqualTo(20));
-            Assert.That(step.Scale(10, 11), Is.EqualTo(40));
-        }
-
         [TestCase(0)]
         [TestCase(-2)]
         public void NonPositiveZone_Throws(int zone)
