@@ -139,7 +139,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             long bankedGold = _run.Bank.AmountOf(TestWheels.Gold);
             Assert.That(bankedGold, Is.GreaterThan(0), "The super zone should have paid gold.");
 
-            _machine.RequestLeave();
+            _machine.RequestExit();
             Assert.That(_view.CashOutVisible, Is.True);
 
             _machine.Confirm();
@@ -190,7 +190,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             _run.JumpToZone(5);
             _run.Bank.Add(TestWheels.Gold, gold);
 
-            _machine.RequestLeave();
+            _machine.RequestExit();
             Assert.That(_machine.IsIn<CashOutState>(), Is.True);
         }
 

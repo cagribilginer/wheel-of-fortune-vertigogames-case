@@ -105,7 +105,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         public void LeaveWithAnEmptyBank_IsIgnored()
         {
             // Fresh on zone 1 with nothing banked: there is nothing to cash out.
-            _machine.RequestLeave();
+            _machine.RequestExit();
 
             Assert.That(_machine.IsIn<IdleState>(), Is.True);
             Assert.That(_view.CashOutVisible, Is.False);
@@ -117,7 +117,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             _machine.RequestSpin();                        // zone 1 -> 2, banks a reward
 
             Assert.That(_run.CurrentZoneType, Is.EqualTo(ZoneType.Normal));
-            _machine.RequestLeave();
+            _machine.RequestExit();
 
             Assert.That(_machine.IsIn<IdleState>(), Is.True, "Normal zones may not be cashed out from.");
             Assert.That(_view.CashOutVisible, Is.False);
@@ -129,7 +129,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             AdvanceToZone(5);                              // zone 5 is safe
 
             Assert.That(_run.CurrentZoneType, Is.EqualTo(ZoneType.Safe));
-            _machine.RequestLeave();
+            _machine.RequestExit();
 
             Assert.That(_machine.IsIn<CashOutState>(), Is.True);
             Assert.That(_view.CashOutVisible, Is.True);
@@ -140,7 +140,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         public void ConfirmingCashOut_ClaimsTheHaulAndStartsAFreshRun()
         {
             AdvanceToZone(5);
-            _machine.RequestLeave();
+            _machine.RequestExit();
             _machine.Confirm();
 
             Assert.That(_run.CurrentZone, Is.EqualTo(1));
@@ -156,7 +156,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             int zoneBefore = _run.CurrentZone;
             int bankedBefore = _run.Bank.DistinctRewardCount;
 
-            _machine.RequestLeave();
+            _machine.RequestExit();
             _machine.Cancel();
 
             Assert.That(_machine.IsIn<IdleState>(), Is.True);
@@ -288,7 +288,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.That(machine.IsIn<SpinningState>(), Is.True);
 
             machine.RequestSpin();
-            machine.RequestLeave();
+            machine.RequestExit();
 
             Assert.That(machine.IsIn<SpinningState>(), Is.True, "No input may be honoured mid-spin.");
             Assert.That(blocking.SpinCalls, Is.EqualTo(1), "A second spin must not have been started.");

@@ -63,10 +63,6 @@ namespace Vertigo.Wheel.Core.States
         {
             Current?.OnSpinRequested();
         }
-        public void RequestLeave()
-        {
-            Current?.OnLeaveRequested();
-        }
         public void RequestExit()
         {
             Current?.OnExitRequested();

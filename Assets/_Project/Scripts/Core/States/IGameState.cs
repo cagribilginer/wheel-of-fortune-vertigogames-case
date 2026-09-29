@@ -10,7 +10,6 @@ namespace Vertigo.Wheel.Core.States
         void Exit();
 
         void OnSpinRequested();
-        void OnLeaveRequested();
         void OnExitRequested();
         void OnConfirmed();
         void OnCancelled();

@@ -28,12 +28,6 @@ namespace Vertigo.Wheel.Core.States.Flow
             Machine.Change<SpinningState>();
         }
 
-        public override void OnLeaveRequested()
-        {
-            if (!Context.Run.CanLeave) return;
-            Machine.Change<CashOutState>();
-        }
-
         /// <summary>
         /// The single EXIT button's action: walk away with the haul. Legal only on a safe or super zone with
         /// something banked and the wheel idle, which <see cref="RunModel.CanLeave"/> checks.
