@@ -50,7 +50,6 @@ namespace Vertigo.Wheel.Core.Run
         #region Events and state
         public event Action<int> ZoneChanged;
         public event Action<RunPhase> PhaseChanged;
-        public event Action<RunEndReason> RunEnded;
 
         public RewardBank Bank { get; }
 
@@ -168,7 +167,6 @@ namespace Vertigo.Wheel.Core.Run
             _lostHaul = new List<BankEntry>(Bank.Entries);
             Bank.Clear();
             Phase = RunPhase.GameOver;
-            RunEnded?.Invoke(RunEndReason.Bomb);
         }
 
         /// <summary>
@@ -227,7 +225,6 @@ namespace Vertigo.Wheel.Core.Run
             }
 
             Phase = RunPhase.CashOut;
-            RunEnded?.Invoke(RunEndReason.CashedOut);
         }
 
         /// <summary>Back to zone 1 with an empty bank. This is what "restart" means.</summary>

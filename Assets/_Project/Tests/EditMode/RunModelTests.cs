@@ -72,14 +72,10 @@ namespace Vertigo.Wheel.Tests.EditMode
         {
             _run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Pistol, 40));
 
-            RunEndReason? reason = null;
-            _run.RunEnded += r => reason = r;
-
             _run.Detonate();
 
             Assert.That(_run.Bank.IsEmpty, Is.True);
             Assert.That(_run.Phase, Is.EqualTo(RunPhase.GameOver));
-            Assert.That(reason, Is.EqualTo(RunEndReason.Bomb));
         }
 
         /// <summary>
