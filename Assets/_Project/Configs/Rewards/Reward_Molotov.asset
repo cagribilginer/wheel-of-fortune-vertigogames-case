@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: Reward_Molotov
   m_EditorClassIdentifier: 
   _id: Reward_Molotov
-  _displayName: Molotov
   _icon: {fileID: 21300000, guid: ee1afa86e7677487bb55850ea4823736, type: 3}
   _category: 2
   _defaultBaseAmount: 4

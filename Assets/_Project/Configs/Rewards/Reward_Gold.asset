@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: Reward_Gold
   m_EditorClassIdentifier: 
   _id: Reward_Gold
-  _displayName: Gold
   _icon: {fileID: 21300000, guid: 1b44d19b22b9a4f0fb514481b5d0a171, type: 3}
   _category: 4
   _defaultBaseAmount: 40

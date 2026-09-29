@@ -17,7 +17,6 @@ namespace Vertigo.Wheel.Data.Configs
         [Tooltip("Stable key used by the logic layer. Defaults to the asset filename.")]
         [SerializeField] private string _id;
 
-        [SerializeField] private string _displayName;
         [Tooltip("PNG cropped to its visible content — icon boxes fit and centre the sprite's full rect.")]
         [SerializeField] private Sprite _icon;
 

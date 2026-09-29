@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: Reward_ChestSilver
   m_EditorClassIdentifier: 
   _id: Reward_ChestSilver
-  _displayName: Silver Chest
   _icon: {fileID: 21300000, guid: 5cf5021a95d7e4ca9b2110f43551b22b, type: 3}
   _category: 5
   _defaultBaseAmount: 1

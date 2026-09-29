@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: Reward_Tier2Mle
   m_EditorClassIdentifier: 
   _id: Reward_Tier2Mle
-  _displayName: Melee Weapon
   _icon: {fileID: 21300000, guid: 51dad327fd84843bba6e074175f2f2c9, type: 3}
   _category: 1
   _defaultBaseAmount: 1
