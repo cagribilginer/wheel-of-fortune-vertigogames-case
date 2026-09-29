@@ -7,8 +7,9 @@ bomb slice can wipe the run — unless they cash out first, or pay to revive.
 - **Engine:** Unity **2021.3.30f1** (LTS), Built-in Render Pipeline
 - **Target:** Android, landscape, notch/dynamic-island aware
 - **Third-party runtime:** DOTween (animation), TextMesh Pro (text)
-- **License note:** the `Vertigo Games Game Developer Demo` brief PDF and the audio pack license
-  are intentionally git-ignored.
+- **Repository note:** the `Vertigo Games Game Developer Demo` brief PDF is intentionally git-ignored.
+  `Assets/_Project/Audio` holds only the clips the game uses, picked from a larger audio pack; the
+  full pack is not in the repo.
 
 ---
 
@@ -21,7 +22,7 @@ Each run starts on **Zone 1** and moves one zone at a time:
 | **Spin** | Weighted random slice on the current zone's wheel. Grants a reward, or detonates a bomb. |
 | **Bank** | Rewards accumulate per-run, stacked by id. This is what a bomb takes. |
 | **Zone type** | `Normal` carries a bomb; `Safe` (every 5th zone) and `Super` (every 30th) are bomb-free and pay more. |
-| **Cash out** | Leave only on a `Safe` or `Super` zone, while the wheel is idle and the bank is non-empty. Banked gold and cash convert to the persistent wallet — the only way either balance ever grows. |
+| **Cash out** | Leave only on a `Safe` or `Super` zone, while the wheel is idle and the bank is non-empty. Every banked currency (gold, cash, …) converts to the persistent wallet — the only way a balance ever grows. |
 | **Bomb** | The whole bank is lost and the run ends — but the lost haul is snapshotted first (see §4). |
 | **Revive** | Gold revive: uncapped, price doubles per use in a run. Ad revive: one free per run. Either restores the snapshotted haul. |
 
@@ -34,7 +35,7 @@ Each run starts on **Zone 1** and moves one zone at a time:
 ```
 Vertigo.Wheel.Core      pure C#, no UnityEngine UI — rules, state machine, run model
 Vertigo.Wheel.Data      ScriptableObject configs + save/audio services (references Core)
-Vertigo.Wheel.UI        MonoBehaviour Views + UI helpers (references Core)
+Vertigo.Wheel.UI        MonoBehaviour Views + UI helpers (references Core and Data)
 Vertigo.Wheel.Gameplay  Presenters + the composition root (references all of the above)
 Vertigo.Wheel.Editor    config + hygiene validators, build pipeline, sprite import rules
 Vertigo.Wheel.Tests.EditMode / .PlayMode
@@ -64,7 +65,7 @@ headlessly (see §5).
 ### Finite state machine
 
 `GameStateMachine` drains a queue of state changes and forwards a fixed input surface
-(`RequestSpin`, `RequestLeave`, `Confirm`, `Cancel`, `RequestContinue`,
+(`RequestSpin`, `RequestExit`, `Confirm`, `Cancel`, `RequestContinue`,
 `RequestAdContinue`, `RequestRestart`) to the current state, which ignores what it does not accept.
 
 ```
@@ -73,6 +74,9 @@ BootState → ZoneSetupState → IdleState ⇄ SpinningState → ResolvingState 
                                 │                              └→ BombHitState → GameOverState
                                 └→ CashOutState (confirm/cancel)
 ```
+
+Every run starts in `BootState`: the first launch, a give-up on the game-over screen and a confirmed
+cash-out all re-enter it, and it resets the run before handing over to zone setup.
 
 `IdleState` is the only state that accepts player input, and it asks `RunModel` /
 `CashOutPolicy` whether each action is legal rather than deciding for itself — so the button
@@ -103,6 +107,13 @@ and checked by `Tools ▸ Vertigo ▸ Validate Game Configs`:
 | `ContinueConfig` | Revive base cost, cost-per-zone, ad-revive cap |
 | `AudioLibrary` | Named SFX slots (`_buttonClick`, `_rewardChime`, `_bombExplosion`, …) |
 
+### Adding a wallet currency
+
+A currency is data, not code. Create a `RewardDefinition` with the `Currency` category (icon, and a
+balance colour for the popups), add it to the `RewardCatalog` list, and place it on a wheel slice.
+Cash-out banks it, the wallet persists it, `Reset Save` clears it and both popups list it in catalog
+order. The gold currency stays a named role only because revives are paid in it.
+
 `ZoneClassifier` reads the intervals and classifies any zone by pure arithmetic
 (`zone % superInterval`, then `zone % safeInterval`), so zone 1 is an ordinary bronze zone with a bomb.
 The Super interval is tested first, which is why zone 30 is Super, not Safe.
@@ -130,7 +141,7 @@ RunModel.ApplyGoldRevive() / ApplyAdRevive():
 
 `_lostHaul` is non-null only while a bomb is waiting on a revive-or-restart decision. A restart or
 a fresh run discards it; `ResetRun()` zeroes both revive counters. The bank's own invariants
-(stack-by-id, first-acquisition order, `Changed` event) are untouched — a revive is an ordinary
+(stack-by-id, first-acquisition order) are untouched — a revive is an ordinary
 sequence of `Bank.Add` calls, not a special path.
 
 ### Deferred cash-out commit
@@ -150,7 +161,7 @@ something."_ The EXIT button's interactable state is a reflection of this, never
 ## 5. Testing Suite
 
 ```
-Assets/_Project/Tests/EditMode    226 tests           pure logic + full flow
+Assets/_Project/Tests/EditMode    219 tests          pure logic + full flow
 Assets/_Project/Tests/PlayMode      1 test            composition-root smoke test
 ```
 
@@ -191,9 +202,9 @@ else is proven faster in EditMode; this proves the composition root itself.
 - **DOTween pipelines** — wheel spin easing, `DOPunchScale` on buttons and the collect card, popup open/close
   scale+fade (`PopupViewBase`), reward tiles flying from the wheel slot into their bank cell
   (`BankPresenter.FlyIn`), the red bomb-alert vignette yoyo.
-- **Dynamic counters** — `CollectPopupView`'s cash/gold row counts up smoothly (`CountingLabel`,
-  `DOVirtual.Int`, `Ease.OutCubic`) instead of snapping; the claim flow animates it to the wallet's
-  new post-claim totals.
+- **Dynamic counters** — the collect popup's currency rows count up smoothly (`CurrencyRowView.CountTo`,
+  `DOVirtual.Int`, `Ease.OutCubic`) instead of snapping; the claim flow animates each one to the
+  wallet's new post-claim total.
 - **Milestone UI** — Safe / Super badges on the zone bar open a preview modal showing that band's
   wheel tier and reward slots.
 - **Responsive layout** — `SafeAreaFitter` on the gameplay and popup layers keeps content clear of
@@ -231,7 +242,7 @@ Or in-editor: **Window ▸ General ▸ Test Runner**.
 ```
 Tools ▸ Vertigo ▸ Validate UI Hygiene     raycast targets, the Maskable/RectMask2D trap, 9-slice sprites
 Tools ▸ Vertigo ▸ Validate Game Configs    config asset integrity
-Tools ▸ Vertigo ▸ Reset Save               clear the persistent gold/cash wallet
+Tools ▸ Vertigo ▸ Reset Save               clear the persistent wallet (every currency)
 ```
 
 ### Build the APK
@@ -241,7 +252,8 @@ Tools ▸ Vertigo ▸ Build Android APK
 # batch: -executeMethod Vertigo.Wheel.Editor.BuildPipelineRunner.BuildAndroid -quit
 ```
 
-`Main.unity` is passed to `BuildPlayer` directly rather than sitting in Build Settings. The Addressables
+`BuildPipelineRunner` passes `Main.unity` to `BuildPlayer` explicitly, so a batch build does not depend on
+the Build Settings list. The Addressables
 content (the six `Settings/` configs) is built as part of the player build — the project pins
 "Build Addressables on Player Build", so the result doesn't depend on a machine-local preference.
 
