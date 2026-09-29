@@ -20,6 +20,9 @@ namespace Vertigo.Wheel.Data.Configs
         [Tooltip("PNG cropped to its visible content — icon boxes fit and centre the sprite's full rect.")]
         [SerializeField] private Sprite _icon;
 
+        [Tooltip("Colour of this reward's number where it is shown as a wallet balance.")]
+        [SerializeField] private Color _balanceColor = Color.white;
+
         [SerializeField] private RewardCategory _category = RewardCategory.Points;
 
         [Tooltip("Amount granted at zone 1, before zone scaling.")]
@@ -37,6 +40,10 @@ namespace Vertigo.Wheel.Data.Configs
         public Sprite Icon
         {
             get { return _icon; }
+        }
+        public Color BalanceColor
+        {
+            get { return _balanceColor; }
         }
         public RewardCategory Category
         {

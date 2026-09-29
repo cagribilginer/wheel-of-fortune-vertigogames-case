@@ -33,6 +33,7 @@ namespace Vertigo.Wheel.Gameplay
         [SerializeField] private DebugOverlayView _debugOverlay;
         [SerializeField] private ZoneMapTileView _zoneMapTilePrefab;
         [SerializeField] private BankEntryView _bankEntryPrefab;
+        [SerializeField] private CurrencyRowView _currencyRowPrefab;
         [SerializeField] private Transform _flightLayer;
         [SerializeField] private Sprite _bombSlotIcon;
 
@@ -74,10 +75,9 @@ namespace Vertigo.Wheel.Gameplay
                 classifier, progression, progression.Scaling, new UnityRandomProvider());
             var spinService = new SpinService(new WeightedSliceResolver(new UnityRandomProvider()));
             RewardId goldRewardId = catalog.GoldCurrency;
-            RewardId cashRewardId = catalog.CashCurrency;
             var wallet = new Wallet(new PlayerPrefsSaveService());
             var continueService = new ContinueService(wallet, goldRewardId, continueConfig.ToSettings());
-            var runModel = new RunModel(classifier, wallet, goldRewardId, cashRewardId, catalog.CurrencyIds);
+            var runModel = new RunModel(classifier, wallet, catalog.CurrencyIds);
 
             var audioLibrary = LoadConfig<AudioLibrary>("Configs/Settings/AudioLibrary");
             IAudioService audioService = new AudioService(transform);
@@ -94,7 +94,7 @@ namespace Vertigo.Wheel.Gameplay
                 _bank, _bankEntryPrefab, catalog, runModel.Bank, _flightLayer, audioPresenter, juice);
             var actionBarPresenter = new ActionBarPresenter(_actionBar);
             var popupPresenter = new PopupPresenter(
-                _bombPopup, _collectPopup, _bankEntryPrefab, catalog, audioPresenter);
+                _bombPopup, _collectPopup, _bankEntryPrefab, _currencyRowPrefab, catalog, audioPresenter, juice);
             var vfxPresenter = new VfxPresenter(_vfx, juice);
 
             var presentation = new ScreenPresentation(

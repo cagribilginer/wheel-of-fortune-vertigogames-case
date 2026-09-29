@@ -77,10 +77,10 @@ namespace Vertigo.Wheel.Editor
 
                 try
                 {
-                    // Both currencies must resolve to catalog entries, or cash-out has nothing to convert.
-                    if (!catalog.Find(catalog.GoldCurrency) || !catalog.Find(catalog.CashCurrency))
+                    // The revive currency must resolve to a catalog entry, or gold revives have nothing to charge.
+                    if (!catalog.Find(catalog.GoldCurrency))
                     {
-                        Debug.LogError("[Vertigo] A catalog currency is not one of the catalog's own rewards.");
+                        Debug.LogError("[Vertigo] The gold currency is not one of the catalog's own rewards.");
                         problems++;
                     }
                 }

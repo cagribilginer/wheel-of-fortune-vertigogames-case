@@ -3,7 +3,6 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Vertigo.Wheel.Core.Run;
 using Vertigo.Wheel.Core.States;
 
 namespace Vertigo.Wheel.UI.Views.Popups
@@ -18,8 +17,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
         [SerializeField] private Image _ui_image_popup_bomb_vignette;
         [SerializeField] private RectTransform _ui_transform_popup_bomb_anim;
         [SerializeField] private TextMeshProUGUI _ui_text_popup_bomb_zone_value;
-        [SerializeField] private TextMeshProUGUI _ui_text_popup_bomb_cash_value;
-        [SerializeField] private TextMeshProUGUI _ui_text_popup_bomb_gold_value;
+        [SerializeField] private RectTransform _ui_row_popup_bomb_currency;
         [SerializeField] private RectTransform _ui_content_popup_bomb_list;
         [SerializeField] private TextMeshProUGUI _ui_text_popup_bomb_empty_value;
         [SerializeField] private Button _ui_button_popup_bomb_giveup;
@@ -33,6 +31,12 @@ namespace Vertigo.Wheel.UI.Views.Popups
             get { return _ui_content_popup_bomb_list; }
         }
 
+        /// <summary>Where the presenter pools the wallet's currency rows.</summary>
+        public RectTransform CurrencyContent
+        {
+            get { return _ui_row_popup_bomb_currency; }
+        }
+
         public event Action GiveUpClicked;
         public event Action ContinueClicked;
         public event Action AdContinueClicked;
@@ -44,8 +48,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
             Bind(ref _ui_image_popup_bomb_vignette, "ui_image_popup_bomb_vignette");
             Bind(ref _ui_transform_popup_bomb_anim, "ui_transform_popup_bomb_anim");
             Bind(ref _ui_text_popup_bomb_zone_value, "ui_text_popup_bomb_zone_value");
-            Bind(ref _ui_text_popup_bomb_cash_value, "ui_text_popup_bomb_cash_value");
-            Bind(ref _ui_text_popup_bomb_gold_value, "ui_text_popup_bomb_gold_value");
+            Bind(ref _ui_row_popup_bomb_currency, "ui_row_popup_bomb_currency");
             Bind(ref _ui_content_popup_bomb_list, "ui_content_popup_bomb_list");
             Bind(ref _ui_text_popup_bomb_empty_value, "ui_text_popup_bomb_empty_value");
             Bind(ref _ui_button_popup_bomb_giveup, "ui_button_popup_bomb_giveup");
@@ -89,8 +92,6 @@ namespace Vertigo.Wheel.UI.Views.Popups
 
             // SetText's zero-alloc formatter does not honour ":N0" (it prints the literal characters), so the
             // thousands separator has to come from the regular setter.
-            _ui_text_popup_bomb_cash_value.text = summary.Wallet.Cash.ToString("N0");
-            _ui_text_popup_bomb_gold_value.text = summary.Wallet.Gold.ToString("N0");
             _ui_text_popup_bomb_continue_value.text = summary.GoldReviveCost.ToString("N0");
 
             _ui_text_popup_bomb_empty_value.gameObject.SetActive(summary.LostHaul.Count == 0);

@@ -31,7 +31,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         {
             _save = new InMemorySaveService();
             _wallet = new Wallet(_save);
-            _run = new RunModel(new ZoneClassifier(), _wallet, TestWheels.Gold, TestWheels.Cash);
+            _run = new RunModel(new ZoneClassifier(), _wallet, TestWheels.Currencies);
 
             var blueprints = new StubBlueprintProvider(BOMB_SLOT);
             var factory = new ZoneWheelFactory(new ZoneClassifier(), blueprints, new LinearRewardScaling());
@@ -275,7 +275,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         {
             var blocking = new BlockingPresentation();
             var context = new GameContext(
-                new RunModel(new ZoneClassifier(), _wallet, TestWheels.Gold, TestWheels.Cash),
+                new RunModel(new ZoneClassifier(), _wallet, TestWheels.Currencies),
                 new ZoneWheelFactory(new ZoneClassifier(), new StubBlueprintProvider(BOMB_SLOT), new LinearRewardScaling()),
                 new SpinService(new FixedSliceResolver(REWARD_SLOT)),
                 new ContinueService(_wallet, TestWheels.Gold, ContinueSettings.Default),

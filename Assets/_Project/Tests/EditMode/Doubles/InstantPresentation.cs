@@ -36,16 +36,13 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
         public int ContinueCostShown { get; private set; }
         public int GameOverZoneShown { get; private set; }
         public bool AdReviveOffered { get; private set; }
-        public int PlayerGoldShown { get; private set; }
-        public int PlayerCashShown { get; private set; }
+        public WalletBalances PlayerBalancesShown { get; private set; }
         public List<BankEntry> LostHaulShown { get; } = new List<BankEntry>();
 
         public bool CashOutVisible { get; private set; }
         public int CashOutZonesCleared { get; private set; }
-        public int CashOutGoldShown { get; private set; }
-        public int CashOutCashShown { get; private set; }
-        public int ClaimGoldShown { get; private set; }
-        public int ClaimCashShown { get; private set; }
+        public WalletBalances CashOutBalancesShown { get; private set; }
+        public WalletBalances ClaimBalancesShown { get; private set; }
         public List<BankEntry> CashOutHaul { get; } = new List<BankEntry>();
 
         public virtual void ShowZone(int zone, ZoneType zoneType, WheelModel wheel, Action onComplete)
@@ -94,8 +91,7 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             ContinueOffered = summary.GoldReviveOffered;
             ContinueCostShown = summary.GoldReviveCost;
             AdReviveOffered = summary.AdReviveOffered;
-            PlayerGoldShown = summary.Wallet.Gold;
-            PlayerCashShown = summary.Wallet.Cash;
+            PlayerBalancesShown = summary.Wallet;
 
             LostHaulShown.Clear();
             IReadOnlyList<BankEntry> lostHaul = summary.LostHaul;
@@ -111,8 +107,7 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
         {
             CashOutVisible = true;
             CashOutZonesCleared = zonesCleared;
-            CashOutGoldShown = wallet.Gold;
-            CashOutCashShown = wallet.Cash;
+            CashOutBalancesShown = wallet;
             CashOutHaul.Clear();
             for (int i = 0; i < haul.Count; i++) CashOutHaul.Add(haul[i]);
         }
@@ -125,8 +120,7 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
         public virtual void ClaimCashOut(WalletBalances wallet, Action onComplete)
         {
             CashOutVisible = false;
-            ClaimGoldShown = wallet.Gold;
-            ClaimCashShown = wallet.Cash;
+            ClaimBalancesShown = wallet;
             onComplete?.Invoke();
         }
 

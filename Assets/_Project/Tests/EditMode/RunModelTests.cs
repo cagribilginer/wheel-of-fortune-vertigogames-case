@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using NUnit.Framework;
 using Vertigo.Wheel.Core.Rewards;
 using Vertigo.Wheel.Core.Run;
@@ -20,7 +21,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         {
             _save = new InMemorySaveService();
             _wallet = new Wallet(_save);
-            _run = new RunModel(new ZoneClassifier(), _wallet, TestWheels.Gold, TestWheels.Cash);
+            _run = new RunModel(new ZoneClassifier(), _wallet, TestWheels.Currencies);
         }
 
         [Test]
@@ -115,7 +116,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         public void CashOut_CreditsEveryCurrencyTheRunWasGiven()
         {
             var gems = new RewardId("gems");
-            var run = new RunModel(new ZoneClassifier(), _wallet, TestWheels.Gold, TestWheels.Cash, new[] { gems });
+            var run = new RunModel(new ZoneClassifier(), _wallet, new[] { TestWheels.Gold, TestWheels.Cash, gems });
 
             run.Grant(new SpinOutcome(1, SliceKind.Reward, gems, 7));
             run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Pistol, 999));
@@ -150,8 +151,8 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             _run.CashOut();
 
-            Assert.That(_run.Balances.Gold, Is.EqualTo(40), "Gold should be credited.");
-            Assert.That(_run.Balances.Cash, Is.EqualTo(50), "Cash should be credited too.");
+            Assert.That(_run.Balances.AmountOf(TestWheels.Gold), Is.EqualTo(40), "Gold should be credited.");
+            Assert.That(_run.Balances.AmountOf(TestWheels.Cash), Is.EqualTo(50), "Cash should be credited too.");
         }
 
         [Test]
@@ -230,8 +231,21 @@ namespace Vertigo.Wheel.Tests.EditMode
             _wallet.Add(TestWheels.Gold, 100);
             _wallet.Add(TestWheels.Cash, 25);
 
-            Assert.That(_run.Balances.Gold, Is.EqualTo(100));
-            Assert.That(_run.Balances.Cash, Is.EqualTo(25));
+            Assert.That(_run.Balances.AmountOf(TestWheels.Gold), Is.EqualTo(100));
+            Assert.That(_run.Balances.AmountOf(TestWheels.Cash), Is.EqualTo(25));
+        }
+
+        [Test]
+        public void Balances_ListsEveryConfiguredCurrencyInOrder_WithoutAnyCodeChange()
+        {
+            var gems = new RewardId("gems");
+            var run = new RunModel(new ZoneClassifier(), _wallet, new[] { TestWheels.Cash, gems, TestWheels.Cash });
+            _wallet.Add(gems, 3);
+
+            Assert.That(run.Balances.Entries.Select(e => e.Reward), Is.EqualTo(new[] { TestWheels.Cash, gems }),
+                "Order follows the configuration and a repeated currency is listed once.");
+            Assert.That(run.Balances.AmountOf(gems), Is.EqualTo(3));
+            Assert.That(run.Balances.AmountOf(TestWheels.Gold), Is.Zero, "A currency the run was not given reads as 0.");
         }
 
         [Test]
@@ -258,9 +272,11 @@ namespace Vertigo.Wheel.Tests.EditMode
         public void NullDependencies_Throw()
         {
             Assert.Throws<ArgumentNullException>(
-                () => new RunModel(null, _wallet, TestWheels.Gold, TestWheels.Cash));
+                () => new RunModel(null, _wallet, TestWheels.Currencies));
             Assert.Throws<ArgumentNullException>(
-                () => new RunModel(new ZoneClassifier(), null, TestWheels.Gold, TestWheels.Cash));
+                () => new RunModel(new ZoneClassifier(), null, TestWheels.Currencies));
+            Assert.Throws<ArgumentNullException>(
+                () => new RunModel(new ZoneClassifier(), _wallet, null));
         }
     }
 }

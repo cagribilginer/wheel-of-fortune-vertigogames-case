@@ -12,6 +12,9 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
         public static readonly RewardId Gold = new RewardId("gold");
         public static readonly RewardId Cash = new RewardId("cash");
 
+        /// <summary>The wallet currencies a test run is built with, in display order.</summary>
+        public static readonly RewardId[] Currencies = { Gold, Cash };
+
         /// <summary>Seven reward slices plus one bomb at <paramref name="bombIndex"/>, all weight 1.</summary>
         public static WheelModel NormalWheel(int bombIndex = 0, int amount = 10)
         {

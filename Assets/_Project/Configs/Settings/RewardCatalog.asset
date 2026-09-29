@@ -42,4 +42,3 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f90cc04eb3c2e451da0497192cdacb8c, type: 2}
   - {fileID: 11400000, guid: 1555425d89225445a9a1c88d919c56b2, type: 2}
   _goldCurrency: {fileID: 11400000, guid: d5a00aead753f4a20ad172887ed327e2, type: 2}
-  _cashCurrency: {fileID: 11400000, guid: 383bfb5cf1e01434fb78357810b71ce8, type: 2}

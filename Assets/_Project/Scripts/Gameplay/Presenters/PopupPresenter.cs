@@ -15,19 +15,25 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly BombPopupView _bomb;
         private readonly CollectPopupView _collect;
         private readonly AudioPresenter _audio;
+        private readonly JuiceConfig _juice;
         private readonly HaulList _bombHaul;
         private readonly HaulList _collectHaul;
+        private readonly CurrencyList _bombCurrencies;
+        private readonly CurrencyList _collectCurrencies;
         private GameStateMachine _machine;
 
         public PopupPresenter(
             BombPopupView bomb, CollectPopupView collect, BankEntryView entryPrefab,
-            RewardCatalog catalog, AudioPresenter audio)
+            CurrencyRowView currencyPrefab, RewardCatalog catalog, AudioPresenter audio, JuiceConfig juice)
         {
             _bomb = bomb;
             _collect = collect;
             _audio = audio;
+            _juice = juice;
             _bombHaul = new HaulList(entryPrefab, bomb.Content, catalog);
             _collectHaul = new HaulList(entryPrefab, collect.Content, catalog);
+            _bombCurrencies = new CurrencyList(currencyPrefab, bomb.CurrencyContent, catalog);
+            _collectCurrencies = new CurrencyList(currencyPrefab, collect.CurrencyContent, catalog);
         }
 
         #region Input
@@ -64,6 +70,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _audio.PlayDefeatAmbience();
 
             // The corner HUD shows the actual wallet, not a score built from the lost haul.
+            _bombCurrencies.Show(summary.Wallet);
             _bomb.Show(summary);
         }
 
@@ -80,7 +87,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _collectHaul.Show(haul);
 
             _audio.PlayPopupOpen();
-            _collect.Show(zonesCleared, wallet);
+
+            // The wallet as it stands before this claim lands; ClaimCashOut is what counts it up.
+            _collectCurrencies.CountTo(wallet, _juice.CountUpDuration);
+            _collect.Show(zonesCleared);
         }
 
         public void HideCashOut()
@@ -93,7 +103,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         {
             // No close sound: the next zone's wheel swoosh fires on the same frame and covers the exit.
             _audio.PlayClaim();
-            _collect.PlayClaim(wallet, onComplete);
+            _collect.PlayClaim(onComplete);
+            _collectCurrencies.CountTo(wallet, _juice.CountUpDuration);
         }
         #endregion
     }

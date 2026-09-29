@@ -16,14 +16,8 @@ namespace Vertigo.Wheel.Core.Run
         private readonly IZoneClassifier _classifier;
         private readonly Wallet _wallet;
 
-        // The currency Balances reports as gold, and ContinueService prices revives in.
-        private readonly RewardId _goldCurrency;
-
-        // The currency Balances reports as cash — the same wallet balance shown everywhere as "cash".
-        private readonly RewardId _cashCurrency;
-
-        // Every reward that lands in the wallet on cash-out. Gold and cash are always members.
-        private readonly HashSet<RewardId> _currencies;
+        // Every reward that lands in the wallet on cash-out, in the order Balances reports them.
+        private readonly List<RewardId> _currencies = new List<RewardId>();
 
         private int _currentZone = 1;
         private int _goldRevivesUsed;
@@ -34,14 +28,15 @@ namespace Vertigo.Wheel.Core.Run
         private List<BankEntry> _lostHaul;
 
         public RunModel(
-            IZoneClassifier classifier, Wallet wallet, RewardId goldCurrency, RewardId cashCurrency,
-            IEnumerable<RewardId> currencies = null)
+            IZoneClassifier classifier, Wallet wallet, IEnumerable<RewardId> currencies)
         {
             _classifier = classifier ?? throw new ArgumentNullException(nameof(classifier));
             _wallet = wallet ?? throw new ArgumentNullException(nameof(wallet));
-            _goldCurrency = goldCurrency;
-            _cashCurrency = cashCurrency;
-            _currencies = new HashSet<RewardId>(currencies ?? Array.Empty<RewardId>()) { goldCurrency, cashCurrency };
+
+            foreach (RewardId currency in currencies ?? throw new ArgumentNullException(nameof(currencies)))
+            {
+                if (!_currencies.Contains(currency)) _currencies.Add(currency);
+            }
 
             Bank = new RewardBank();
         }
@@ -82,13 +77,17 @@ namespace Vertigo.Wheel.Core.Run
             get { return _lostHaul ?? (IReadOnlyList<BankEntry>)Array.Empty<BankEntry>(); }
         }
 
-        /// <summary>
-        /// The persistent gold and cash balances as one value, for handing to the presentation. Same wallet,
-        /// same rules, just a different id per currency.
-        /// </summary>
+        /// <summary>The persistent balance of every wallet currency as one value, for handing to the presentation.</summary>
         public WalletBalances Balances
         {
-            get { return new WalletBalances(_wallet.BalanceOf(_goldCurrency), _wallet.BalanceOf(_cashCurrency)); }
+            get
+            {
+                var rows = new BankEntry[_currencies.Count];
+                for (int i = 0; i < rows.Length; i++)
+                    rows[i] = new BankEntry(_currencies[i], _wallet.BalanceOf(_currencies[i]));
+
+                return new WalletBalances(rows);
+            }
         }
 
         public ZoneType CurrentZoneType

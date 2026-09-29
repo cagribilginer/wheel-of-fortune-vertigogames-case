@@ -17,12 +17,11 @@ namespace Vertigo.Wheel.Data.Configs
     {
         [SerializeField] private List<RewardDefinition> _all = new List<RewardDefinition>();
 
-        // Referenced, not named: the wallet, cash-out and revive pricing key off these two rewards' ids, and
-        // an asset reference survives a rename or an Id edit that a hard-coded id string would silently miss.
-        [Tooltip("Cash-out converts this reward into the persistent gold balance; gold revives are paid in it.")]
+        // Referenced, not named: revive pricing keys off this reward's id, and an asset reference survives a
+        // rename or an Id edit that a hard-coded id string would silently miss. Every other Currency reward
+        // needs no entry here: cash-out banks all of them (see CurrencyIds).
+        [Tooltip("The currency gold revives are paid in.")]
         [SerializeField] private RewardDefinition _goldCurrency;
-        [Tooltip("Cash-out converts this reward into the persistent cash balance.")]
-        [SerializeField] private RewardDefinition _cashCurrency;
 
         private Dictionary<string, RewardDefinition> _byId;
 
@@ -35,10 +34,6 @@ namespace Vertigo.Wheel.Data.Configs
         public RewardId GoldCurrency
         {
             get { return CurrencyId(_goldCurrency, "gold"); }
-        }
-        public RewardId CashCurrency
-        {
-            get { return CurrencyId(_cashCurrency, "cash"); }
         }
 
         /// <summary>Every reward in the Currency category: what a cash-out banks into the wallet.</summary>
@@ -129,7 +124,6 @@ namespace Vertigo.Wheel.Data.Configs
             }
 
             ValidateCurrency(_goldCurrency, "gold");
-            ValidateCurrency(_cashCurrency, "cash");
         }
 
         private void ValidateCurrency(RewardDefinition currency, string role)

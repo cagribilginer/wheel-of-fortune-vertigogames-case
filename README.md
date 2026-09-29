@@ -98,7 +98,7 @@ and checked by `Tools ▸ Vertigo ▸ Validate Game Configs`:
 | `ZoneProgressionConfig` | Safe/Super intervals, one wheel per special zone type, per-band overrides |
 | `ZoneWheelConfig` / `WheelSpinConfig` | Slice layout, weights, bomb placement per zone type |
 | `WheelThemeConfig` (Bronze / Silver / Golden) | Wheel sprite set, accent + glow colours, tick SFX |
-| `RewardCatalog` + `RewardDefinition` | The only bridge from a Core `RewardId` to a sprite; also names which rewards are the gold and cash currencies |
+| `RewardCatalog` + `RewardDefinition` | The only bridge from a Core `RewardId` to a sprite; also names the gold (revive) currency. Every `Currency`-category reward in the catalog is a wallet currency: cash-out banks it, the popups list it, Reset Save clears it |
 | Scaling strategy (`LinearScalingSO`) | How a reward's base amount grows with zone depth (unit-tested) |
 | `ContinueConfig` | Revive base cost, cost-per-zone, ad-revive cap |
 | `AudioLibrary` | Named SFX slots (`_buttonClick`, `_rewardChime`, `_bombExplosion`, …) |

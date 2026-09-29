@@ -28,7 +28,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         {
             _save = new InMemorySaveService();
             _wallet = new Wallet(_save);
-            _run = new RunModel(new ZoneClassifier(), _wallet, TestWheels.Gold, TestWheels.Cash);
+            _run = new RunModel(new ZoneClassifier(), _wallet, TestWheels.Currencies);
 
             _blueprints = new StubBlueprintProvider(bombIndex: 0) { BombWeight = bombWeight };
             var factory = new ZoneWheelFactory(new ZoneClassifier(), _blueprints, new LinearRewardScaling());

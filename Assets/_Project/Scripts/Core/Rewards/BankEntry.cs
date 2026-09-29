@@ -1,6 +1,6 @@
 namespace Vertigo.Wheel.Core.Rewards
 {
-    /// <summary>One stacked row in the run bank: a reward and how much of it the player is holding.</summary>
+    /// <summary>One stacked row: a reward and how much of it is held, in the run bank or in the wallet.</summary>
     public readonly struct BankEntry
     {
         public readonly RewardId Reward;
