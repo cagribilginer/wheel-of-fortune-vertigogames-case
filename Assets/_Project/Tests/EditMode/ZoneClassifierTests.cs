@@ -107,18 +107,6 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.That(_classifier.NextZoneOfType(-4, ZoneType.Safe), Is.EqualTo(5));
         }
 
-        [Test]
-        public void DefaultIntervals_AreConsistent()
-        {
-            Assert.That(_classifier.IntervalsAreConsistent, Is.True);
-        }
-
-        [Test]
-        public void SuperIntervalNotMultipleOfSafe_IsReportedInconsistent()
-        {
-            Assert.That(new ZoneClassifier(4, 30).IntervalsAreConsistent, Is.False);
-        }
-
         [TestCase(0)]
         [TestCase(-3)]
         public void NonPositiveInterval_Throws(int interval)

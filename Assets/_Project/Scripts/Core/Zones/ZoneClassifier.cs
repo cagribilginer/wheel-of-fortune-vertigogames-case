@@ -25,15 +25,6 @@ namespace Vertigo.Wheel.Core.Zones
             _superInterval = superInterval;
         }
 
-        /// <summary>
-        /// True when every super zone is also a safe zone. When this does not hold, some super zones would
-        /// not be reachable as safe zones and the progression reads inconsistently to a designer.
-        /// </summary>
-        public bool IntervalsAreConsistent
-        {
-            get { return _superInterval % _safeInterval == 0; }
-        }
-
         public ZoneType Classify(int zone)
         {
             if (zone < 1)
