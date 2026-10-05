@@ -1,5 +1,4 @@
 using System;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,14 +11,12 @@ namespace Vertigo.Wheel.UI.Views
     public sealed class ActionBarView : UIViewBase
     {
         [SerializeField] private Button _ui_button_action_exit;
-        [SerializeField] private TextMeshProUGUI _ui_text_action_exit_value;
 
         public event Action ExitClicked;
 
         protected override void CacheReferences()
         {
             Bind(ref _ui_button_action_exit, "ui_button_action_exit");
-            Bind(ref _ui_text_action_exit_value, "ui_text_action_exit_value");
         }
 
         private void OnEnable()

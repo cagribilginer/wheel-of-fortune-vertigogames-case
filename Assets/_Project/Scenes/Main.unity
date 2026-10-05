@@ -3586,7 +3586,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _ui_button_action_exit: {fileID: 695240245}
-  _ui_text_action_exit_value: {fileID: 1607273878}
 --- !u!1 &549298707
 GameObject:
   m_ObjectHideFlags: 0
@@ -4068,7 +4067,7 @@ GameObject:
   - component: {fileID: 574698986}
   - component: {fileID: 574698985}
   m_Layer: 0
-  m_Name: ui_text_popup_collect_confirm_value
+  m_Name: ui_text_popup_collect_confirm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6825,7 +6824,7 @@ GameObject:
   - component: {fileID: 986935354}
   - component: {fileID: 986935353}
   m_Layer: 0
-  m_Name: ui_text_popup_bomb_advert_value
+  m_Name: ui_text_popup_bomb_advert
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10272,7 +10271,7 @@ GameObject:
   - component: {fileID: 1607273879}
   - component: {fileID: 1607273878}
   m_Layer: 0
-  m_Name: ui_text_action_exit_value
+  m_Name: ui_text_action_exit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12523,7 +12522,7 @@ GameObject:
   - component: {fileID: 1861362642}
   - component: {fileID: 1861362641}
   m_Layer: 0
-  m_Name: ui_text_popup_bomb_giveup_value
+  m_Name: ui_text_popup_bomb_giveup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
