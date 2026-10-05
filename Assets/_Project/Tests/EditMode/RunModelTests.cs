@@ -29,7 +29,6 @@ namespace Vertigo.Wheel.Tests.EditMode
         {
             Assert.That(_run.CurrentZone, Is.EqualTo(1));
             Assert.That(_run.Bank.IsEmpty, Is.True);
-            Assert.That(_run.Phase, Is.EqualTo(RunPhase.Idle));
         }
 
         [Test]
@@ -72,7 +71,6 @@ namespace Vertigo.Wheel.Tests.EditMode
             _run.Detonate();
 
             Assert.That(_run.Bank.IsEmpty, Is.True);
-            Assert.That(_run.Phase, Is.EqualTo(RunPhase.GameOver));
         }
 
         /// <summary>
@@ -100,7 +98,6 @@ namespace Vertigo.Wheel.Tests.EditMode
             _run.CashOut();
 
             Assert.That(_wallet.BalanceOf(TestWheels.Gold), Is.EqualTo(180));
-            Assert.That(_run.Phase, Is.EqualTo(RunPhase.CashOut));
         }
 
         [Test]
@@ -167,7 +164,6 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             Assert.That(_run.CurrentZone, Is.EqualTo(1));
             Assert.That(_run.Bank.IsEmpty, Is.True);
-            Assert.That(_run.Phase, Is.EqualTo(RunPhase.Idle));
             Assert.That(_run.GoldRevivesUsedThisRun, Is.Zero);
             Assert.That(_run.AdRevivesUsedThisRun, Is.Zero);
         }
@@ -192,7 +188,6 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             Assert.That(_run.CurrentZone, Is.EqualTo(2));
             Assert.That(_run.Bank.AmountOf(TestWheels.Pistol), Is.EqualTo(10), "the snapshotted haul is restored");
-            Assert.That(_run.Phase, Is.EqualTo(RunPhase.Idle));
             Assert.That(_run.GoldRevivesUsedThisRun, Is.EqualTo(1));
             Assert.That(_run.AdRevivesUsedThisRun, Is.Zero);
         }
@@ -258,15 +253,6 @@ namespace Vertigo.Wheel.Tests.EditMode
             _run.Grant(new SpinOutcome(5, SliceKind.Reward, TestWheels.Pistol, 10));
 
             Assert.That(_run.CanLeave, Is.True, "bank has a reward");
-        }
-
-        [Test]
-        public void CanLeave_IsFalseWhileSpinningEvenWithAHaul()
-        {
-            _run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Pistol, 10));
-            _run.Phase = RunPhase.Spinning;
-
-            Assert.That(_run.CanLeave, Is.False);
         }
 
         [Test]

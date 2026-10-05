@@ -89,16 +89,10 @@ namespace Vertigo.Wheel.Core.Run
             get { return _classifier.Classify(_currentZone); }
         }
 
-        public RunPhase Phase { get; set; } = RunPhase.Idle;
-
-        public bool CanSpin
-        {
-            get { return CashOutPolicy.CanSpin(Phase); }
-        }
-
+        /// <summary>Whether the EXIT button would be legal right now. The wheel being idle is the state machine's business.</summary>
         public bool CanLeave
         {
-            get { return CashOutPolicy.CanLeave(Phase, !Bank.IsEmpty, CurrentZoneType); }
+            get { return CashOutPolicy.CanLeave(!Bank.IsEmpty, CurrentZoneType); }
         }
         #endregion
 
@@ -134,7 +128,6 @@ namespace Vertigo.Wheel.Core.Run
         {
             _lostHaul = new List<BankEntry>(Bank.Entries);
             Bank.Clear();
-            Phase = RunPhase.GameOver;
         }
 
         /// <summary>
@@ -146,7 +139,6 @@ namespace Vertigo.Wheel.Core.Run
         {
             _goldRevivesUsed++;
             RestoreLostHaul();
-            Phase = RunPhase.Idle;
         }
 
         /// <summary>
@@ -157,7 +149,6 @@ namespace Vertigo.Wheel.Core.Run
         {
             _adRevivesUsed++;
             RestoreLostHaul();
-            Phase = RunPhase.Idle;
         }
 
         /// <summary>
@@ -191,8 +182,6 @@ namespace Vertigo.Wheel.Core.Run
                 if (entry.Amount > 0 && _currencies.Contains(entry.Reward))
                     _wallet.Add(entry.Reward, entry.Amount);
             }
-
-            Phase = RunPhase.CashOut;
         }
 
         /// <summary>Back to zone 1 with an empty bank. This is what "restart" means.</summary>
@@ -204,8 +193,6 @@ namespace Vertigo.Wheel.Core.Run
             _lostHaul = null;
 
             _currentZone = 1;
-
-            Phase = RunPhase.Idle;
         }
         #endregion
     }

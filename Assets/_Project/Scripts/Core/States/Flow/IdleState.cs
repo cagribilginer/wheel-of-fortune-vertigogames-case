@@ -12,9 +12,7 @@ namespace Vertigo.Wheel.Core.States.Flow
 
         public override void Enter()
         {
-            Context.Run.Phase = RunPhase.Idle;
-            Context.Input.SetInputState(
-                new InputState(canSpin: Context.Run.CanSpin, canLeave: Context.Run.CanLeave));
+            Context.Input.SetInputState(new InputState(canSpin: true, canLeave: Context.Run.CanLeave));
         }
 
         public override void Exit()
@@ -24,13 +22,12 @@ namespace Vertigo.Wheel.Core.States.Flow
 
         public override void OnSpinRequested()
         {
-            if (!Context.Run.CanSpin) return;
             Machine.Change<SpinningState>();
         }
 
         /// <summary>
         /// The single EXIT button's action: walk away with the haul. Legal only on a safe or super zone with
-        /// something banked and the wheel idle, which <see cref="RunModel.CanLeave"/> checks.
+        /// something banked, which <see cref="RunModel.CanLeave"/> checks.
         /// </summary>
         public override void OnExitRequested()
         {

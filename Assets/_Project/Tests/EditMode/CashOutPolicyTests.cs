@@ -5,44 +5,21 @@ using Vertigo.Wheel.Core.Zones;
 namespace Vertigo.Wheel.Tests.EditMode
 {
     /// <summary>
-    /// "The player can leave with their haul whenever the wheel is idle, there is something banked, and
-    /// the zone is safe or the super zone." All three conditions are tested here, because the EXIT
-    /// button only mirrors this decision.
+    /// "The player can leave with their haul whenever something is banked and the zone is safe or super."
+    /// The EXIT button only mirrors this decision; that the wheel is idle is the state machine's rule.
     /// </summary>
     [TestFixture]
     public sealed class CashOutPolicyTests
     {
-        [TestCase(RunPhase.Idle, true, ZoneType.Safe, true)]
-        [TestCase(RunPhase.Idle, true, ZoneType.Super, true)]
-        [TestCase(RunPhase.Idle, false, ZoneType.Safe, false)]
-        public void LeavingNeedsAnIdleWheelWithAHaulOnASafeOrSuperZone(
-            RunPhase phase, bool bankHasRewards, ZoneType zoneType, bool expected)
+        [TestCase(true, ZoneType.Safe, true)]
+        [TestCase(true, ZoneType.Super, true)]
+        [TestCase(false, ZoneType.Safe, false)]
+        [TestCase(false, ZoneType.Super, false)]
+        [TestCase(true, ZoneType.Normal, false)]
+        [TestCase(false, ZoneType.Normal, false)]
+        public void LeavingNeedsAHaulOnASafeOrSuperZone(bool bankHasRewards, ZoneType zoneType, bool expected)
         {
-            Assert.That(CashOutPolicy.CanLeave(phase, bankHasRewards, zoneType), Is.EqualTo(expected));
-        }
-
-        [Test]
-        public void NormalZone_BlocksLeavingEvenIdleWithAHaul()
-        {
-            Assert.That(CashOutPolicy.CanLeave(RunPhase.Idle, bankHasRewards: true, ZoneType.Normal), Is.False);
-        }
-
-        [TestCase(RunPhase.Spinning)]
-        [TestCase(RunPhase.Resolving)]
-        [TestCase(RunPhase.GameOver)]
-        [TestCase(RunPhase.CashOut)]
-        public void NonIdlePhase_BlocksLeavingEvenWithAHaulOnASafeZone(RunPhase phase)
-        {
-            Assert.That(CashOutPolicy.CanLeave(phase, bankHasRewards: true, ZoneType.Safe), Is.False);
-        }
-
-        [TestCase(RunPhase.Idle, true)]
-        [TestCase(RunPhase.Spinning, false)]
-        [TestCase(RunPhase.Resolving, false)]
-        [TestCase(RunPhase.GameOver, false)]
-        public void Spinning_IsOnlyAllowedWhenIdle(RunPhase phase, bool expected)
-        {
-            Assert.That(CashOutPolicy.CanSpin(phase), Is.EqualTo(expected));
+            Assert.That(CashOutPolicy.CanLeave(bankHasRewards, zoneType), Is.EqualTo(expected));
         }
     }
 }

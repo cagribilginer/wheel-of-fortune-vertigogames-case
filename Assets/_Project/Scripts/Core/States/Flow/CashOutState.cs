@@ -19,10 +19,8 @@ namespace Vertigo.Wheel.Core.States.Flow
         {
             _claiming = false;
 
-            // Block the wheel while the summary is up, but leave the bank untouched so a cancel is a
-            // genuine no-op.
-            Context.Run.Phase = RunPhase.CashOut;
-
+            // The wheel is blocked while the summary is up because this state accepts no spin input. The bank
+            // stays untouched so a cancel is a genuine no-op.
             // CurrentZone is the one being stood on, so cleared zones are one fewer. The wallet shows as before the claim.
             Context.CashOut.ShowCashOut(
                 Context.Run.Bank.Entries, Context.Run.CurrentZone - 1, Context.Run.Balances);
@@ -43,7 +41,6 @@ namespace Vertigo.Wheel.Core.States.Flow
             if (_claiming) return;
 
             Context.CashOut.HideCashOut();
-            Context.Run.Phase = RunPhase.Idle;
             Machine.Change<IdleState>();
         }
     }

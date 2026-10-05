@@ -9,8 +9,6 @@ namespace Vertigo.Wheel.Core.States.Flow
 
         public override void Enter()
         {
-            Context.Run.Phase = RunPhase.Resolving;
-
             Context.Spin.PlayReveal(Context.PendingOutcome, Context.Run.CurrentZoneType, () =>
             {
                 if (Context.PendingOutcome.IsBomb) Machine.Change<BombHitState>();

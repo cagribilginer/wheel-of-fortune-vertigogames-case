@@ -12,7 +12,6 @@ namespace Vertigo.Wheel.Core.States.Flow
 
         public override void Enter()
         {
-            Context.Run.Phase = RunPhase.Spinning;
             Context.PendingOutcome = Context.SpinService.Spin(Context.CurrentWheel);
 
             Context.Spin.PlaySpin(
