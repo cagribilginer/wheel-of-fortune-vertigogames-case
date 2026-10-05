@@ -11,6 +11,8 @@ namespace Vertigo.Wheel.Core.Spin
     /// </summary>
     public sealed class ZoneWheelFactory
     {
+        public const int NORMAL_ZONE_BOMB_COUNT = 1;
+
         private readonly IZoneClassifier _classifier;
         private readonly IWheelBlueprintProvider _blueprints;
         private readonly IRewardScaling _scaling;
@@ -45,11 +47,14 @@ namespace Vertigo.Wheel.Core.Spin
                 throw new InvalidOperationException(
                     $"No wheel blueprint was configured for zone {zone} ({zoneType}).");
 
-            // A safe or super zone that still carried a bomb would silently break the headline promise of
-            // the whole mode, so it is a hard failure rather than something to notice on a play-through.
-            if (zoneType != ZoneType.Normal && blueprint.BombCount > 0)
+            // The mode's headline promise: a normal zone carries exactly one bomb, a safe or super zone none.
+            // A bombless normal zone is a free run and a bombed safe zone breaks the zone's whole point, so a
+            // wheel that misses the count is a hard failure here, not something to notice on a play-through.
+            int expectedBombs = zoneType == ZoneType.Normal ? NORMAL_ZONE_BOMB_COUNT : 0;
+            if (blueprint.BombCount != expectedBombs)
                 throw new InvalidOperationException(
-                    $"Zone {zone} is {zoneType} and must be risk-free, but its wheel carries {blueprint.BombCount} bomb slice(s).");
+                    $"Zone {zone} is {zoneType} and must carry exactly {expectedBombs} bomb slice(s), " +
+                    $"but its wheel carries {blueprint.BombCount}.");
 
             IReadOnlyList<SliceBlueprint> authored = blueprint.Slices;
             var slices = new List<WheelSlice>(authored.Count);

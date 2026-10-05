@@ -37,6 +37,9 @@ namespace Vertigo.Wheel.Core.Spin
             MaxAmount = maxAmount;
         }
 
+        /// <summary>A zero-weight bomb could never be drawn, which silently turns a normal zone into a free one.</summary>
+        public const string BOMB_WEIGHT_MESSAGE = "A bomb slice needs a weight of at least 1, or it could never detonate.";
+
         public static SliceBlueprint CreateReward(
             RewardId reward, int baseAmount, int weight = 1, bool scalable = true, int maxAmount = 0)
         {
@@ -57,8 +60,8 @@ namespace Vertigo.Wheel.Core.Spin
 
         public static SliceBlueprint CreateBomb(int weight = 1)
         {
-            if (weight < 0)
-                throw new ArgumentOutOfRangeException(nameof(weight), weight, "Weight cannot be negative.");
+            if (weight < 1)
+                throw new ArgumentOutOfRangeException(nameof(weight), weight, BOMB_WEIGHT_MESSAGE);
 
             return new SliceBlueprint(SliceKind.Bomb, RewardId.None, 0, weight, scalable: false, maxAmount: 0);
         }

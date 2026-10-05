@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Vertigo.Wheel.Core.Rewards;
 using Vertigo.Wheel.Core.Spin;
@@ -160,6 +161,22 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
+        public void NormalZoneWithNoBomb_ThrowsRatherThanShipping()
+        {
+            var factory = new ZoneWheelFactory(new ZoneClassifier(), new BombCountProvider(0), new LinearRewardScaling());
+
+            Assert.Throws<InvalidOperationException>(() => factory.Build(1));
+        }
+
+        [Test]
+        public void NormalZoneWithTwoBombs_ThrowsRatherThanShipping()
+        {
+            var factory = new ZoneWheelFactory(new ZoneClassifier(), new BombCountProvider(2), new LinearRewardScaling());
+
+            Assert.Throws<InvalidOperationException>(() => factory.Build(1));
+        }
+
+        [Test]
         public void MissingBlueprint_Throws()
         {
             var empty = new NullProvider();
@@ -192,6 +209,28 @@ namespace Vertigo.Wheel.Tests.EditMode
             public WheelBlueprint GetBlueprint(int zone, ZoneType zoneType)
             {
                 return new WheelBlueprint(WheelTier.Silver, new[] { SliceBlueprint.CreateBomb(), SliceBlueprint.CreateReward(TestWheels.Pistol, 1) });
+            }
+        }
+
+        /// <summary>Every zone gets a wheel with exactly <c>bombs</c> bomb slices and rewards elsewhere.</summary>
+        private sealed class BombCountProvider : IWheelBlueprintProvider
+        {
+            private readonly int _bombs;
+
+            public BombCountProvider(int bombs)
+            {
+                _bombs = bombs;
+            }
+
+            public WheelBlueprint GetBlueprint(int zone, ZoneType zoneType)
+            {
+                var slices = new List<SliceBlueprint>();
+                for (int i = 0; i < WheelModel.STANDARD_SLICE_COUNT; i++)
+                    slices.Add(i < _bombs
+                        ? SliceBlueprint.CreateBomb()
+                        : SliceBlueprint.CreateReward(TestWheels.Pistol, 1));
+
+                return new WheelBlueprint(WheelTier.Bronze, slices);
             }
         }
 

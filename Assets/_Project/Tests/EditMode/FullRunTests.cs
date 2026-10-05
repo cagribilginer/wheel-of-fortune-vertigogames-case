@@ -24,19 +24,19 @@ namespace Vertigo.Wheel.Tests.EditMode
         private InstantPresentation _view;
         private GameStateMachine _machine;
 
-        private void Build(IRandomProvider random, int bombWeight = 1, InstantPresentation view = null)
+        private void Build(IRandomProvider random, bool survivable = false, InstantPresentation view = null)
         {
             _save = new InMemorySaveService();
             _wallet = new Wallet(_save);
             _run = new RunModel(new ZoneClassifier(), _wallet, TestWheels.Currencies);
 
-            _blueprints = new StubBlueprintProvider(bombIndex: 0) { BombWeight = bombWeight };
+            _blueprints = new StubBlueprintProvider(bombIndex: 0);
             var factory = new ZoneWheelFactory(new ZoneClassifier(), _blueprints, new LinearRewardScaling());
 
             _view = view ?? new InstantPresentation();
 
             var context = new GameContext(
-                _run, factory, new SpinService(new WeightedSliceResolver(random)),
+                _run, factory, new SpinService(survivable ? new RewardOnlyResolver(random) : new WeightedSliceResolver(random)),
                 new ContinueService(_wallet, TestWheels.Gold, TestWheels.Continue), _view);
 
             _machine = GameFlow.Build(context);
@@ -83,7 +83,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void SixtyZoneRun_ClearsBothSuperZonesWithoutOverflow()
         {
-            Build(new SystemRandomProvider(7), bombWeight: 0);
+            Build(new SystemRandomProvider(7), survivable: true);
 
             var superZonesSeen = new System.Collections.Generic.List<int>();
             var safeZonesSeen = 0;
@@ -107,7 +107,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void DeepRun_DoesNotOverflowRewardAmounts()
         {
-            Build(new SystemRandomProvider(3), bombWeight: 0);
+            Build(new SystemRandomProvider(3), survivable: true);
 
             while (_run.CurrentZone < 200) _machine.RequestSpin();
 
@@ -125,7 +125,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void CashingOutOnASuperZone_FundsAFutureContinue()
         {
-            Build(new SystemRandomProvider(11), bombWeight: 0);
+            Build(new SystemRandomProvider(11), survivable: true);
 
             while (_run.CurrentZone < 30) _machine.RequestSpin();
 
@@ -186,7 +186,7 @@ namespace Vertigo.Wheel.Tests.EditMode
         // Leaving is only legal from a safe zone, so park the run on zone 5 first.
         private void OpenCashOutWithGold(InstantPresentation view, int gold)
         {
-            Build(new SystemRandomProvider(1), bombWeight: 0, view: view);
+            Build(new SystemRandomProvider(1), survivable: true, view: view);
             _run.JumpToZone(5);
             _run.Bank.Add(TestWheels.Gold, gold);
 

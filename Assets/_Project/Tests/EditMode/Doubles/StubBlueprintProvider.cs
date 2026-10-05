@@ -20,9 +20,6 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             _shuffle = shuffle;
         }
 
-        /// <summary>Set to 0 to make normal zones survivable, for long-run and overflow tests.</summary>
-        public int BombWeight { get; set; } = 1;
-
         public WheelBlueprint GetBlueprint(int zone, ZoneType zoneType)
         {
             var slices = new List<SliceBlueprint>(WheelModel.STANDARD_SLICE_COUNT);
@@ -32,7 +29,7 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
                 bool isBomb = zoneType == ZoneType.Normal && i == _bombIndex;
 
                 slices.Add(isBomb
-                    ? SliceBlueprint.CreateBomb(BombWeight)
+                    ? SliceBlueprint.CreateBomb()
                     : SliceBlueprint.CreateReward(RewardFor(zoneType), BaseAmountFor(zoneType), weight: 1));
             }
 

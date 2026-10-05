@@ -96,7 +96,15 @@ namespace Vertigo.Wheel.Data.Configs
 
                 totalWeight += entry.Weight;
 
-                if (entry.IsBomb) { bombs++; continue; }
+                if (entry.IsBomb)
+                {
+                    bombs++;
+                    if (entry.Weight < 1)
+                        Debug.LogError(
+                            $"[Vertigo] Wheel '{name}' slice {i} is a bomb with weight {entry.Weight}; it needs at " +
+                            "least 1 or it can never be drawn.", this);
+                    continue;
+                }
 
                 if (!entry.Reward)
                 {

@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using Vertigo.Wheel.Core.Rewards;
 using Vertigo.Wheel.Core.Spin;
@@ -85,6 +86,14 @@ namespace Vertigo.Wheel.Tests.EditMode
         {
             Assert.Throws<System.ArgumentOutOfRangeException>(
                 () => SliceBlueprint.CreateReward(Knife, baseAmount: 6, maxAmount: 5));
+        }
+
+        [TestCase(0)]
+        [TestCase(-1)]
+        public void Bomb_NeedsAPositiveWeight(int weight)
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => SliceBlueprint.CreateBomb(weight));
+            Assert.Throws<ArgumentOutOfRangeException>(() => WheelSlice.CreateBomb(weight));
         }
     }
 }

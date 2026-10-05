@@ -36,8 +36,8 @@ namespace Vertigo.Wheel.Core.Spin
 
         public static WheelSlice CreateBomb(int weight = 1)
         {
-            if (weight < 0)
-                throw new ArgumentOutOfRangeException(nameof(weight), weight, "Weight cannot be negative.");
+            if (weight < 1)
+                throw new ArgumentOutOfRangeException(nameof(weight), weight, SliceBlueprint.BOMB_WEIGHT_MESSAGE);
 
             return new WheelSlice(SliceKind.Bomb, RewardId.None, 0, weight);
         }
