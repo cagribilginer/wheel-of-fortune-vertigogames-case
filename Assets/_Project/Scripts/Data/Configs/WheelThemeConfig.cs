@@ -14,6 +14,12 @@ namespace Vertigo.Wheel.Data.Configs
         [SerializeField] private Color _glowColor = Color.white;
         [SerializeField] private AudioClip _tick;
 
+        [Header("Zone strip")]
+        [Tooltip("Colour of a zone's number in the strip when that zone uses this theme.")]
+        [SerializeField] private Color _stripNumberColor = Color.white;
+        [Tooltip("Whether the number is bold, which marks the milestone (safe / super) zones.")]
+        [SerializeField] private bool _stripNumberBold;
+
         public Sprite BaseSprite
         {
             get { return _baseSprite; }
@@ -33,6 +39,14 @@ namespace Vertigo.Wheel.Data.Configs
         public AudioClip Tick
         {
             get { return _tick; }
+        }
+        public Color StripNumberColor
+        {
+            get { return _stripNumberColor; }
+        }
+        public bool StripNumberBold
+        {
+            get { return _stripNumberBold; }
         }
 
 #if UNITY_EDITOR

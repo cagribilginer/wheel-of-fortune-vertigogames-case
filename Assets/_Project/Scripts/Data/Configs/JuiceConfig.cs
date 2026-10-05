@@ -44,6 +44,7 @@ namespace Vertigo.Wheel.Data.Configs
         [Header("Zone map")]
         [Range(0f, 1f)] [SerializeField] private float _zoneScrollDuration = 0.45f;
         [Range(1f, 2f)] [SerializeField] private float _currentZoneTileScale = 1.12f;
+        [SerializeField] private Color _currentZoneTextColor = new(0.12f, 0.13f, 0.16f);
 
         [Header("Popups")]
         [Range(0f, 1f)] [SerializeField] private float _popupBackdropAlpha = 0.82f;
@@ -162,6 +163,10 @@ namespace Vertigo.Wheel.Data.Configs
         public float CurrentZoneTileScale
         {
             get { return _currentZoneTileScale; }
+        }
+        public Color CurrentZoneTextColor
+        {
+            get { return _currentZoneTextColor; }
         }
         public float PopupBackdropAlpha
         {

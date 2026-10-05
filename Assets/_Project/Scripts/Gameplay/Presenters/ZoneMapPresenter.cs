@@ -12,7 +12,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     /// <summary>
     /// The horizontal zone strip: one pooled tile per zone in a window built ahead of the player and scrolled to
     /// keep the current zone centred. The strip only grows; a reset just moves the highlight back to zone 1.
-    /// Number colour follows zone type only.
+    /// A number's colour and weight come from the theme of the wheel that zone uses, like the wheel itself.
     /// </summary>
     public sealed class ZoneMapPresenter
     {
@@ -22,23 +22,20 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         // The scroll target that puts a tile in the middle of the viewport.
         private const float VIEWPORT_CENTER = 0.5f;
 
-        // Colour follows zone type only: green for safe, gold for super, grey for the rest, passed or not.
-        private static readonly Color CURRENT_TEXT_COLOR = new(0.12f, 0.13f, 0.16f);
-        private static readonly Color SAFE_TEXT_COLOR = new(0.40f, 0.95f, 0.45f);
-        private static readonly Color SUPER_TEXT_COLOR = new(1f, 0.82f, 0.30f);
-        private static readonly Color NORMAL_TEXT_COLOR = new(0.62f, 0.64f, 0.70f);
-
         private readonly ZoneMapView _view;
         private readonly IZoneClassifier _classifier;
+        private readonly ZoneProgressionConfig _progression;
         private readonly JuiceConfig _juice;
         private readonly ObjectPool<ZoneMapTileView> _pool;
         private readonly List<ZoneMapTileView> _active = new();
 
         public ZoneMapPresenter(
-            ZoneMapView view, ZoneMapTileView tilePrefab, IZoneClassifier classifier, JuiceConfig juice)
+            ZoneMapView view, ZoneMapTileView tilePrefab, IZoneClassifier classifier,
+            ZoneProgressionConfig progression, JuiceConfig juice)
         {
             _view = view;
             _classifier = classifier;
+            _progression = progression;
             _juice = juice;
 
             _pool = new ObjectPool<ZoneMapTileView>(
@@ -78,25 +75,16 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         {
             if (zoneNumber == currentZone)
             {
-                tile.SetCurrent(CURRENT_TEXT_COLOR);
+                tile.SetCurrent(_juice.CurrentZoneTextColor);
                 tile.Rect.localScale = Vector3.one * _juice.CurrentZoneTileScale;
                 return;
             }
 
             tile.Rect.localScale = Vector3.one;
 
-            switch (_classifier.Classify(zoneNumber))
-            {
-                case ZoneType.Super:
-                    tile.SetPlain(SUPER_TEXT_COLOR, bold: true);
-                    break;
-                case ZoneType.Safe:
-                    tile.SetPlain(SAFE_TEXT_COLOR, bold: true);
-                    break;
-                default:
-                    tile.SetPlain(NORMAL_TEXT_COLOR, bold: false);
-                    break;
-            }
+            WheelThemeConfig theme = _progression.ThemeFor(zoneNumber, _classifier.Classify(zoneNumber));
+            if (theme) tile.SetPlain(theme.StripNumberColor, theme.StripNumberBold);
+            else tile.SetPlain(Color.white, bold: false);
         }
 
         private void Scroll(int zone, System.Action onComplete)

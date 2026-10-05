@@ -89,7 +89,7 @@ namespace Vertigo.Wheel.Gameplay
             _milestonePopup.Configure(juice);
             _milestonePreviewPresenter = new MilestonePreviewPresenter(_zoneMap, _milestonePopup);
             var wheelPresenter = new WheelPresenter(_wheel, spinConfig, catalog, _bombSlotIcon, audioService, juice);
-            var zoneMapPresenter = new ZoneMapPresenter(_zoneMap, _zoneMapTilePrefab, classifier, juice);
+            var zoneMapPresenter = new ZoneMapPresenter(_zoneMap, _zoneMapTilePrefab, classifier, progression, juice);
             var bankPresenter = new BankPresenter(
                 _bank, _bankEntryPrefab, catalog, runModel.Bank, _flightLayer, audioPresenter, juice);
             var actionBarPresenter = new ActionBarPresenter(_actionBar);
