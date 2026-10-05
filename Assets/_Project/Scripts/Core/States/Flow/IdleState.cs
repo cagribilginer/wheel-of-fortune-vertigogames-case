@@ -6,7 +6,7 @@ namespace Vertigo.Wheel.Core.States.Flow
     /// The only state that accepts player input. It asks the run whether each action is legal instead of
     /// deciding itself, so the buttons and the guards read the same rule.
     /// </summary>
-    public sealed class IdleState : GameStateBase
+    public sealed class IdleState : GameStateBase, ISpinInputHandler, IExitInputHandler
     {
         public IdleState(GameContext context) : base(context) { }
 
@@ -20,7 +20,7 @@ namespace Vertigo.Wheel.Core.States.Flow
             Context.Input.SetInputState(InputState.Locked);
         }
 
-        public override void OnSpinRequested()
+        public void OnSpinRequested()
         {
             Machine.Change<SpinningState>();
         }
@@ -29,7 +29,7 @@ namespace Vertigo.Wheel.Core.States.Flow
         /// The single EXIT button's action: walk away with the haul. Legal only on a safe or super zone with
         /// something banked, which <see cref="RunModel.CanLeave"/> checks.
         /// </summary>
-        public override void OnExitRequested()
+        public void OnExitRequested()
         {
             if (Context.Run.CanLeave) Machine.Change<CashOutState>();
         }

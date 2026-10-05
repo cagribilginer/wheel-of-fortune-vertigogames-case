@@ -58,34 +58,35 @@ namespace Vertigo.Wheel.Core.States
             }
         }
 
-        // Input surface. Each call is forwarded to the current state, which ignores what it does not accept.
+        // Input surface. Each call goes to the current state only if it declares the matching handler; any other
+        // state ignores it on purpose (no second spin while one is running, no confirm outside the summary).
         public void RequestSpin()
         {
-            Current?.OnSpinRequested();
+            if (Current is ISpinInputHandler handler) handler.OnSpinRequested();
         }
         public void RequestExit()
         {
-            Current?.OnExitRequested();
+            if (Current is IExitInputHandler handler) handler.OnExitRequested();
         }
         public void Confirm()
         {
-            Current?.OnConfirmed();
+            if (Current is IConfirmInputHandler handler) handler.OnConfirmed();
         }
         public void Cancel()
         {
-            Current?.OnCancelled();
+            if (Current is ICancelInputHandler handler) handler.OnCancelled();
         }
         public void RequestRestart()
         {
-            Current?.OnRestartRequested();
+            if (Current is IRestartInputHandler handler) handler.OnRestartRequested();
         }
         public void RequestContinue()
         {
-            Current?.OnContinueRequested();
+            if (Current is IContinueInputHandler handler) handler.OnContinueRequested();
         }
         public void RequestAdContinue()
         {
-            Current?.OnAdContinueRequested();
+            if (Current is IAdContinueInputHandler handler) handler.OnAdContinueRequested();
         }
     }
 }

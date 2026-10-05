@@ -7,7 +7,7 @@ namespace Vertigo.Wheel.Core.States.Flow
     /// cancel back to the wheel and keep spinning. Only on confirm does banked gold convert to the
     /// persistent wallet — the one route by which the wallet ever grows — and the run reset.
     /// </summary>
-    public sealed class CashOutState : GameStateBase
+    public sealed class CashOutState : GameStateBase, IConfirmInputHandler, ICancelInputHandler
     {
         // The claim celebration keeps this state current for its whole duration; input arriving in that
         // window must neither credit the wallet a second time nor cancel a claim that already paid out.
@@ -27,7 +27,7 @@ namespace Vertigo.Wheel.Core.States.Flow
                 Context.Run.WalletGains, Context.Run.CurrentZone - 1, Context.Run.Balances);
         }
 
-        public override void OnConfirmed()
+        public void OnConfirmed()
         {
             if (_claiming) return;
             _claiming = true;
@@ -37,7 +37,7 @@ namespace Vertigo.Wheel.Core.States.Flow
             Context.CashOut.ClaimCashOut(Context.Run.Balances, () => Machine.Change<BootState>());
         }
 
-        public override void OnCancelled()
+        public void OnCancelled()
         {
             if (_claiming) return;
 

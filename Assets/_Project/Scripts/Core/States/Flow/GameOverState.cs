@@ -4,7 +4,7 @@ namespace Vertigo.Wheel.Core.States.Flow
     /// The ways out of a bomb: give up and restart at zone one, or revive with gold or an ad, which restores
     /// the snapshotted haul on the same zone. Gold has no per-run cap; the ad revive does.
     /// </summary>
-    public sealed class GameOverState : GameStateBase
+    public sealed class GameOverState : GameStateBase, IRestartInputHandler, IContinueInputHandler, IAdContinueInputHandler
     {
         public GameOverState(GameContext context) : base(context) { }
 
@@ -25,13 +25,13 @@ namespace Vertigo.Wheel.Core.States.Flow
 
         // Give up is a restart: close the screen and boot a fresh run. The bomb already emptied the bank, so the
         // refresh on the way out shows it empty.
-        public override void OnRestartRequested()
+        public void OnRestartRequested()
         {
             Context.GameOver.HideGameOver();
             Machine.Change<BootState>();
         }
 
-        public override void OnContinueRequested()
+        public void OnContinueRequested()
         {
             int zoneReached = Context.Run.CurrentZone;
 
@@ -42,7 +42,7 @@ namespace Vertigo.Wheel.Core.States.Flow
             Revive();
         }
 
-        public override void OnAdContinueRequested()
+        public void OnAdContinueRequested()
         {
             // No wallet debit — watching the video is the price. Capped per run.
             if (!Context.ContinueService.IsAdReviveOffered(Context.Run.AdRevivesUsedThisRun)) return;
