@@ -12,12 +12,22 @@ using Vertigo.Wheel.UI.Views;
 namespace Vertigo.Wheel.Gameplay.Presenters
 {
     /// <summary>
-    /// The collected-rewards grid: a pooled <see cref="BankEntryView"/> per stacked reward, plus one reused ghost that
-    /// carries a fresh reward from the wheel into its cell. The ghost sits on the canvas root, outside the layout
-    /// group, so a layout rebuild cannot fight its tween.
+    /// The collected-rewards grid: a pooled <see cref="BankEntryView"/> per stacked reward, and the icons that carry a
+    /// fresh reward from the wheel into its cell.
+    /// <para>
+    /// What the grid shows follows what has actually arrived, not the model. A new reward's cell is created hidden so the
+    /// layout reserves its slot, and is revealed when the first icon lands; an existing cell's number climbs when an
+    /// icon lands on it. Every icon has its own ghost, so one reward can send several icons and rewards can follow
+    /// each other before the earlier ones land without any flight completing another. The ghosts sit on the canvas
+    /// root, outside the layout group, so a layout rebuild cannot fight their tweens.
+    /// </para>
     /// </summary>
     public sealed class BankPresenter
     {
+        // Matches BankEntryView's own icon box closely enough that a ghost doesn't visibly resize when it lands
+        // (that box is 88x88, but the ghost also needs headroom to fly over other UI unclipped).
+        private static readonly Vector2 GHOST_SIZE = new(72f, 72f);
+
         private readonly BankView _view;
         private readonly RewardCatalog _catalog;
         private readonly RewardBank _bank;
@@ -25,11 +35,13 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly AudioPresenter _audio;
         private readonly JuiceConfig _juice;
         private readonly ObjectPool<BankEntryView> _pool;
-        private readonly List<BankEntryView> _active = new();
+        private readonly List<BankCell> _cells = new();
+        private readonly List<IconFlight> _flights = new();
+        private readonly Stack<Ghost> _freeGhosts = new();
 
-        // Created lazily and reused: only one reward flies at a time.
-        private RectTransform _ghostRect;
-        private Image _ghostImage;
+        // Bumped by every Refresh. A flight from an older generation was overtaken by a rebuild that already shows
+        // the final state, so its landing must not add to it a second time.
+        private int _generation;
 
         public BankPresenter(
             BankView view, BankEntryView entryPrefab, RewardCatalog catalog, RewardBank bank,
@@ -50,19 +62,22 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         }
 
         #region Bank grid
+        /// <summary>Rebuilds the grid from the model. Anything still flying is finished off, since the rebuild shows its result.</summary>
         public void Refresh()
         {
-            for (int i = 0; i < _active.Count; i++) _pool.Release(_active[i]);
-            _active.Clear();
+            _generation++;
+            CancelFlights();
+
+            for (int i = 0; i < _cells.Count; i++)
+            {
+                _cells[i].StopCounting();
+                _pool.Release(_cells[i].View);
+            }
+            _cells.Clear();
 
             IReadOnlyList<BankEntry> entries = _bank.Entries;
             for (int i = 0; i < entries.Count; i++)
-            {
-                BankEntryView entry = _pool.Get();
-                entry.SetEntry(_catalog.IconFor(entries[i].Reward), entries[i].Amount);
-                entry.transform.SetSiblingIndex(i);
-                _active.Add(entry);
-            }
+                AddCell(entries[i].Reward, entries[i].Amount, revealed: true);
 
             _view.SetEmpty(entries.Count == 0);
 
@@ -70,80 +85,297 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             LayoutRebuilder.ForceRebuildLayoutImmediate(_view.Content);
         }
 
-        public void FlyIn(SpinOutcome outcome, Vector3 fromWorldPosition, Action onComplete)
+        private BankCell AddCell(RewardId reward, int amount, bool revealed)
         {
-            Refresh();
+            BankEntryView view = _pool.Get();
+            view.SetEntry(_catalog.IconFor(reward), amount);
+            view.SetRevealed(revealed);
+            view.transform.SetSiblingIndex(_cells.Count);
 
-            // Refresh has already rebuilt the grid from the post-grant bank, so this cell exists whether the
-            // reward is a brand-new row (appended last) or a stack that was already there.
-            int index = IndexOf(outcome.Reward);
-            if (index < 0) { onComplete(); return; }
+            var cell = new BankCell(view, reward, amount, revealed);
+            _cells.Add(cell);
+            return cell;
+        }
 
-            BankEntryView targetEntry = _active[index];
-            RectTransform target = targetEntry.Rect;
-
-            // Hold the number at its pre-win value until the icon actually lands, then count it up.
-            int finalAmount = _bank.Entries[index].Amount;
-            int startAmount = Mathf.Max(0, finalAmount - outcome.Amount);
-            targetEntry.SetAmount(startAmount);
-
-            EnsureGhost();
-            _ghostRect.DOComplete();
-            _ghostRect.gameObject.SetActive(true);
-            _ghostRect.position = fromWorldPosition;
-            _ghostImage.sprite = _catalog.IconFor(outcome.Reward);
-
-            _ghostRect.DOMove(target.position, _juice.BankFlyDuration)
-                .SetEase(Ease.InBack)
-                .SetLink(_ghostRect.gameObject, LinkBehaviour.KillOnDestroy)
-                .OnComplete(() =>
-            {
-                _ghostRect.gameObject.SetActive(false);
-
-                target.DOKill();
-                target.localScale = Vector3.one;
-                target.DOPunchScale(Vector3.one * _juice.BankPunchScale, _juice.BankPunchDuration)
-                    .SetLink(target.gameObject, LinkBehaviour.KillOnDestroy);
-
-                // The reveal sting already played at the wheel stop; this is the softer "into the bag" swoosh.
-                _audio.PlayBankCollect();
-
-                DOVirtual.Int(startAmount, finalAmount, _juice.BankCounterDuration, v => targetEntry.SetAmount(v))
-                    .SetLink(target.gameObject, LinkBehaviour.KillOnDestroy)
-                    .OnComplete(() =>
-                    {
-                        targetEntry.SetAmount(finalAmount);
-                        onComplete();
-                    });
-            });
+        private BankCell FindCell(RewardId reward)
+        {
+            for (int i = 0; i < _cells.Count; i++)
+                if (_cells[i].Reward.Equals(reward)) return _cells[i];
+            return null;
         }
         #endregion
 
-        #region Ghost and lookup
-        // Matches BankEntryView's own icon box closely enough that the ghost doesn't visibly resize when
-        // it lands (that box is 88x88, but the ghost also needs headroom to fly over other UI unclipped).
-        private static readonly Vector2 GHOST_SIZE = new(72f, 72f);
-
-        private void EnsureGhost()
+        #region Flight
+        /// <summary>
+        /// Flies the reward from the wheel into the bank. <paramref name="onComplete"/> runs once, after the last icon
+        /// has landed and its number has finished climbing. Flights may overlap.
+        /// </summary>
+        public void FlyIn(SpinOutcome outcome, Vector3 fromWorldPosition, Action onComplete)
         {
-            if (_ghostRect) return;
+            BankCell cell = FindCell(outcome.Reward);
+            if (cell == null)
+            {
+                // A new stack: reserve its slot now, hidden, so the layout knows where the icon lands. The cell shows
+                // up when the first icon arrives, not before.
+                cell = AddCell(outcome.Reward, 0, revealed: false);
+                _view.SetEmpty(false);
+                LayoutRebuilder.ForceRebuildLayoutImmediate(_view.Content);
+            }
 
-            var ghostGo = new GameObject("bank_fly_ghost", typeof(RectTransform), typeof(Image));
-            _ghostRect = (RectTransform)ghostGo.transform;
-            _ghostRect.SetParent(_flightLayer, false);
-            _ghostRect.sizeDelta = GHOST_SIZE;
+            int icons = Mathf.Clamp(_juice.BankFlyIconsPerReward, 1, Mathf.Max(1, outcome.Amount));
+            var reward = new RewardFlight(icons, onComplete);
 
-            _ghostImage = ghostGo.GetComponent<Image>();
-            _ghostImage.preserveAspect = true;
-            _ghostImage.raycastTarget = false;
+            for (int i = 0; i < icons; i++)
+            {
+                // The amount is split across the icons; the first ones take the remainder.
+                int share = outcome.Amount / icons + (i < outcome.Amount % icons ? 1 : 0);
+                var flight = new IconFlight(this, reward, cell, share, fromWorldPosition, _generation);
+                _flights.Add(flight);
+                flight.TakeOffAfter(i * _juice.BankFlyStagger);
+            }
         }
 
-        private int IndexOf(RewardId reward)
+        private void CancelFlights()
         {
-            IReadOnlyList<BankEntry> entries = _bank.Entries;
-            for (int i = 0; i < entries.Count; i++)
-                if (entries[i].Reward.Equals(reward)) return i;
-            return -1;
+            // Iterated over a copy: cancelling removes the flight from the live list.
+            foreach (IconFlight flight in _flights.ToArray()) flight.Cancel();
+        }
+
+        // An icon reached its cell: reveal it if it was hidden, punch it, and count the number up.
+        private void Arrive(IconFlight flight)
+        {
+            BankCell cell = flight.Cell;
+
+            if (!cell.Revealed)
+            {
+                cell.Revealed = true;
+                cell.View.SetRevealed(true);
+            }
+
+            cell.Target += flight.Share;
+
+            // A second icon landing while the first is still counting finishes that count first (its own flight
+            // completes with it), then counts on from there.
+            cell.FinishCounting();
+
+            RectTransform rect = cell.View.Rect;
+            rect.DOKill();
+            rect.localScale = Vector3.one;
+            rect.DOPunchScale(Vector3.one * _juice.BankPunchScale, _juice.BankPunchDuration)
+                .SetLink(rect.gameObject, LinkBehaviour.KillOnDestroy);
+
+            // The reveal sting already played at the wheel stop; this is the softer "into the bag" swoosh.
+            _audio.PlayBankCollect();
+
+            cell.StartCounting(_juice.BankCounterDuration, flight.OnCounted);
+        }
+
+        private Ghost TakeGhost()
+        {
+            if (_freeGhosts.Count > 0) return _freeGhosts.Pop();
+
+            var go = new GameObject("bank_fly_ghost", typeof(RectTransform), typeof(Image));
+            var rect = (RectTransform)go.transform;
+            rect.SetParent(_flightLayer, false);
+            rect.sizeDelta = GHOST_SIZE;
+            go.SetActive(false);
+
+            var image = go.GetComponent<Image>();
+            image.preserveAspect = true;
+            image.raycastTarget = false;
+
+            return new Ghost(rect, image);
+        }
+
+        private void ReleaseGhost(Ghost ghost)
+        {
+            ghost.Rect.gameObject.SetActive(false);
+            _freeGhosts.Push(ghost);
+        }
+        #endregion
+
+        #region Flight state
+        private sealed class BankCell
+        {
+            public readonly BankEntryView View;
+            public readonly RewardId Reward;
+            public bool Revealed;
+
+            /// <summary>What the number is counting towards: the amount of every icon that has landed so far.</summary>
+            public int Target;
+
+            /// <summary>What the number currently reads.</summary>
+            public int Displayed;
+
+            // Dropped on kill: with tween recycling on, a stale reference would kill whichever tween reuses the object.
+            private Tween _count;
+
+            public BankCell(BankEntryView view, RewardId reward, int amount, bool revealed)
+            {
+                View = view;
+                Reward = reward;
+                Revealed = revealed;
+                Target = amount;
+                Displayed = amount;
+            }
+
+            public void StartCounting(float duration, TweenCallback onCounted)
+            {
+                _count = DOVirtual.Int(Displayed, Target, duration, SetDisplayed)
+                    .SetLink(View.gameObject, LinkBehaviour.KillOnDestroy)
+                    .OnComplete(onCounted)
+                    .OnKill(OnCountKilled);
+            }
+
+            /// <summary>Jumps the running count to its target, which also reports its flight as done.</summary>
+            public void FinishCounting()
+            {
+                _count?.Kill(complete: true);
+            }
+
+            /// <summary>Abandons the running count without reporting anything.</summary>
+            public void StopCounting()
+            {
+                _count?.Kill();
+            }
+
+            private void SetDisplayed(int value)
+            {
+                Displayed = value;
+                View.SetAmount(value);
+            }
+
+            private void OnCountKilled()
+            {
+                _count = null;
+            }
+        }
+
+        private readonly struct Ghost
+        {
+            public readonly RectTransform Rect;
+            public readonly Image Image;
+
+            public Ghost(RectTransform rect, Image image)
+            {
+                Rect = rect;
+                Image = image;
+            }
+        }
+
+        /// <summary>One reward's flight: calls back once when all of its icons are done.</summary>
+        private sealed class RewardFlight
+        {
+            private readonly Action _onComplete;
+            private int _remaining;
+
+            public RewardFlight(int icons, Action onComplete)
+            {
+                _remaining = icons;
+                _onComplete = onComplete;
+            }
+
+            public void IconDone()
+            {
+                if (--_remaining == 0) _onComplete();
+            }
+        }
+
+        /// <summary>One icon on its way to a cell. Its steps are named handlers so the flow reads top to bottom.</summary>
+        private sealed class IconFlight
+        {
+            private readonly BankPresenter _owner;
+            private readonly RewardFlight _reward;
+            private readonly Vector3 _from;
+            private readonly int _generation;
+            private Ghost _ghost;
+            private bool _holdsGhost;
+            private Tween _tween;
+            private bool _finished;
+
+            public readonly BankCell Cell;
+            public readonly int Share;
+
+            public IconFlight(
+                BankPresenter owner, RewardFlight reward, BankCell cell, int share, Vector3 from, int generation)
+            {
+                _owner = owner;
+                _reward = reward;
+                Cell = cell;
+                Share = share;
+                _from = from;
+                _generation = generation;
+            }
+
+            public void TakeOffAfter(float delay)
+            {
+                _ghost = _owner.TakeGhost();
+                _holdsGhost = true;
+                _ghost.Image.sprite = _owner._catalog.IconFor(Cell.Reward);
+
+                _tween = _ghost.Rect.DOMove(Cell.View.Rect.position, _owner._juice.BankFlyDuration)
+                    .SetDelay(delay)
+                    .SetEase(Ease.InBack)
+                    .SetLink(_ghost.Rect.gameObject, LinkBehaviour.KillOnDestroy)
+                    .OnStart(OnTakeOff)
+                    .OnComplete(OnLanded);
+            }
+
+            private void OnTakeOff()
+            {
+                _ghost.Rect.position = _from;
+                _ghost.Rect.gameObject.SetActive(true);
+            }
+
+            private void OnLanded()
+            {
+                _tween = null;
+                ReleaseGhost();
+
+                // A rebuild overtook this flight and already shows the final amount; counting it again would double it.
+                if (_generation != _owner._generation)
+                {
+                    Finish();
+                    return;
+                }
+
+                _owner.Arrive(this);
+            }
+
+            /// <summary>The number has finished climbing.</summary>
+            public void OnCounted()
+            {
+                Finish();
+            }
+
+            /// <summary>A rebuild supersedes this flight: stop it without counting, but still report it done.</summary>
+            public void Cancel()
+            {
+                if (_finished) return;
+
+                // Only a flight still in the air owns a live tween; a landed one's tween is finished and may be recycled.
+                _tween?.Kill();
+                _tween = null;
+                ReleaseGhost();
+                Finish();
+            }
+
+            private void ReleaseGhost()
+            {
+                if (!_holdsGhost) return;
+
+                _holdsGhost = false;
+                _owner.ReleaseGhost(_ghost);
+            }
+
+            private void Finish()
+            {
+                if (_finished) return;
+
+                _finished = true;
+                _owner._flights.Remove(this);
+                _reward.IconDone();
+            }
         }
         #endregion
     }

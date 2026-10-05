@@ -16,6 +16,7 @@ namespace Vertigo.Wheel.UI.Views
         [SerializeField] private TextMeshProUGUI _ui_text_bank_entry_amount_value;
 
         private RectTransform _rect;
+        private CanvasGroup _group;
 
         public RectTransform Rect
         {
@@ -31,6 +32,16 @@ namespace Vertigo.Wheel.UI.Views
             Bind(ref _ui_image_bank_entry_frame, "ui_image_bank_entry_frame");
             Bind(ref _ui_image_bank_entry_icon_value, "ui_image_bank_entry_icon_value");
             Bind(ref _ui_text_bank_entry_amount_value, "ui_text_bank_entry_amount_value");
+        }
+
+        /// <summary>
+        /// Hides the cell without deactivating it, so it keeps its slot in the layout. The bank reserves a new
+        /// reward's slot this way and reveals it the moment the flying icon arrives.
+        /// </summary>
+        public void SetRevealed(bool revealed)
+        {
+            if (!_group && !TryGetComponent(out _group)) _group = gameObject.AddComponent<CanvasGroup>();
+            _group.alpha = revealed ? 1f : 0f;
         }
 
         public void SetEntry(Sprite icon, int amount)

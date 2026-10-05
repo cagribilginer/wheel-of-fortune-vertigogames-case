@@ -40,6 +40,10 @@ namespace Vertigo.Wheel.Data.Configs
         [Range(0f, 1f)] [SerializeField] private float _bankPunchScale = 0.2f;
         [Range(0f, 1f)] [SerializeField] private float _bankPunchDuration = 0.2f;
         [Range(0f, 1f)] [SerializeField] private float _bankCounterDuration = 0.4f;
+        [Tooltip("How many icons carry one reward into the bank; its amount is split between them.")]
+        [Range(1, 5)] [SerializeField] private int _bankFlyIconsPerReward = 1;
+        [Tooltip("Delay between the icons of one reward taking off.")]
+        [Range(0f, 0.3f)] [SerializeField] private float _bankFlyStagger = 0.08f;
 
         [Header("Zone map")]
         [Range(0f, 1f)] [SerializeField] private float _zoneScrollDuration = 0.45f;
@@ -155,6 +159,14 @@ namespace Vertigo.Wheel.Data.Configs
         public float BankCounterDuration
         {
             get { return _bankCounterDuration; }
+        }
+        public int BankFlyIconsPerReward
+        {
+            get { return _bankFlyIconsPerReward; }
+        }
+        public float BankFlyStagger
+        {
+            get { return _bankFlyStagger; }
         }
         public float ZoneScrollDuration
         {
