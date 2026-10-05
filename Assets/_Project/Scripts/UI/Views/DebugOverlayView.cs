@@ -44,8 +44,10 @@ namespace Vertigo.Wheel.UI.Views
             Bind(ref _ui_button_debug_items, "ui_button_debug_items");
         }
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             _available = Application.isEditor || Debug.isDebugBuild;
             if (!_available)
             {
