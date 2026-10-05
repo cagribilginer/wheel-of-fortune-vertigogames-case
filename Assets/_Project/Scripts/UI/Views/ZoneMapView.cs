@@ -12,20 +12,20 @@ namespace Vertigo.Wheel.UI.Views
     /// </summary>
     public sealed class ZoneMapView : UIViewBase
     {
-        [SerializeField] private ScrollRect _ui_scroll_zonemap;
-        [SerializeField] private RectTransform _ui_content_zonemap;
-        [SerializeField] private TextMeshProUGUI _ui_text_zonemap_milestone_super_value;
-        [SerializeField] private TextMeshProUGUI _ui_text_zonemap_milestone_safe_value;
-        [SerializeField] private Button _ui_card_zonemap_milestone_super;
-        [SerializeField] private Button _ui_card_zonemap_milestone_safe;
+        [SerializeField] private ScrollRect _scrollZonemap;
+        [SerializeField] private RectTransform _contentZonemap;
+        [SerializeField] private TextMeshProUGUI _textZonemapMilestoneSuperValue;
+        [SerializeField] private TextMeshProUGUI _textZonemapMilestoneSafeValue;
+        [SerializeField] private Button _cardZonemapMilestoneSuper;
+        [SerializeField] private Button _cardZonemapMilestoneSafe;
 
         public ScrollRect Scroll
         {
-            get { return _ui_scroll_zonemap; }
+            get { return _scrollZonemap; }
         }
         public RectTransform Content
         {
-            get { return _ui_content_zonemap; }
+            get { return _contentZonemap; }
         }
 
         /// <summary>Raised when the player taps a milestone badge — opens the preview teaser.</summary>
@@ -34,24 +34,24 @@ namespace Vertigo.Wheel.UI.Views
 
         protected override void CacheReferences()
         {
-            Bind(ref _ui_scroll_zonemap, "ui_scroll_zonemap");
-            Bind(ref _ui_content_zonemap, "ui_content_zonemap");
-            Bind(ref _ui_text_zonemap_milestone_super_value, "ui_text_zonemap_milestone_super_value");
-            Bind(ref _ui_text_zonemap_milestone_safe_value, "ui_text_zonemap_milestone_safe_value");
-            Bind(ref _ui_card_zonemap_milestone_super, "ui_card_zonemap_milestone_super");
-            Bind(ref _ui_card_zonemap_milestone_safe, "ui_card_zonemap_milestone_safe");
+            Bind(ref _scrollZonemap, "ui_scroll_zonemap");
+            Bind(ref _contentZonemap, "ui_content_zonemap");
+            Bind(ref _textZonemapMilestoneSuperValue, "ui_text_zonemap_milestone_super_value");
+            Bind(ref _textZonemapMilestoneSafeValue, "ui_text_zonemap_milestone_safe_value");
+            Bind(ref _cardZonemapMilestoneSuper, "ui_card_zonemap_milestone_super");
+            Bind(ref _cardZonemapMilestoneSafe, "ui_card_zonemap_milestone_safe");
         }
 
         private void OnEnable()
         {
-            _ui_card_zonemap_milestone_safe.onClick.AddListener(RaiseSafe);
-            _ui_card_zonemap_milestone_super.onClick.AddListener(RaiseSuper);
+            _cardZonemapMilestoneSafe.onClick.AddListener(RaiseSafe);
+            _cardZonemapMilestoneSuper.onClick.AddListener(RaiseSuper);
         }
 
         private void OnDisable()
         {
-            _ui_card_zonemap_milestone_safe.onClick.RemoveListener(RaiseSafe);
-            _ui_card_zonemap_milestone_super.onClick.RemoveListener(RaiseSuper);
+            _cardZonemapMilestoneSafe.onClick.RemoveListener(RaiseSafe);
+            _cardZonemapMilestoneSuper.onClick.RemoveListener(RaiseSuper);
         }
 
         private void RaiseSafe()
@@ -69,8 +69,8 @@ namespace Vertigo.Wheel.UI.Views
         /// </summary>
         public void SetMilestoneTargets(int nextSafeZone, int nextSuperZone)
         {
-            _ui_text_zonemap_milestone_super_value.SetText("SUPER ZONE {0}", nextSuperZone);
-            _ui_text_zonemap_milestone_safe_value.SetText("SAFE ZONE {0}", nextSafeZone);
+            _textZonemapMilestoneSuperValue.SetText("SUPER ZONE {0}", nextSuperZone);
+            _textZonemapMilestoneSafeValue.SetText("SAFE ZONE {0}", nextSafeZone);
         }
     }
 }

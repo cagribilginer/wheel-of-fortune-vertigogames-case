@@ -128,9 +128,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6904ef23fc4447ad9b83655808e0dcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ui_image_bank_entry_frame: {fileID: 3109769565119676731}
-  _ui_image_bank_entry_icon_value: {fileID: 6189662172896242969}
-  _ui_text_bank_entry_amount_value: {fileID: 581218774629202185}
+  _imageBankEntryFrame: {fileID: 3109769565119676731}
+  _imageBankEntryIconValue: {fileID: 6189662172896242969}
+  _textBankEntryAmountValue: {fileID: 581218774629202185}
 --- !u!1 &7394827578101639655
 GameObject:
   m_ObjectHideFlags: 0

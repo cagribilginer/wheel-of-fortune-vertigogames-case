@@ -10,23 +10,23 @@ namespace Vertigo.Wheel.UI.Views
     /// </summary>
     public sealed class ActionBarView : UIViewBase
     {
-        [SerializeField] private Button _ui_button_action_exit;
+        [SerializeField] private Button _buttonActionExit;
 
         public event Action ExitClicked;
 
         protected override void CacheReferences()
         {
-            Bind(ref _ui_button_action_exit, "ui_button_action_exit");
+            Bind(ref _buttonActionExit, "ui_button_action_exit");
         }
 
         private void OnEnable()
         {
-            _ui_button_action_exit.onClick.AddListener(RaiseExit);
+            _buttonActionExit.onClick.AddListener(RaiseExit);
         }
 
         private void OnDisable()
         {
-            _ui_button_action_exit.onClick.RemoveListener(RaiseExit);
+            _buttonActionExit.onClick.RemoveListener(RaiseExit);
         }
 
         private void RaiseExit()
@@ -36,7 +36,7 @@ namespace Vertigo.Wheel.UI.Views
 
         public void SetExitInteractable(bool interactable)
         {
-            _ui_button_action_exit.interactable = interactable;
+            _buttonActionExit.interactable = interactable;
         }
     }
 }

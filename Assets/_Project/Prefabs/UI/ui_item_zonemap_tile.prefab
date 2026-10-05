@@ -207,8 +207,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3efb532131d4a4f94a4a67e5658922e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ui_image_zonemap_tile_marker_value: {fileID: 8414123760255258184}
-  _ui_text_zonemap_tile_number_value: {fileID: 8549760136776858309}
+  _imageZonemapTileMarkerValue: {fileID: 8414123760255258184}
+  _textZonemapTileNumberValue: {fileID: 8549760136776858309}
 --- !u!1 &8771232045223407488
 GameObject:
   m_ObjectHideFlags: 0

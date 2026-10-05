@@ -14,13 +14,13 @@ namespace Vertigo.Wheel.UI.Views
         // Tap-only landscape game — nothing else reads the keyboard, so a plain letter is safe here.
         private const KeyCode TOGGLE_KEY = KeyCode.D;
 
-        [SerializeField] private Button _ui_button_debug_toggle;
-        [SerializeField] private RectTransform _ui_panel_debug_body;
-        [SerializeField] private Button _ui_button_debug_zone5;
-        [SerializeField] private Button _ui_button_debug_zone30;
-        [SerializeField] private Button _ui_button_debug_bomb;
-        [SerializeField] private Button _ui_button_debug_gold;
-        [SerializeField] private Button _ui_button_debug_items;
+        [SerializeField] private Button _buttonDebugToggle;
+        [SerializeField] private RectTransform _panelDebugBody;
+        [SerializeField] private Button _buttonDebugZone5;
+        [SerializeField] private Button _buttonDebugZone30;
+        [SerializeField] private Button _buttonDebugBomb;
+        [SerializeField] private Button _buttonDebugGold;
+        [SerializeField] private Button _buttonDebugItems;
 
         public event Action JumpToZone5Clicked;
         public event Action JumpToZone30Clicked;
@@ -35,13 +35,13 @@ namespace Vertigo.Wheel.UI.Views
         #region Wiring
         protected override void CacheReferences()
         {
-            Bind(ref _ui_button_debug_toggle, "ui_button_debug_toggle");
-            Bind(ref _ui_panel_debug_body, "ui_panel_debug_body");
-            Bind(ref _ui_button_debug_zone5, "ui_button_debug_zone5");
-            Bind(ref _ui_button_debug_zone30, "ui_button_debug_zone30");
-            Bind(ref _ui_button_debug_bomb, "ui_button_debug_bomb");
-            Bind(ref _ui_button_debug_gold, "ui_button_debug_gold");
-            Bind(ref _ui_button_debug_items, "ui_button_debug_items");
+            Bind(ref _buttonDebugToggle, "ui_button_debug_toggle");
+            Bind(ref _panelDebugBody, "ui_panel_debug_body");
+            Bind(ref _buttonDebugZone5, "ui_button_debug_zone5");
+            Bind(ref _buttonDebugZone30, "ui_button_debug_zone30");
+            Bind(ref _buttonDebugBomb, "ui_button_debug_bomb");
+            Bind(ref _buttonDebugGold, "ui_button_debug_gold");
+            Bind(ref _buttonDebugItems, "ui_button_debug_items");
         }
 
         protected override void Awake()
@@ -67,22 +67,22 @@ namespace Vertigo.Wheel.UI.Views
 
         private void OnEnable()
         {
-            _ui_button_debug_toggle.onClick.AddListener(ToggleBody);
-            _ui_button_debug_zone5.onClick.AddListener(RaiseZone5);
-            _ui_button_debug_zone30.onClick.AddListener(RaiseZone30);
-            _ui_button_debug_bomb.onClick.AddListener(RaiseBomb);
-            _ui_button_debug_gold.onClick.AddListener(RaiseGold);
-            _ui_button_debug_items.onClick.AddListener(RaiseItems);
+            _buttonDebugToggle.onClick.AddListener(ToggleBody);
+            _buttonDebugZone5.onClick.AddListener(RaiseZone5);
+            _buttonDebugZone30.onClick.AddListener(RaiseZone30);
+            _buttonDebugBomb.onClick.AddListener(RaiseBomb);
+            _buttonDebugGold.onClick.AddListener(RaiseGold);
+            _buttonDebugItems.onClick.AddListener(RaiseItems);
         }
 
         private void OnDisable()
         {
-            _ui_button_debug_toggle.onClick.RemoveListener(ToggleBody);
-            _ui_button_debug_zone5.onClick.RemoveListener(RaiseZone5);
-            _ui_button_debug_zone30.onClick.RemoveListener(RaiseZone30);
-            _ui_button_debug_bomb.onClick.RemoveListener(RaiseBomb);
-            _ui_button_debug_gold.onClick.RemoveListener(RaiseGold);
-            _ui_button_debug_items.onClick.RemoveListener(RaiseItems);
+            _buttonDebugToggle.onClick.RemoveListener(ToggleBody);
+            _buttonDebugZone5.onClick.RemoveListener(RaiseZone5);
+            _buttonDebugZone30.onClick.RemoveListener(RaiseZone30);
+            _buttonDebugBomb.onClick.RemoveListener(RaiseBomb);
+            _buttonDebugGold.onClick.RemoveListener(RaiseGold);
+            _buttonDebugItems.onClick.RemoveListener(RaiseItems);
         }
         #endregion
 
@@ -91,7 +91,7 @@ namespace Vertigo.Wheel.UI.Views
         private void SetShown(bool shown)
         {
             _isShown = shown;
-            if (_ui_button_debug_toggle) _ui_button_debug_toggle.gameObject.SetActive(shown);
+            if (_buttonDebugToggle) _buttonDebugToggle.gameObject.SetActive(shown);
             if (!shown) SetExpanded(false);
         }
 
@@ -103,7 +103,7 @@ namespace Vertigo.Wheel.UI.Views
         private void SetExpanded(bool expanded)
         {
             _isExpanded = expanded;
-            if (_ui_panel_debug_body) _ui_panel_debug_body.gameObject.SetActive(expanded);
+            if (_panelDebugBody) _panelDebugBody.gameObject.SetActive(expanded);
         }
         #endregion
 

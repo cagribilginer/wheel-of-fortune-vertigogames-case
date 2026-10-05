@@ -13,23 +13,23 @@ namespace Vertigo.Wheel.UI.Views.Popups
     /// </summary>
     public sealed class CollectPopupView : PopupViewBase
     {
-        [SerializeField] private Image _ui_image_popup_collect_backdrop;
-        [SerializeField] private RectTransform _ui_transform_popup_collect_anim;
-        [SerializeField] private TextMeshProUGUI _ui_text_popup_collect_zone_value;
-        [SerializeField] private RectTransform _ui_row_popup_collect_currency;
-        [SerializeField] private RectTransform _ui_content_popup_collect_list;
-        [SerializeField] private Button _ui_button_popup_collect_confirm;
-        [SerializeField] private Button _ui_button_popup_collect_cancel;
+        [SerializeField] private Image _imagePopupCollectBackdrop;
+        [SerializeField] private RectTransform _transformPopupCollectAnim;
+        [SerializeField] private TextMeshProUGUI _textPopupCollectZoneValue;
+        [SerializeField] private RectTransform _rowPopupCollectCurrency;
+        [SerializeField] private RectTransform _contentPopupCollectList;
+        [SerializeField] private Button _buttonPopupCollectConfirm;
+        [SerializeField] private Button _buttonPopupCollectCancel;
 
         public RectTransform Content
         {
-            get { return _ui_content_popup_collect_list; }
+            get { return _contentPopupCollectList; }
         }
 
         /// <summary>Where the presenter pools the wallet's currency rows.</summary>
         public RectTransform CurrencyContent
         {
-            get { return _ui_row_popup_collect_currency; }
+            get { return _rowPopupCollectCurrency; }
         }
 
         private Action _onClaimFinished;
@@ -40,25 +40,25 @@ namespace Vertigo.Wheel.UI.Views.Popups
         #region Wiring
         protected override void CacheReferences()
         {
-            Bind(ref _ui_image_popup_collect_backdrop, "ui_image_popup_collect_backdrop");
-            Bind(ref _ui_transform_popup_collect_anim, "ui_transform_popup_collect_anim");
-            Bind(ref _ui_text_popup_collect_zone_value, "ui_text_popup_collect_zone_value");
-            Bind(ref _ui_row_popup_collect_currency, "ui_row_popup_collect_currency");
-            Bind(ref _ui_content_popup_collect_list, "ui_content_popup_collect_list");
-            Bind(ref _ui_button_popup_collect_confirm, "ui_button_popup_collect_confirm");
-            Bind(ref _ui_button_popup_collect_cancel, "ui_button_popup_collect_cancel");
+            Bind(ref _imagePopupCollectBackdrop, "ui_image_popup_collect_backdrop");
+            Bind(ref _transformPopupCollectAnim, "ui_transform_popup_collect_anim");
+            Bind(ref _textPopupCollectZoneValue, "ui_text_popup_collect_zone_value");
+            Bind(ref _rowPopupCollectCurrency, "ui_row_popup_collect_currency");
+            Bind(ref _contentPopupCollectList, "ui_content_popup_collect_list");
+            Bind(ref _buttonPopupCollectConfirm, "ui_button_popup_collect_confirm");
+            Bind(ref _buttonPopupCollectCancel, "ui_button_popup_collect_cancel");
         }
 
         private void OnEnable()
         {
-            _ui_button_popup_collect_confirm.onClick.AddListener(RaiseConfirm);
-            _ui_button_popup_collect_cancel.onClick.AddListener(RaiseCancel);
+            _buttonPopupCollectConfirm.onClick.AddListener(RaiseConfirm);
+            _buttonPopupCollectCancel.onClick.AddListener(RaiseCancel);
         }
 
         private void OnDisable()
         {
-            _ui_button_popup_collect_confirm.onClick.RemoveListener(RaiseConfirm);
-            _ui_button_popup_collect_cancel.onClick.RemoveListener(RaiseCancel);
+            _buttonPopupCollectConfirm.onClick.RemoveListener(RaiseConfirm);
+            _buttonPopupCollectCancel.onClick.RemoveListener(RaiseCancel);
         }
 
         private void RaiseConfirm()
@@ -74,13 +74,13 @@ namespace Vertigo.Wheel.UI.Views.Popups
         #region Presentation
         public void Show(int zonesCleared)
         {
-            _ui_text_popup_collect_zone_value.SetText("Cleared {0} zones", zonesCleared);
+            _textPopupCollectZoneValue.SetText("Cleared {0} zones", zonesCleared);
 
             // A fresh summary is fully interactive again.
-            _ui_button_popup_collect_confirm.interactable = true;
-            _ui_button_popup_collect_cancel.interactable = true;
+            _buttonPopupCollectConfirm.interactable = true;
+            _buttonPopupCollectCancel.interactable = true;
 
-            PlayOpen(_ui_image_popup_collect_backdrop, _ui_transform_popup_collect_anim);
+            PlayOpen(_imagePopupCollectBackdrop, _transformPopupCollectAnim);
         }
 
         /// <summary>
@@ -89,12 +89,12 @@ namespace Vertigo.Wheel.UI.Views.Popups
         /// </summary>
         public void PlayClaim(Action onComplete)
         {
-            _ui_button_popup_collect_confirm.interactable = false;
-            _ui_button_popup_collect_cancel.interactable = false;
+            _buttonPopupCollectConfirm.interactable = false;
+            _buttonPopupCollectCancel.interactable = false;
 
-            _ui_transform_popup_collect_anim.DOKill();
-            _ui_transform_popup_collect_anim.localScale = Vector3.one;
-            _ui_transform_popup_collect_anim.DOPunchScale(Vector3.one * Juice.CardPunchScale, Juice.CardPunchDuration).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
+            _transformPopupCollectAnim.DOKill();
+            _transformPopupCollectAnim.localScale = Vector3.one;
+            _transformPopupCollectAnim.DOPunchScale(Vector3.one * Juice.CardPunchScale, Juice.CardPunchDuration).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
 
             _onClaimFinished = onComplete;
             DOVirtual.DelayedCall(Juice.ClaimHoldDuration, OnClaimHoldElapsed).SetLink(gameObject);
@@ -108,7 +108,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
 
         public void Hide()
         {
-            PlayClose(_ui_image_popup_collect_backdrop, _ui_transform_popup_collect_anim);
+            PlayClose(_imagePopupCollectBackdrop, _transformPopupCollectAnim);
         }
         #endregion
     }

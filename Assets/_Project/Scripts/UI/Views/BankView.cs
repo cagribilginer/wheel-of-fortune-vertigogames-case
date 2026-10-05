@@ -10,25 +10,25 @@ namespace Vertigo.Wheel.UI.Views
     /// </summary>
     public sealed class BankView : UIViewBase
     {
-        [SerializeField] private ScrollRect _ui_scroll_bank;
-        [SerializeField] private RectTransform _ui_content_bank;
-        [SerializeField] private TextMeshProUGUI _ui_text_bank_empty_value;
+        [SerializeField] private ScrollRect _scrollBank;
+        [SerializeField] private RectTransform _contentBank;
+        [SerializeField] private TextMeshProUGUI _textBankEmptyValue;
 
         public RectTransform Content
         {
-            get { return _ui_content_bank; }
+            get { return _contentBank; }
         }
 
         protected override void CacheReferences()
         {
-            Bind(ref _ui_scroll_bank, "ui_scroll_bank");
-            Bind(ref _ui_content_bank, "ui_content_bank");
-            Bind(ref _ui_text_bank_empty_value, "ui_text_bank_empty_value");
+            Bind(ref _scrollBank, "ui_scroll_bank");
+            Bind(ref _contentBank, "ui_content_bank");
+            Bind(ref _textBankEmptyValue, "ui_text_bank_empty_value");
         }
 
         public void SetEmpty(bool empty)
         {
-            _ui_text_bank_empty_value.gameObject.SetActive(empty);
+            _textBankEmptyValue.gameObject.SetActive(empty);
         }
     }
 }

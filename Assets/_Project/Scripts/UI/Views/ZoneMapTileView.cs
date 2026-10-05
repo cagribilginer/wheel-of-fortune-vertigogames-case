@@ -10,8 +10,8 @@ namespace Vertigo.Wheel.UI.Views
     /// </summary>
     public sealed class ZoneMapTileView : UIViewBase
     {
-        [SerializeField] private Image _ui_image_zonemap_tile_marker_value;
-        [SerializeField] private TextMeshProUGUI _ui_text_zonemap_tile_number_value;
+        [SerializeField] private Image _imageZonemapTileMarkerValue;
+        [SerializeField] private TextMeshProUGUI _textZonemapTileNumberValue;
 
         private RectTransform _rect;
 
@@ -26,29 +26,29 @@ namespace Vertigo.Wheel.UI.Views
 
         protected override void CacheReferences()
         {
-            Bind(ref _ui_image_zonemap_tile_marker_value, "ui_image_zonemap_tile_marker_value");
-            Bind(ref _ui_text_zonemap_tile_number_value, "ui_text_zonemap_tile_number_value");
+            Bind(ref _imageZonemapTileMarkerValue, "ui_image_zonemap_tile_marker_value");
+            Bind(ref _textZonemapTileNumberValue, "ui_text_zonemap_tile_number_value");
         }
 
         public void SetZoneNumber(int zone)
         {
-            _ui_text_zonemap_tile_number_value.SetText("{0}", zone);
+            _textZonemapTileNumberValue.SetText("{0}", zone);
         }
 
         /// <summary>A passed (or upcoming) zone: no marker, just the number in the presenter's colour/weight.</summary>
         public void SetPlain(Color numberColor, bool bold)
         {
-            _ui_image_zonemap_tile_marker_value.enabled = false;
-            _ui_text_zonemap_tile_number_value.color = numberColor;
-            _ui_text_zonemap_tile_number_value.fontStyle = bold ? FontStyles.Bold : FontStyles.Normal;
+            _imageZonemapTileMarkerValue.enabled = false;
+            _textZonemapTileNumberValue.color = numberColor;
+            _textZonemapTileNumberValue.fontStyle = bold ? FontStyles.Bold : FontStyles.Normal;
         }
 
         /// <summary>The zone the player is standing on: the raised white marker plus a dark, bold number.</summary>
         public void SetCurrent(Color numberColor)
         {
-            _ui_image_zonemap_tile_marker_value.enabled = true;
-            _ui_text_zonemap_tile_number_value.color = numberColor;
-            _ui_text_zonemap_tile_number_value.fontStyle = FontStyles.Bold;
+            _imageZonemapTileMarkerValue.enabled = true;
+            _textZonemapTileNumberValue.color = numberColor;
+            _textZonemapTileNumberValue.fontStyle = FontStyles.Bold;
         }
     }
 }

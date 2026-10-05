@@ -11,14 +11,14 @@ namespace Vertigo.Wheel.UI.Views.Popups
     /// </summary>
     public sealed class MilestonePreviewPopupView : PopupViewBase
     {
-        [SerializeField] private Image _ui_image_popup_milestone_backdrop;
-        [SerializeField] private Button _ui_button_popup_milestone_backdrop;
-        [SerializeField] private RectTransform _ui_transform_popup_milestone_anim;
-        [SerializeField] private TextMeshProUGUI _ui_text_popup_milestone_title_value;
-        [SerializeField] private TextMeshProUGUI _ui_text_popup_milestone_desc_value;
-        [SerializeField] private RectTransform _ui_row_popup_milestone_safe;
-        [SerializeField] private RectTransform _ui_row_popup_milestone_super;
-        [SerializeField] private Button _ui_button_popup_milestone_close;
+        [SerializeField] private Image _imagePopupMilestoneBackdrop;
+        [SerializeField] private Button _buttonPopupMilestoneBackdrop;
+        [SerializeField] private RectTransform _transformPopupMilestoneAnim;
+        [SerializeField] private TextMeshProUGUI _textPopupMilestoneTitleValue;
+        [SerializeField] private TextMeshProUGUI _textPopupMilestoneDescValue;
+        [SerializeField] private RectTransform _rowPopupMilestoneSafe;
+        [SerializeField] private RectTransform _rowPopupMilestoneSuper;
+        [SerializeField] private Button _buttonPopupMilestoneClose;
 
         private const string SAFE_DESCRIPTION = "Win special rewards in bomb-free Safe Zones!";
         private const string SUPER_DESCRIPTION = "Win super rewards in bomb-free Super Zones!";
@@ -27,26 +27,26 @@ namespace Vertigo.Wheel.UI.Views.Popups
 
         protected override void CacheReferences()
         {
-            Bind(ref _ui_image_popup_milestone_backdrop, "ui_image_popup_milestone_backdrop");
-            Bind(ref _ui_button_popup_milestone_backdrop, "ui_image_popup_milestone_backdrop");
-            Bind(ref _ui_transform_popup_milestone_anim, "ui_transform_popup_milestone_anim");
-            Bind(ref _ui_text_popup_milestone_title_value, "ui_text_popup_milestone_title_value");
-            Bind(ref _ui_text_popup_milestone_desc_value, "ui_text_popup_milestone_desc_value");
-            Bind(ref _ui_row_popup_milestone_safe, "ui_row_popup_milestone_safe");
-            Bind(ref _ui_row_popup_milestone_super, "ui_row_popup_milestone_super");
-            Bind(ref _ui_button_popup_milestone_close, "ui_button_popup_milestone_close");
+            Bind(ref _imagePopupMilestoneBackdrop, "ui_image_popup_milestone_backdrop");
+            Bind(ref _buttonPopupMilestoneBackdrop, "ui_image_popup_milestone_backdrop");
+            Bind(ref _transformPopupMilestoneAnim, "ui_transform_popup_milestone_anim");
+            Bind(ref _textPopupMilestoneTitleValue, "ui_text_popup_milestone_title_value");
+            Bind(ref _textPopupMilestoneDescValue, "ui_text_popup_milestone_desc_value");
+            Bind(ref _rowPopupMilestoneSafe, "ui_row_popup_milestone_safe");
+            Bind(ref _rowPopupMilestoneSuper, "ui_row_popup_milestone_super");
+            Bind(ref _buttonPopupMilestoneClose, "ui_button_popup_milestone_close");
         }
 
         private void OnEnable()
         {
-            _ui_button_popup_milestone_backdrop.onClick.AddListener(RaiseClose);
-            _ui_button_popup_milestone_close.onClick.AddListener(RaiseClose);
+            _buttonPopupMilestoneBackdrop.onClick.AddListener(RaiseClose);
+            _buttonPopupMilestoneClose.onClick.AddListener(RaiseClose);
         }
 
         private void OnDisable()
         {
-            _ui_button_popup_milestone_backdrop.onClick.RemoveListener(RaiseClose);
-            _ui_button_popup_milestone_close.onClick.RemoveListener(RaiseClose);
+            _buttonPopupMilestoneBackdrop.onClick.RemoveListener(RaiseClose);
+            _buttonPopupMilestoneClose.onClick.RemoveListener(RaiseClose);
         }
 
         private void RaiseClose()
@@ -56,18 +56,18 @@ namespace Vertigo.Wheel.UI.Views.Popups
 
         public void Show(bool isSuper)
         {
-            _ui_row_popup_milestone_safe.gameObject.SetActive(!isSuper);
-            _ui_row_popup_milestone_super.gameObject.SetActive(isSuper);
+            _rowPopupMilestoneSafe.gameObject.SetActive(!isSuper);
+            _rowPopupMilestoneSuper.gameObject.SetActive(isSuper);
 
-            _ui_text_popup_milestone_title_value.text = isSuper ? "SUPER ZONE" : "SAFE ZONE";
-            _ui_text_popup_milestone_desc_value.text = isSuper ? SUPER_DESCRIPTION : SAFE_DESCRIPTION;
+            _textPopupMilestoneTitleValue.text = isSuper ? "SUPER ZONE" : "SAFE ZONE";
+            _textPopupMilestoneDescValue.text = isSuper ? SUPER_DESCRIPTION : SAFE_DESCRIPTION;
 
-            PlayOpen(_ui_image_popup_milestone_backdrop, _ui_transform_popup_milestone_anim);
+            PlayOpen(_imagePopupMilestoneBackdrop, _transformPopupMilestoneAnim);
         }
 
         public void Hide()
         {
-            PlayClose(_ui_image_popup_milestone_backdrop, _ui_transform_popup_milestone_anim);
+            PlayClose(_imagePopupMilestoneBackdrop, _transformPopupMilestoneAnim);
         }
     }
 }

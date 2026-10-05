@@ -78,8 +78,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9218b5af90f4402a391c3a39ad4a05c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ui_image_popup_currency_icon: {fileID: 184415505619003752}
-  _ui_text_popup_currency_value: {fileID: 4231412336472812947}
+  _imagePopupCurrencyIcon: {fileID: 184415505619003752}
+  _textPopupCurrencyValue: {fileID: 4231412336472812947}
 --- !u!1 &5562906564283252498
 GameObject:
   m_ObjectHideFlags: 0

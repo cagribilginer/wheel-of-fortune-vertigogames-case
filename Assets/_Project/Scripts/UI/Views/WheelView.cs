@@ -14,13 +14,13 @@ namespace Vertigo.Wheel.UI.Views
         /// <summary>Hole centres as a fraction of the wheel's width, measured off the bronze/silver/golden base art.</summary>
         private const float SLOT_RING_RADIUS = 0.2955f;
 
-        [SerializeField] private Image _ui_image_wheel_glow;
-        [SerializeField] private RectTransform _ui_transform_wheel_rotor;
-        [SerializeField] private Image _ui_image_wheel_base_value;
-        [SerializeField] private RectTransform _ui_group_wheel_slots;
-        [SerializeField] private RectTransform _ui_transform_wheel_indicator;
-        [SerializeField] private Image _ui_image_wheel_indicator_value;
-        [SerializeField] private Button _ui_button_wheel_spin;
+        [SerializeField] private Image _imageWheelGlow;
+        [SerializeField] private RectTransform _transformWheelRotor;
+        [SerializeField] private Image _imageWheelBaseValue;
+        [SerializeField] private RectTransform _groupWheelSlots;
+        [SerializeField] private RectTransform _transformWheelIndicator;
+        [SerializeField] private Image _imageWheelIndicatorValue;
+        [SerializeField] private Button _buttonWheelSpin;
         [SerializeField] private WheelSlotView[] _slots = Array.Empty<WheelSlotView>();
 
         /// <summary>
@@ -41,15 +41,15 @@ namespace Vertigo.Wheel.UI.Views
 
         public RectTransform Rotor
         {
-            get { return _ui_transform_wheel_rotor; }
+            get { return _transformWheelRotor; }
         }
         public RectTransform Indicator
         {
-            get { return _ui_transform_wheel_indicator; }
+            get { return _transformWheelIndicator; }
         }
         public RectTransform SpinButtonRect
         {
-            get { return (RectTransform)_ui_button_wheel_spin.transform; }
+            get { return (RectTransform)_buttonWheelSpin.transform; }
         }
         public IReadOnlyList<WheelSlotView> Slots
         {
@@ -62,26 +62,26 @@ namespace Vertigo.Wheel.UI.Views
         #region Binding
         protected override void CacheReferences()
         {
-            Bind(ref _ui_image_wheel_glow, "ui_image_wheel_glow");
-            Bind(ref _ui_transform_wheel_rotor, "ui_transform_wheel_rotor");
-            Bind(ref _ui_image_wheel_base_value, "ui_image_wheel_base_value");
-            Bind(ref _ui_group_wheel_slots, "ui_group_wheel_slots");
-            Bind(ref _ui_transform_wheel_indicator, "ui_transform_wheel_indicator");
-            Bind(ref _ui_image_wheel_indicator_value, "ui_image_wheel_indicator_value");
-            Bind(ref _ui_button_wheel_spin, "ui_button_wheel_spin");
+            Bind(ref _imageWheelGlow, "ui_image_wheel_glow");
+            Bind(ref _transformWheelRotor, "ui_transform_wheel_rotor");
+            Bind(ref _imageWheelBaseValue, "ui_image_wheel_base_value");
+            Bind(ref _groupWheelSlots, "ui_group_wheel_slots");
+            Bind(ref _transformWheelIndicator, "ui_transform_wheel_indicator");
+            Bind(ref _imageWheelIndicatorValue, "ui_image_wheel_indicator_value");
+            Bind(ref _buttonWheelSpin, "ui_button_wheel_spin");
 
-            _slots = _ui_group_wheel_slots
-                ? _ui_group_wheel_slots.GetComponentsInChildren<WheelSlotView>(includeInactive: true)
+            _slots = _groupWheelSlots
+                ? _groupWheelSlots.GetComponentsInChildren<WheelSlotView>(includeInactive: true)
                 : Array.Empty<WheelSlotView>();
         }
 
         private void OnEnable()
         {
-            _ui_button_wheel_spin.onClick.AddListener(RaiseSpinClicked);
+            _buttonWheelSpin.onClick.AddListener(RaiseSpinClicked);
         }
         private void OnDisable()
         {
-            _ui_button_wheel_spin.onClick.RemoveListener(RaiseSpinClicked);
+            _buttonWheelSpin.onClick.RemoveListener(RaiseSpinClicked);
         }
         private void RaiseSpinClicked()
         {
@@ -92,15 +92,15 @@ namespace Vertigo.Wheel.UI.Views
         #region Presentation
         public void SetTheme(Sprite baseSprite, Sprite indicatorSprite, Color accent, Color glow)
         {
-            _ui_image_wheel_base_value.sprite = baseSprite;
-            _ui_image_wheel_indicator_value.sprite = indicatorSprite;
-            _ui_image_wheel_glow.color = glow;
-            _ui_button_wheel_spin.image.color = accent;
+            _imageWheelBaseValue.sprite = baseSprite;
+            _imageWheelIndicatorValue.sprite = indicatorSprite;
+            _imageWheelGlow.color = glow;
+            _buttonWheelSpin.image.color = accent;
         }
 
         public void SetSpinInteractable(bool interactable)
         {
-            _ui_button_wheel_spin.interactable = interactable;
+            _buttonWheelSpin.interactable = interactable;
         }
 
         /// <summary>
@@ -133,13 +133,13 @@ namespace Vertigo.Wheel.UI.Views
         {
             CacheReferences();
 
-            if (!_ui_transform_wheel_rotor || _slots.Length == 0)
+            if (!_transformWheelRotor || _slots.Length == 0)
             {
                 Debug.LogWarning("[Vertigo] WheelSlotLayout: rotor or slots not found. Run OnValidate first.", this);
                 return;
             }
 
-            float wheelSize = _ui_transform_wheel_rotor.rect.width;
+            float wheelSize = _transformWheelRotor.rect.width;
             LayoutSlots(wheelSize);
             for (int i = 0; i < _slots.Length; i++) UnityEditor.EditorUtility.SetDirty(_slots[i].Rect);
 

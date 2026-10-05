@@ -2034,13 +2034,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a61cea0f778445cd892a1d9b083494f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ui_image_wheel_glow: {fileID: 479748402}
-  _ui_transform_wheel_rotor: {fileID: 1689767071}
-  _ui_image_wheel_base_value: {fileID: 335479253}
-  _ui_group_wheel_slots: {fileID: 1766598092}
-  _ui_transform_wheel_indicator: {fileID: 1357186639}
-  _ui_image_wheel_indicator_value: {fileID: 943317188}
-  _ui_button_wheel_spin: {fileID: 26175700}
+  _imageWheelGlow: {fileID: 479748402}
+  _transformWheelRotor: {fileID: 1689767071}
+  _imageWheelBaseValue: {fileID: 335479253}
+  _groupWheelSlots: {fileID: 1766598092}
+  _transformWheelIndicator: {fileID: 1357186639}
+  _imageWheelIndicatorValue: {fileID: 943317188}
+  _buttonWheelSpin: {fileID: 26175700}
   _slots:
   - {fileID: 906668696}
   - {fileID: 1313862266}
@@ -2976,13 +2976,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdbaed861547545368b9fa274e0c6683, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ui_button_debug_toggle: {fileID: 308471600}
-  _ui_panel_debug_body: {fileID: 626794725}
-  _ui_button_debug_zone5: {fileID: 1598999430}
-  _ui_button_debug_zone30: {fileID: 1058043989}
-  _ui_button_debug_bomb: {fileID: 1756102764}
-  _ui_button_debug_gold: {fileID: 2036678754}
-  _ui_button_debug_items: {fileID: 593539023}
+  _buttonDebugToggle: {fileID: 308471600}
+  _panelDebugBody: {fileID: 626794725}
+  _buttonDebugZone5: {fileID: 1598999430}
+  _buttonDebugZone30: {fileID: 1058043989}
+  _buttonDebugBomb: {fileID: 1756102764}
+  _buttonDebugGold: {fileID: 2036678754}
+  _buttonDebugItems: {fileID: 593539023}
 --- !u!1 &467306452
 GameObject:
   m_ObjectHideFlags: 0
@@ -3585,7 +3585,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 039a8377e00f943c39d6e45e27523ae6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ui_button_action_exit: {fileID: 695240245}
+  _buttonActionExit: {fileID: 695240245}
 --- !u!1 &549298707
 GameObject:
   m_ObjectHideFlags: 0
@@ -5405,9 +5405,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65f7b49c4048a49b38223cea5e24357f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ui_scroll_bank: {fileID: 1693569392}
-  _ui_content_bank: {fileID: 395666475}
-  _ui_text_bank_empty_value: {fileID: 1596545673}
+  _scrollBank: {fileID: 1693569392}
+  _contentBank: {fileID: 395666475}
+  _textBankEmptyValue: {fileID: 1596545673}
 --- !u!1 &749625118
 GameObject:
   m_ObjectHideFlags: 0
@@ -5773,14 +5773,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f59cbb9ba56745f3978b0840a89b817, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ui_image_popup_milestone_backdrop: {fileID: 26613557}
-  _ui_button_popup_milestone_backdrop: {fileID: 26613556}
-  _ui_transform_popup_milestone_anim: {fileID: 356234272}
-  _ui_text_popup_milestone_title_value: {fileID: 1634183299}
-  _ui_text_popup_milestone_desc_value: {fileID: 757097169}
-  _ui_row_popup_milestone_safe: {fileID: 1191113333}
-  _ui_row_popup_milestone_super: {fileID: 1592447122}
-  _ui_button_popup_milestone_close: {fileID: 862724766}
+  _imagePopupMilestoneBackdrop: {fileID: 26613557}
+  _buttonPopupMilestoneBackdrop: {fileID: 26613556}
+  _transformPopupMilestoneAnim: {fileID: 356234272}
+  _textPopupMilestoneTitleValue: {fileID: 1634183299}
+  _textPopupMilestoneDescValue: {fileID: 757097169}
+  _rowPopupMilestoneSafe: {fileID: 1191113333}
+  _rowPopupMilestoneSuper: {fileID: 1592447122}
+  _buttonPopupMilestoneClose: {fileID: 862724766}
 --- !u!1 &824716974
 GameObject:
   m_ObjectHideFlags: 0
@@ -5911,12 +5911,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e902a49a0edba4cc8b44038ff16881b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ui_scroll_zonemap: {fileID: 65759935}
-  _ui_content_zonemap: {fileID: 1747717679}
-  _ui_text_zonemap_milestone_super_value: {fileID: 1847226675}
-  _ui_text_zonemap_milestone_safe_value: {fileID: 635565984}
-  _ui_card_zonemap_milestone_super: {fileID: 671575625}
-  _ui_card_zonemap_milestone_safe: {fileID: 1747765198}
+  _scrollZonemap: {fileID: 65759935}
+  _contentZonemap: {fileID: 1747717679}
+  _textZonemapMilestoneSuperValue: {fileID: 1847226675}
+  _textZonemapMilestoneSafeValue: {fileID: 635565984}
+  _cardZonemapMilestoneSuper: {fileID: 671575625}
+  _cardZonemapMilestoneSafe: {fileID: 1747765198}
 --- !u!1 &862724763
 GameObject:
   m_ObjectHideFlags: 0
@@ -8689,17 +8689,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17bc1fdd227d74b04a77ad05ccf46a31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ui_image_popup_bomb_backdrop: {fileID: 467306454}
-  _ui_image_popup_bomb_vignette: {fileID: 286086780}
-  _ui_transform_popup_bomb_anim: {fileID: 57408244}
-  _ui_text_popup_bomb_zone_value: {fileID: 395070166}
-  _ui_row_popup_bomb_currency: {fileID: 326388656}
-  _ui_content_popup_bomb_list: {fileID: 2125180939}
-  _ui_text_popup_bomb_empty_value: {fileID: 1616323994}
-  _ui_button_popup_bomb_giveup: {fileID: 1146919924}
-  _ui_button_popup_bomb_continue: {fileID: 139277109}
-  _ui_text_popup_bomb_continue_value: {fileID: 653150710}
-  _ui_button_popup_bomb_advert: {fileID: 1750602022}
+  _imagePopupBombBackdrop: {fileID: 467306454}
+  _imagePopupBombVignette: {fileID: 286086780}
+  _transformPopupBombAnim: {fileID: 57408244}
+  _textPopupBombZoneValue: {fileID: 395070166}
+  _rowPopupBombCurrency: {fileID: 326388656}
+  _contentPopupBombList: {fileID: 2125180939}
+  _textPopupBombEmptyValue: {fileID: 1616323994}
+  _buttonPopupBombGiveup: {fileID: 1146919924}
+  _buttonPopupBombContinue: {fileID: 139277109}
+  _textPopupBombContinueValue: {fileID: 653150710}
+  _buttonPopupBombAdvert: {fileID: 1750602022}
 --- !u!1001 &1295937131
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12372,9 +12372,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f99bc9bcb1af42ce9d8c621d23f70fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ui_transform_vfx_screenshake: {fileID: 20180030}
-  _ui_image_vfx_flash: {fileID: 1645130994}
-  _ui_image_vfx_reward_burst: {fileID: 1399017688}
+  _transformVfxScreenshake: {fileID: 20180030}
+  _imageVfxFlash: {fileID: 1645130994}
+  _imageVfxRewardBurst: {fileID: 1399017688}
 --- !u!1 &1847226673
 GameObject:
   m_ObjectHideFlags: 0
@@ -12810,13 +12810,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7c3fac496a78441ea3ca4b689228d01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ui_image_popup_collect_backdrop: {fileID: 1976151548}
-  _ui_transform_popup_collect_anim: {fileID: 1402873928}
-  _ui_text_popup_collect_zone_value: {fileID: 92565154}
-  _ui_row_popup_collect_currency: {fileID: 890164387}
-  _ui_content_popup_collect_list: {fileID: 1358839046}
-  _ui_button_popup_collect_confirm: {fileID: 328613908}
-  _ui_button_popup_collect_cancel: {fileID: 549298710}
+  _imagePopupCollectBackdrop: {fileID: 1976151548}
+  _transformPopupCollectAnim: {fileID: 1402873928}
+  _textPopupCollectZoneValue: {fileID: 92565154}
+  _rowPopupCollectCurrency: {fileID: 890164387}
+  _contentPopupCollectList: {fileID: 1358839046}
+  _buttonPopupCollectConfirm: {fileID: 328613908}
+  _buttonPopupCollectCancel: {fileID: 549298710}
 --- !u!1 &1947361173
 GameObject:
   m_ObjectHideFlags: 0

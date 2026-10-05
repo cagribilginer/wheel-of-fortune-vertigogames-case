@@ -11,9 +11,9 @@ namespace Vertigo.Wheel.UI.Views
     /// </summary>
     public sealed class BankEntryView : UIViewBase
     {
-        [SerializeField] private Image _ui_image_bank_entry_frame;
-        [SerializeField] private Image _ui_image_bank_entry_icon_value;
-        [SerializeField] private TextMeshProUGUI _ui_text_bank_entry_amount_value;
+        [SerializeField] private Image _imageBankEntryFrame;
+        [SerializeField] private Image _imageBankEntryIconValue;
+        [SerializeField] private TextMeshProUGUI _textBankEntryAmountValue;
 
         private RectTransform _rect;
         private CanvasGroup _group;
@@ -29,9 +29,9 @@ namespace Vertigo.Wheel.UI.Views
 
         protected override void CacheReferences()
         {
-            Bind(ref _ui_image_bank_entry_frame, "ui_image_bank_entry_frame");
-            Bind(ref _ui_image_bank_entry_icon_value, "ui_image_bank_entry_icon_value");
-            Bind(ref _ui_text_bank_entry_amount_value, "ui_text_bank_entry_amount_value");
+            Bind(ref _imageBankEntryFrame, "ui_image_bank_entry_frame");
+            Bind(ref _imageBankEntryIconValue, "ui_image_bank_entry_icon_value");
+            Bind(ref _textBankEntryAmountValue, "ui_text_bank_entry_amount_value");
         }
 
         /// <summary>
@@ -46,14 +46,14 @@ namespace Vertigo.Wheel.UI.Views
 
         public void SetEntry(Sprite icon, int amount)
         {
-            _ui_image_bank_entry_icon_value.sprite = icon;
+            _imageBankEntryIconValue.sprite = icon;
             SetAmount(amount);
         }
 
         /// <summary>Just the count — the fly-in tween drives this every frame while the number climbs.</summary>
         public void SetAmount(int amount)
         {
-            AmountFormat.Apply(_ui_text_bank_entry_amount_value, amount);
+            AmountFormat.Apply(_textBankEntryAmountValue, amount);
         }
     }
 }

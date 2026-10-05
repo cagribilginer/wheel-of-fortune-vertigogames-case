@@ -11,8 +11,8 @@ namespace Vertigo.Wheel.UI.Views
     /// </summary>
     public sealed class CurrencyRowView : UIViewBase
     {
-        [SerializeField] private Image _ui_image_popup_currency_icon;
-        [SerializeField] private TextMeshProUGUI _ui_text_popup_currency_value;
+        [SerializeField] private Image _imagePopupCurrencyIcon;
+        [SerializeField] private TextMeshProUGUI _textPopupCurrencyValue;
 
         private int _shown;
         private bool _isInitialised;
@@ -20,14 +20,14 @@ namespace Vertigo.Wheel.UI.Views
 
         protected override void CacheReferences()
         {
-            Bind(ref _ui_image_popup_currency_icon, "ui_image_popup_currency_icon");
-            Bind(ref _ui_text_popup_currency_value, "ui_text_popup_currency_value");
+            Bind(ref _imagePopupCurrencyIcon, "ui_image_popup_currency_icon");
+            Bind(ref _textPopupCurrencyValue, "ui_text_popup_currency_value");
         }
 
         public void SetCurrency(Sprite icon, Color valueColor)
         {
-            _ui_image_popup_currency_icon.sprite = icon;
-            _ui_text_popup_currency_value.color = valueColor;
+            _imagePopupCurrencyIcon.sprite = icon;
+            _textPopupCurrencyValue.color = valueColor;
         }
 
         /// <summary>Shows the balance outright. The regular setter is needed for the thousands separator: TMP's zero-alloc SetText does not honour ":N0".</summary>
@@ -36,7 +36,7 @@ namespace Vertigo.Wheel.UI.Views
             if (_tween != null) _tween.Kill();
             _shown = amount;
             _isInitialised = true;
-            _ui_text_popup_currency_value.text = amount.ToString("N0");
+            _textPopupCurrencyValue.text = amount.ToString("N0");
         }
 
         /// <summary>The first value shows outright, later ones count up from what is on screen.</summary>
@@ -53,7 +53,7 @@ namespace Vertigo.Wheel.UI.Views
             Tween countUp = DOVirtual.Int(_shown, target, duration, value =>
                 {
                     _shown = value;
-                    _ui_text_popup_currency_value.text = value.ToString("N0");
+                    _textPopupCurrencyValue.text = value.ToString("N0");
                 })
                 .SetEase(Ease.OutCubic)
                 .SetLink(gameObject);

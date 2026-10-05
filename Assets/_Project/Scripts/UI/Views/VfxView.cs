@@ -10,28 +10,28 @@ namespace Vertigo.Wheel.UI.Views
     /// </summary>
     public sealed class VfxView : UIViewBase
     {
-        [SerializeField] private RectTransform _ui_transform_vfx_screenshake;
-        [SerializeField] private Image _ui_image_vfx_flash;
-        [SerializeField] private Image _ui_image_vfx_reward_burst;
+        [SerializeField] private RectTransform _transformVfxScreenshake;
+        [SerializeField] private Image _imageVfxFlash;
+        [SerializeField] private Image _imageVfxRewardBurst;
 
         public RectTransform Shake
         {
-            get { return _ui_transform_vfx_screenshake; }
+            get { return _transformVfxScreenshake; }
         }
         public Image Flash
         {
-            get { return _ui_image_vfx_flash; }
+            get { return _imageVfxFlash; }
         }
         public Image Burst
         {
-            get { return _ui_image_vfx_reward_burst; }
+            get { return _imageVfxRewardBurst; }
         }
 
         protected override void CacheReferences()
         {
-            Bind(ref _ui_transform_vfx_screenshake, "ui_transform_vfx_screenshake");
-            Bind(ref _ui_image_vfx_flash, "ui_image_vfx_flash");
-            Bind(ref _ui_image_vfx_reward_burst, "ui_image_vfx_reward_burst");
+            Bind(ref _transformVfxScreenshake, "ui_transform_vfx_screenshake");
+            Bind(ref _imageVfxFlash, "ui_image_vfx_flash");
+            Bind(ref _imageVfxRewardBurst, "ui_image_vfx_reward_burst");
         }
     }
 }

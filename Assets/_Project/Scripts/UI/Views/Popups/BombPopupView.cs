@@ -13,28 +13,28 @@ namespace Vertigo.Wheel.UI.Views.Popups
     /// </summary>
     public sealed class BombPopupView : PopupViewBase
     {
-        [SerializeField] private Image _ui_image_popup_bomb_backdrop;
-        [SerializeField] private Image _ui_image_popup_bomb_vignette;
-        [SerializeField] private RectTransform _ui_transform_popup_bomb_anim;
-        [SerializeField] private TextMeshProUGUI _ui_text_popup_bomb_zone_value;
-        [SerializeField] private RectTransform _ui_row_popup_bomb_currency;
-        [SerializeField] private RectTransform _ui_content_popup_bomb_list;
-        [SerializeField] private TextMeshProUGUI _ui_text_popup_bomb_empty_value;
-        [SerializeField] private Button _ui_button_popup_bomb_giveup;
-        [SerializeField] private Button _ui_button_popup_bomb_continue;
-        [SerializeField] private TextMeshProUGUI _ui_text_popup_bomb_continue_value;
-        [SerializeField] private Button _ui_button_popup_bomb_advert;
+        [SerializeField] private Image _imagePopupBombBackdrop;
+        [SerializeField] private Image _imagePopupBombVignette;
+        [SerializeField] private RectTransform _transformPopupBombAnim;
+        [SerializeField] private TextMeshProUGUI _textPopupBombZoneValue;
+        [SerializeField] private RectTransform _rowPopupBombCurrency;
+        [SerializeField] private RectTransform _contentPopupBombList;
+        [SerializeField] private TextMeshProUGUI _textPopupBombEmptyValue;
+        [SerializeField] private Button _buttonPopupBombGiveup;
+        [SerializeField] private Button _buttonPopupBombContinue;
+        [SerializeField] private TextMeshProUGUI _textPopupBombContinueValue;
+        [SerializeField] private Button _buttonPopupBombAdvert;
 
         /// <summary>Where the presenter pools the lost-haul preview tiles.</summary>
         public RectTransform Content
         {
-            get { return _ui_content_popup_bomb_list; }
+            get { return _contentPopupBombList; }
         }
 
         /// <summary>Where the presenter pools the wallet's currency rows.</summary>
         public RectTransform CurrencyContent
         {
-            get { return _ui_row_popup_bomb_currency; }
+            get { return _rowPopupBombCurrency; }
         }
 
         public event Action GiveUpClicked;
@@ -44,31 +44,31 @@ namespace Vertigo.Wheel.UI.Views.Popups
         #region Wiring
         protected override void CacheReferences()
         {
-            Bind(ref _ui_image_popup_bomb_backdrop, "ui_image_popup_bomb_backdrop");
-            Bind(ref _ui_image_popup_bomb_vignette, "ui_image_popup_bomb_vignette");
-            Bind(ref _ui_transform_popup_bomb_anim, "ui_transform_popup_bomb_anim");
-            Bind(ref _ui_text_popup_bomb_zone_value, "ui_text_popup_bomb_zone_value");
-            Bind(ref _ui_row_popup_bomb_currency, "ui_row_popup_bomb_currency");
-            Bind(ref _ui_content_popup_bomb_list, "ui_content_popup_bomb_list");
-            Bind(ref _ui_text_popup_bomb_empty_value, "ui_text_popup_bomb_empty_value");
-            Bind(ref _ui_button_popup_bomb_giveup, "ui_button_popup_bomb_giveup");
-            Bind(ref _ui_button_popup_bomb_continue, "ui_button_popup_bomb_continue");
-            Bind(ref _ui_text_popup_bomb_continue_value, "ui_text_popup_bomb_continue_value");
-            Bind(ref _ui_button_popup_bomb_advert, "ui_button_popup_bomb_advert");
+            Bind(ref _imagePopupBombBackdrop, "ui_image_popup_bomb_backdrop");
+            Bind(ref _imagePopupBombVignette, "ui_image_popup_bomb_vignette");
+            Bind(ref _transformPopupBombAnim, "ui_transform_popup_bomb_anim");
+            Bind(ref _textPopupBombZoneValue, "ui_text_popup_bomb_zone_value");
+            Bind(ref _rowPopupBombCurrency, "ui_row_popup_bomb_currency");
+            Bind(ref _contentPopupBombList, "ui_content_popup_bomb_list");
+            Bind(ref _textPopupBombEmptyValue, "ui_text_popup_bomb_empty_value");
+            Bind(ref _buttonPopupBombGiveup, "ui_button_popup_bomb_giveup");
+            Bind(ref _buttonPopupBombContinue, "ui_button_popup_bomb_continue");
+            Bind(ref _textPopupBombContinueValue, "ui_text_popup_bomb_continue_value");
+            Bind(ref _buttonPopupBombAdvert, "ui_button_popup_bomb_advert");
         }
 
         private void OnEnable()
         {
-            _ui_button_popup_bomb_giveup.onClick.AddListener(RaiseGiveUp);
-            _ui_button_popup_bomb_continue.onClick.AddListener(RaiseContinue);
-            _ui_button_popup_bomb_advert.onClick.AddListener(RaiseAdContinue);
+            _buttonPopupBombGiveup.onClick.AddListener(RaiseGiveUp);
+            _buttonPopupBombContinue.onClick.AddListener(RaiseContinue);
+            _buttonPopupBombAdvert.onClick.AddListener(RaiseAdContinue);
         }
 
         private void OnDisable()
         {
-            _ui_button_popup_bomb_giveup.onClick.RemoveListener(RaiseGiveUp);
-            _ui_button_popup_bomb_continue.onClick.RemoveListener(RaiseContinue);
-            _ui_button_popup_bomb_advert.onClick.RemoveListener(RaiseAdContinue);
+            _buttonPopupBombGiveup.onClick.RemoveListener(RaiseGiveUp);
+            _buttonPopupBombContinue.onClick.RemoveListener(RaiseContinue);
+            _buttonPopupBombAdvert.onClick.RemoveListener(RaiseAdContinue);
         }
 
         private void RaiseGiveUp()
@@ -88,34 +88,34 @@ namespace Vertigo.Wheel.UI.Views.Popups
         #region Presentation
         public void Show(GameOverSummary summary)
         {
-            _ui_text_popup_bomb_zone_value.SetText("You reached Zone {0}", summary.ZoneReached);
+            _textPopupBombZoneValue.SetText("You reached Zone {0}", summary.ZoneReached);
 
             // SetText's zero-alloc formatter does not honour ":N0" (it prints the literal characters), so the
             // thousands separator has to come from the regular setter.
-            _ui_text_popup_bomb_continue_value.text = summary.GoldReviveCost.ToString("N0");
+            _textPopupBombContinueValue.text = summary.GoldReviveCost.ToString("N0");
 
-            _ui_text_popup_bomb_empty_value.gameObject.SetActive(summary.LostHaul.Count == 0);
+            _textPopupBombEmptyValue.gameObject.SetActive(summary.LostHaul.Count == 0);
 
             // Every button stays in the row; an unavailable revive is disabled, not hidden.
-            _ui_button_popup_bomb_continue.interactable = summary.IsGoldReviveOffered;
-            _ui_button_popup_bomb_advert.interactable = summary.IsAdReviveOffered;
+            _buttonPopupBombContinue.interactable = summary.IsGoldReviveOffered;
+            _buttonPopupBombAdvert.interactable = summary.IsAdReviveOffered;
 
             PlayVignette();
-            PlayOpen(_ui_image_popup_bomb_backdrop, _ui_transform_popup_bomb_anim, Juice.BombBackdropAlpha);
+            PlayOpen(_imagePopupBombBackdrop, _transformPopupBombAnim, Juice.BombBackdropAlpha);
         }
 
         public void Hide()
         {
-            _ui_image_popup_bomb_vignette.DOKill();
-            _ui_image_popup_bomb_vignette.DOFade(0f, Juice.PopupFadeDuration)
-                .SetLink(_ui_image_popup_bomb_vignette.gameObject, LinkBehaviour.KillOnDestroy);
-            PlayClose(_ui_image_popup_bomb_backdrop, _ui_transform_popup_bomb_anim);
+            _imagePopupBombVignette.DOKill();
+            _imagePopupBombVignette.DOFade(0f, Juice.PopupFadeDuration)
+                .SetLink(_imagePopupBombVignette.gameObject, LinkBehaviour.KillOnDestroy);
+            PlayClose(_imagePopupBombBackdrop, _transformPopupBombAnim);
         }
 
         // A slow alpha yoyo that runs for as long as the screen is up.
         private void PlayVignette()
         {
-            Image vignette = _ui_image_popup_bomb_vignette;
+            Image vignette = _imagePopupBombVignette;
             vignette.DOKill();
 
             Color c = vignette.color;

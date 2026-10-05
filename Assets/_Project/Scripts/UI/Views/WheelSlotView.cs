@@ -15,8 +15,8 @@ namespace Vertigo.Wheel.UI.Views
         private static readonly Vector2 s_iconCenter = new(0f, 10f);
         private static readonly Vector2 s_textCenter = new(0f, -32f);
 
-        [SerializeField] private Image _ui_image_slot_icon_value;
-        [SerializeField] private TextMeshProUGUI _ui_text_slot_amount_value;
+        [SerializeField] private Image _imageSlotIconValue;
+        [SerializeField] private TextMeshProUGUI _textSlotAmountValue;
 
         private RectTransform _rect;
 
@@ -35,8 +35,8 @@ namespace Vertigo.Wheel.UI.Views
 
         protected override void CacheReferences()
         {
-            Bind(ref _ui_image_slot_icon_value, "ui_image_slot_icon_value");
-            Bind(ref _ui_text_slot_amount_value, "ui_text_slot_amount_value");
+            Bind(ref _imageSlotIconValue, "ui_image_slot_icon_value");
+            Bind(ref _textSlotAmountValue, "ui_text_slot_amount_value");
         }
 
         /// <summary>
@@ -53,8 +53,8 @@ namespace Vertigo.Wheel.UI.Views
             _placedForRotation = slotRotation;
 
             Quaternion toSlotSpace = Quaternion.Inverse(slotRotation);
-            RectTransform iconRect = _ui_image_slot_icon_value.rectTransform;
-            RectTransform textRect = _ui_text_slot_amount_value.rectTransform;
+            RectTransform iconRect = _imageSlotIconValue.rectTransform;
+            RectTransform textRect = _textSlotAmountValue.rectTransform;
 
             iconRect.rotation = Quaternion.identity;
             iconRect.localPosition = toSlotSpace * (Vector3)s_iconCenter;
@@ -72,18 +72,18 @@ namespace Vertigo.Wheel.UI.Views
         {
             gameObject.SetActive(true);
             SetIcon(bombIcon);
-            _ui_text_slot_amount_value.gameObject.SetActive(true);
-            _ui_text_slot_amount_value.color = Color.white;
-            _ui_text_slot_amount_value.SetText(string.Empty);
+            _textSlotAmountValue.gameObject.SetActive(true);
+            _textSlotAmountValue.color = Color.white;
+            _textSlotAmountValue.SetText(string.Empty);
         }
 
         public void SetReward(Sprite icon, int amount)
         {
             gameObject.SetActive(true);
             SetIcon(icon);
-            _ui_text_slot_amount_value.gameObject.SetActive(true);
-            _ui_text_slot_amount_value.color = Color.white;
-            AmountFormat.Apply(_ui_text_slot_amount_value, amount);
+            _textSlotAmountValue.gameObject.SetActive(true);
+            _textSlotAmountValue.color = Color.white;
+            AmountFormat.Apply(_textSlotAmountValue, amount);
         }
 
         /// <summary>
@@ -95,12 +95,12 @@ namespace Vertigo.Wheel.UI.Views
             if (!icon)
                 Debug.LogWarning($"[Vertigo] {name}: no icon sprite resolved; the slot will render blank.", this);
 
-            _ui_image_slot_icon_value.sprite = icon;
-            _ui_image_slot_icon_value.enabled = icon;
-            _ui_image_slot_icon_value.preserveAspect = true;
-            _ui_image_slot_icon_value.maskable = false; // never inside a mask — the wheel itself isn't clipped
-            _ui_image_slot_icon_value.color = Color.white;
-            _ui_image_slot_icon_value.rectTransform.sizeDelta = s_iconAreaSize;
+            _imageSlotIconValue.sprite = icon;
+            _imageSlotIconValue.enabled = icon;
+            _imageSlotIconValue.preserveAspect = true;
+            _imageSlotIconValue.maskable = false; // never inside a mask — the wheel itself isn't clipped
+            _imageSlotIconValue.color = Color.white;
+            _imageSlotIconValue.rectTransform.sizeDelta = s_iconAreaSize;
         }
     }
 }
