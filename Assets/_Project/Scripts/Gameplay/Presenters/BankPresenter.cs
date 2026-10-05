@@ -146,9 +146,9 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         {
             BankCell cell = flight.Cell;
 
-            if (!cell.Revealed)
+            if (!cell.IsRevealed)
             {
-                cell.Revealed = true;
+                cell.IsRevealed = true;
                 cell.View.SetRevealed(true);
             }
 
@@ -199,7 +199,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         {
             public readonly BankEntryView View;
             public readonly RewardId Reward;
-            public bool Revealed;
+            public bool IsRevealed;
 
             /// <summary>What the number is counting towards: the amount of every icon that has landed so far.</summary>
             public int Target;
@@ -214,7 +214,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             {
                 View = view;
                 Reward = reward;
-                Revealed = revealed;
+                IsRevealed = revealed;
                 Target = amount;
                 Displayed = amount;
             }
@@ -289,9 +289,9 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             private readonly Vector3 _from;
             private readonly int _generation;
             private Ghost _ghost;
-            private bool _holdsGhost;
+            private bool _hasGhost;
             private Tween _tween;
-            private bool _finished;
+            private bool _isFinished;
 
             public readonly BankCell Cell;
             public readonly int Share;
@@ -310,7 +310,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             public void TakeOffAfter(float delay)
             {
                 _ghost = _owner.TakeGhost();
-                _holdsGhost = true;
+                _hasGhost = true;
                 _ghost.Image.sprite = _owner._catalog.IconFor(Cell.Reward);
 
                 _tween = _ghost.Rect.DOMove(Cell.View.Rect.position, _owner._juice.BankFlyDuration)
@@ -351,7 +351,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             /// <summary>A rebuild supersedes this flight: stop it without counting, but still report it done.</summary>
             public void Cancel()
             {
-                if (_finished) return;
+                if (_isFinished) return;
 
                 // Only a flight still in the air owns a live tween; a landed one's tween is finished and may be recycled.
                 if (_tween != null) _tween.Kill();
@@ -362,17 +362,17 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
             private void ReleaseGhost()
             {
-                if (!_holdsGhost) return;
+                if (!_hasGhost) return;
 
-                _holdsGhost = false;
+                _hasGhost = false;
                 _owner.ReleaseGhost(_ghost);
             }
 
             private void Finish()
             {
-                if (_finished) return;
+                if (_isFinished) return;
 
-                _finished = true;
+                _isFinished = true;
                 _owner._flights.Remove(this);
                 _reward.IconDone();
             }

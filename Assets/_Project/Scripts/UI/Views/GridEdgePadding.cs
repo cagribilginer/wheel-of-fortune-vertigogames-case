@@ -17,7 +17,7 @@ namespace Vertigo.Wheel.UI.Views
 
         private GridLayoutGroup _grid;
         private RectTransform _rect;
-        private bool _dirty = true;
+        private bool _isDirty = true;
 
         protected override void Awake()
         {
@@ -27,18 +27,18 @@ namespace Vertigo.Wheel.UI.Views
 
         protected override void OnEnable()
         {
-            _dirty = true;
+            _isDirty = true;
         }
 
         protected override void OnRectTransformDimensionsChange()
         {
-            _dirty = true;
+            _isDirty = true;
         }
 
         private void Update()
         {
-            if (!_dirty) return;
-            _dirty = false;
+            if (!_isDirty) return;
+            _isDirty = false;
             Apply();
         }
 
@@ -51,7 +51,7 @@ namespace Vertigo.Wheel.UI.Views
             float step = _grid.cellSize.x + _grid.spacing.x;
             if (width <= 0f || step <= 0f)
             {
-                _dirty = true; // width not resolved yet; try again next frame
+                _isDirty = true; // width not resolved yet; try again next frame
                 return;
             }
 

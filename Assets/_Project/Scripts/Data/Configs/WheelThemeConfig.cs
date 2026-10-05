@@ -18,7 +18,7 @@ namespace Vertigo.Wheel.Data.Configs
         [Tooltip("Colour of a zone's number in the strip when that zone uses this theme.")]
         [SerializeField] private Color _stripNumberColor = Color.white;
         [Tooltip("Whether the number is bold, which marks the milestone (safe / super) zones.")]
-        [SerializeField] private bool _stripNumberBold;
+        [SerializeField] private bool _isStripNumberBold;
 
         public Sprite BaseSprite
         {
@@ -44,9 +44,9 @@ namespace Vertigo.Wheel.Data.Configs
         {
             get { return _stripNumberColor; }
         }
-        public bool StripNumberBold
+        public bool IsStripNumberBold
         {
-            get { return _stripNumberBold; }
+            get { return _isStripNumberBold; }
         }
 
 #if UNITY_EDITOR

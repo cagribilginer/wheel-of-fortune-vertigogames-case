@@ -46,7 +46,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly float _homeY;
         private readonly float _hiddenY;
         private bool _hasShownZone;
-        private bool _slotsLaidOut;
+        private bool _hasLaidOutSlots;
 
         public WheelPresenter(
             WheelView view, WheelSpinConfig spinConfig, RewardCatalog catalog, Sprite bombIcon,
@@ -143,7 +143,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             }
 
             // First zone setup: the Canvas has laid out by now, so the rotor rect is real.
-            if (!_slotsLaidOut) LayoutSlots();
+            if (!_hasLaidOutSlots) LayoutSlots();
 
             PopulateSlots(wheel);
         }
@@ -171,7 +171,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             }
             else
             {
-                _slotsLaidOut = true;
+                _hasLaidOutSlots = true;
             }
 
             _view.LayoutSlots(wheelSize);

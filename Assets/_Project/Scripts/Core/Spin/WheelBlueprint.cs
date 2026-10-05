@@ -27,7 +27,7 @@ namespace Vertigo.Wheel.Core.Spin
 
             Tier = tier;
             BombCount = bombCount;
-            ShuffleSlices = shuffleSlices;
+            IsShuffleEnabled = shuffleSlices;
         }
 
         public WheelTier Tier { get; }
@@ -44,6 +44,6 @@ namespace Vertigo.Wheel.Core.Spin
         /// pool does not sit on the same wedges every zone. Bomb <em>count</em> is unaffected — only its
         /// position moves — so the safe/super risk-free rule still holds.
         /// </summary>
-        public bool ShuffleSlices { get; }
+        public bool IsShuffleEnabled { get; }
     }
 }

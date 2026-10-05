@@ -35,7 +35,7 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
         public bool ContinueOffered { get; private set; }
         public int ContinueCostShown { get; private set; }
         public int GameOverZoneShown { get; private set; }
-        public bool AdReviveOffered { get; private set; }
+        public bool IsAdReviveOffered { get; private set; }
         public WalletBalances PlayerBalancesShown { get; private set; }
         public List<BankEntry> LostHaulShown { get; } = new();
 
@@ -88,9 +88,9 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
         {
             GameOverVisible = true;
             GameOverZoneShown = summary.ZoneReached;
-            ContinueOffered = summary.GoldReviveOffered;
+            ContinueOffered = summary.IsGoldReviveOffered;
             ContinueCostShown = summary.GoldReviveCost;
-            AdReviveOffered = summary.AdReviveOffered;
+            IsAdReviveOffered = summary.IsAdReviveOffered;
             PlayerBalancesShown = summary.Wallet;
 
             LostHaulShown.Clear();

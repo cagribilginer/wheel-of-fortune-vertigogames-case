@@ -11,13 +11,13 @@ namespace Vertigo.Wheel.Core.States.Flow
     {
         // The claim celebration keeps this state current for its whole duration; input arriving in that
         // window must neither credit the wallet a second time nor cancel a claim that already paid out.
-        private bool _claiming;
+        private bool _isClaiming;
 
         public CashOutState(GameContext context) : base(context) { }
 
         public override void Enter()
         {
-            _claiming = false;
+            _isClaiming = false;
 
             // The wheel is blocked while the summary is up because this state accepts no spin input. The bank
             // stays untouched so a cancel is a genuine no-op.
@@ -29,8 +29,8 @@ namespace Vertigo.Wheel.Core.States.Flow
 
         public void OnConfirmed()
         {
-            if (_claiming) return;
-            _claiming = true;
+            if (_isClaiming) return;
+            _isClaiming = true;
 
             // Credit the wallet, then read the new balances back for the count-up. A fresh run boots after the celebration.
             Context.Run.CashOut();
@@ -44,7 +44,7 @@ namespace Vertigo.Wheel.Core.States.Flow
 
         public void OnCancelled()
         {
-            if (_claiming) return;
+            if (_isClaiming) return;
 
             Context.CashOut.HideCashOut();
             Machine.Change<IdleState>();

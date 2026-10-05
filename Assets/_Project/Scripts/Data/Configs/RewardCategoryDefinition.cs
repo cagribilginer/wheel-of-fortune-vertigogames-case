@@ -11,7 +11,7 @@ namespace Vertigo.Wheel.Data.Configs
     public sealed class RewardCategoryDefinition : ScriptableObject
     {
         [Tooltip("Whether more than one of this reward can be granted at once. Unique drops (weapons, chests) are always one.")]
-        [SerializeField] private bool _stackable = true;
+        [SerializeField] private bool _isStackable = true;
 
         [Tooltip("Hard ceiling on a single drop's count after zone scaling; 0 means no ceiling.")]
         [Min(0)]
@@ -20,9 +20,9 @@ namespace Vertigo.Wheel.Data.Configs
         [Tooltip("Rewards of this category are wallet currencies: cash-out banks them into the persistent wallet.")]
         [SerializeField] private bool _isWalletCurrency;
 
-        public bool Stackable
+        public bool IsStackable
         {
-            get { return _stackable; }
+            get { return _isStackable; }
         }
         public int MaxAmountPerDrop
         {

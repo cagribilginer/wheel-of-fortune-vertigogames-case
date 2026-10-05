@@ -23,11 +23,11 @@ namespace Vertigo.Wheel.Core.States
         public readonly WalletBalances Wallet;
 
         /// <summary>The two revive offers are independent: paid needs an affordable, unused continue slot.</summary>
-        public readonly bool GoldReviveOffered;
+        public readonly bool IsGoldReviveOffered;
         public readonly int GoldReviveCost;
 
         /// <summary>Ad revive only needs an unused slot — no wallet cost.</summary>
-        public readonly bool AdReviveOffered;
+        public readonly bool IsAdReviveOffered;
 
         public GameOverSummary(
             int zoneReached, IReadOnlyList<BankEntry> lostHaul, WalletBalances wallet,
@@ -36,9 +36,9 @@ namespace Vertigo.Wheel.Core.States
             ZoneReached = zoneReached;
             LostHaul = lostHaul;
             Wallet = wallet;
-            GoldReviveOffered = goldReviveOffered;
+            IsGoldReviveOffered = goldReviveOffered;
             GoldReviveCost = goldReviveCost;
-            AdReviveOffered = adReviveOffered;
+            IsAdReviveOffered = adReviveOffered;
         }
     }
 }

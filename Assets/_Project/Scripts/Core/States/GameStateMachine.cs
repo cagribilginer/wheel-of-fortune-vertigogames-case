@@ -11,7 +11,7 @@ namespace Vertigo.Wheel.Core.States
     {
         private readonly Dictionary<Type, IGameState> _states = new();
         private readonly Queue<Type> _pending = new();
-        private bool _draining;
+        private bool _isDraining;
 
         public IGameState Current { get; private set; }
 
@@ -38,9 +38,9 @@ namespace Vertigo.Wheel.Core.States
                 throw new InvalidOperationException($"State {key.Name} was never registered.");
 
             _pending.Enqueue(key);
-            if (_draining) return;
+            if (_isDraining) return;
 
-            _draining = true;
+            _isDraining = true;
             try
             {
                 while (_pending.Count > 0)
@@ -54,7 +54,7 @@ namespace Vertigo.Wheel.Core.States
             }
             finally
             {
-                _draining = false;
+                _isDraining = false;
             }
         }
 

@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c817e9610a742f09febaf94ee3a51a6, type: 3}
   m_Name: Category_Chest
   m_EditorClassIdentifier: 
-  _stackable: 0
+  _isStackable: 0
   _maxAmountPerDrop: 0
   _isWalletCurrency: 0

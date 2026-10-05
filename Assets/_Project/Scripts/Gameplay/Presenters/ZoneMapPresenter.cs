@@ -83,7 +83,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             tile.Rect.localScale = Vector3.one;
 
             WheelThemeConfig theme = _progression.ThemeFor(zoneNumber, _classifier.Classify(zoneNumber));
-            if (theme) tile.SetPlain(theme.StripNumberColor, theme.StripNumberBold);
+            if (theme) tile.SetPlain(theme.StripNumberColor, theme.IsStripNumberBold);
             else tile.SetPlain(Color.white, bold: false);
         }
 

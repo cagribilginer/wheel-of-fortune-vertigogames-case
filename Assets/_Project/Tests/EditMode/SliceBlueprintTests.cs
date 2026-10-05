@@ -44,13 +44,13 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void RewardSlicesDefaultToScalable()
         {
-            Assert.That(SliceBlueprint.CreateReward(Cash, 5).Scalable, Is.True);
+            Assert.That(SliceBlueprint.CreateReward(Cash, 5).IsScalable, Is.True);
         }
 
         [Test]
         public void BombSlice_IsNeverScalable()
         {
-            Assert.That(SliceBlueprint.CreateBomb().Scalable, Is.False);
+            Assert.That(SliceBlueprint.CreateBomb().IsScalable, Is.False);
         }
 
         [Test]

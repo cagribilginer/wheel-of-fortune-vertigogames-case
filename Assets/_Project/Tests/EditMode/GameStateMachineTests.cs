@@ -260,7 +260,7 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             _resolver.LandOn(BOMB_SLOT);
             _machine.RequestSpin();                       // bomb -> game over
-            Assert.That(_view.AdReviveOffered, Is.True);
+            Assert.That(_view.IsAdReviveOffered, Is.True);
 
             _machine.RequestAdContinue();                 // free revive
             Assert.That(_machine.IsIn<IdleState>(), Is.True);
@@ -268,7 +268,7 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             _machine.RequestSpin();                       // bombs again, same zone
             Assert.That(_machine.IsIn<GameOverState>(), Is.True);
-            Assert.That(_view.AdReviveOffered, Is.False, "the ad revive is one per run");
+            Assert.That(_view.IsAdReviveOffered, Is.False, "the ad revive is one per run");
         }
 
         [Test]

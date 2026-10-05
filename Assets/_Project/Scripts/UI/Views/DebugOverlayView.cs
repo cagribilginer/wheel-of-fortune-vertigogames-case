@@ -28,9 +28,9 @@ namespace Vertigo.Wheel.UI.Views
         public event Action GrantGoldClicked;
         public event Action GrantItemsClicked;
 
-        private bool _available;
-        private bool _shown;
-        private bool _expanded;
+        private bool _isAvailable;
+        private bool _isShown;
+        private bool _isExpanded;
 
         #region Wiring
         protected override void CacheReferences()
@@ -48,8 +48,8 @@ namespace Vertigo.Wheel.UI.Views
         {
             base.Awake();
 
-            _available = Application.isEditor || Debug.isDebugBuild;
-            if (!_available)
+            _isAvailable = Application.isEditor || Debug.isDebugBuild;
+            if (!_isAvailable)
             {
                 gameObject.SetActive(false);
                 return;
@@ -61,8 +61,8 @@ namespace Vertigo.Wheel.UI.Views
 
         private void Update()
         {
-            if (_available && Input.GetKeyDown(TOGGLE_KEY))
-                SetShown(!_shown);
+            if (_isAvailable && Input.GetKeyDown(TOGGLE_KEY))
+                SetShown(!_isShown);
         }
 
         private void OnEnable()
@@ -90,19 +90,19 @@ namespace Vertigo.Wheel.UI.Views
         // Whole-overlay visibility, driven by the hotkey. The root stays active either way.
         private void SetShown(bool shown)
         {
-            _shown = shown;
+            _isShown = shown;
             if (_ui_button_debug_toggle) _ui_button_debug_toggle.gameObject.SetActive(shown);
             if (!shown) SetExpanded(false);
         }
 
         private void ToggleBody()
         {
-            SetExpanded(!_expanded);
+            SetExpanded(!_isExpanded);
         }
 
         private void SetExpanded(bool expanded)
         {
-            _expanded = expanded;
+            _isExpanded = expanded;
             if (_ui_panel_debug_body) _ui_panel_debug_body.gameObject.SetActive(expanded);
         }
         #endregion

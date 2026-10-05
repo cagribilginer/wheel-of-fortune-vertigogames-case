@@ -62,7 +62,7 @@ namespace Vertigo.Wheel.Core.Spin
             for (int i = 0; i < authored.Count; i++)
                 slices.Add(authored[i].ToSlice(zone, _scaling));
 
-            if (blueprint.ShuffleSlices && _random != null)
+            if (blueprint.IsShuffleEnabled && _random != null)
                 Shuffle(slices);
 
             return new WheelModel(blueprint.Tier, slices);

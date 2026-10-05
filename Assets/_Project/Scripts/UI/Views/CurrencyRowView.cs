@@ -15,7 +15,7 @@ namespace Vertigo.Wheel.UI.Views
         [SerializeField] private TextMeshProUGUI _ui_text_popup_currency_value;
 
         private int _shown;
-        private bool _initialised;
+        private bool _isInitialised;
         private Tween _tween;
 
         protected override void CacheReferences()
@@ -35,14 +35,14 @@ namespace Vertigo.Wheel.UI.Views
         {
             if (_tween != null) _tween.Kill();
             _shown = amount;
-            _initialised = true;
+            _isInitialised = true;
             _ui_text_popup_currency_value.text = amount.ToString("N0");
         }
 
         /// <summary>The first value shows outright, later ones count up from what is on screen.</summary>
         public void CountTo(int target, float duration)
         {
-            if (!_initialised)
+            if (!_isInitialised)
             {
                 SetAmount(target);
                 return;

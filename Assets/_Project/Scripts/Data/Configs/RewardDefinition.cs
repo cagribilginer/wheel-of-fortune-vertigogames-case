@@ -64,7 +64,7 @@ namespace Vertigo.Wheel.Data.Configs
         /// <summary>Whether more than one of this reward can be granted at once. Decided by its category asset.</summary>
         public bool IsStackable
         {
-            get { return Category.Stackable; }
+            get { return Category.IsStackable; }
         }
 
         /// <summary>Hard ceiling on a single drop's count after zone scaling, or 0 for no ceiling. Decided by its category asset.</summary>

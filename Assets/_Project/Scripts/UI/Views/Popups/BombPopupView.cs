@@ -97,8 +97,8 @@ namespace Vertigo.Wheel.UI.Views.Popups
             _ui_text_popup_bomb_empty_value.gameObject.SetActive(summary.LostHaul.Count == 0);
 
             // Every button stays in the row; an unavailable revive is disabled, not hidden.
-            _ui_button_popup_bomb_continue.interactable = summary.GoldReviveOffered;
-            _ui_button_popup_bomb_advert.interactable = summary.AdReviveOffered;
+            _ui_button_popup_bomb_continue.interactable = summary.IsGoldReviveOffered;
+            _ui_button_popup_bomb_advert.interactable = summary.IsAdReviveOffered;
 
             PlayVignette();
             PlayOpen(_ui_image_popup_bomb_backdrop, _ui_transform_popup_bomb_anim, Juice.BombBackdropAlpha);

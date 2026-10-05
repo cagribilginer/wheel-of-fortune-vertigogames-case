@@ -18,7 +18,7 @@ namespace Vertigo.Wheel.Core.Spin
         /// Whether zone scaling applies to this slice's amount. False for unique drops (fully-built weapons,
         /// cosmetics, chests), which are always granted as a single item regardless of zone depth.
         /// </summary>
-        public readonly bool Scalable;
+        public readonly bool IsScalable;
 
         /// <summary>
         /// Hard ceiling on the materialised amount, or 0 for no ceiling. Craft shards (the "Points"
@@ -33,7 +33,7 @@ namespace Vertigo.Wheel.Core.Spin
             Reward = reward;
             BaseAmount = baseAmount;
             Weight = weight;
-            Scalable = scalable;
+            IsScalable = scalable;
             MaxAmount = maxAmount;
         }
 
@@ -78,7 +78,7 @@ namespace Vertigo.Wheel.Core.Spin
 
             if (IsBomb) return WheelSlice.CreateBomb(Weight);
 
-            int amount = Scalable ? scaling.Scale(BaseAmount, zone) : BaseAmount;
+            int amount = IsScalable ? scaling.Scale(BaseAmount, zone) : BaseAmount;
             if (MaxAmount > 0 && amount > MaxAmount) amount = MaxAmount;
             return WheelSlice.CreateReward(Reward, amount, Weight);
         }

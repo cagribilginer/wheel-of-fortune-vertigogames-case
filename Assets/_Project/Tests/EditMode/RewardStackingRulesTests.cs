@@ -81,7 +81,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             Assert.That(entry.ResolveBaseAmount(), Is.EqualTo(1));
 
             SliceBlueprint blueprint = entry.ToBlueprint();
-            Assert.That(blueprint.Scalable, Is.False);
+            Assert.That(blueprint.IsScalable, Is.False);
             Assert.That(blueprint.BaseAmount, Is.EqualTo(1));
         }
 
@@ -91,7 +91,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             WheelSliceEntry entry = MakeEntry(Make(Category(stackable: true), baseAmount: 3), baseAmountOverride: 0);
 
             Assert.That(entry.ResolveBaseAmount(), Is.EqualTo(3));
-            Assert.That(entry.ToBlueprint().Scalable, Is.True);
+            Assert.That(entry.ToBlueprint().IsScalable, Is.True);
         }
 
         [Test]
@@ -100,7 +100,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             WheelSliceEntry entry = MakeEntry(Make(Category(true, SHARD_CEILING), baseAmount: 1), baseAmountOverride: 0);
 
             SliceBlueprint blueprint = entry.ToBlueprint();
-            Assert.That(blueprint.Scalable, Is.True);
+            Assert.That(blueprint.IsScalable, Is.True);
             Assert.That(blueprint.MaxAmount, Is.EqualTo(SHARD_CEILING));
             Assert.That(blueprint.ToSlice(99, new LinearRewardScaling()).Amount, Is.EqualTo(SHARD_CEILING));
         }
@@ -128,7 +128,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             var category = AssetDatabase.LoadAssetAtPath<RewardCategoryDefinition>($"{CATEGORY_FOLDER}Category_{name}.asset");
 
             Assert.That(category, Is.Not.Null, $"Category_{name}.asset is missing.");
-            Assert.That(category.Stackable, Is.EqualTo(stackable));
+            Assert.That(category.IsStackable, Is.EqualTo(stackable));
             Assert.That(category.MaxAmountPerDrop, Is.EqualTo(ceiling));
             Assert.That(category.IsWalletCurrency, Is.EqualTo(currency));
         }
@@ -140,7 +140,7 @@ namespace Vertigo.Wheel.Tests.EditMode
             _created.Add(category);
 
             var so = new SerializedObject(category);
-            so.FindProperty("_stackable").boolValue = stackable;
+            so.FindProperty("_isStackable").boolValue = stackable;
             so.FindProperty("_maxAmountPerDrop").intValue = maxAmountPerDrop;
             so.FindProperty("_isWalletCurrency").boolValue = isWalletCurrency;
             so.ApplyModifiedPropertiesWithoutUndo();
