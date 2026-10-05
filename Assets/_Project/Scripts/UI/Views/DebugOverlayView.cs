@@ -110,23 +110,23 @@ namespace Vertigo.Wheel.UI.Views
         #region Events
         private void RaiseZone5()
         {
-            JumpToZone5Clicked?.Invoke();
+            if (JumpToZone5Clicked != null) JumpToZone5Clicked();
         }
         private void RaiseZone30()
         {
-            JumpToZone30Clicked?.Invoke();
+            if (JumpToZone30Clicked != null) JumpToZone30Clicked();
         }
         private void RaiseBomb()
         {
-            TriggerBombClicked?.Invoke();
+            if (TriggerBombClicked != null) TriggerBombClicked();
         }
         private void RaiseGold()
         {
-            GrantGoldClicked?.Invoke();
+            if (GrantGoldClicked != null) GrantGoldClicked();
         }
         private void RaiseItems()
         {
-            GrantItemsClicked?.Invoke();
+            if (GrantItemsClicked != null) GrantItemsClicked();
         }
         #endregion
     }

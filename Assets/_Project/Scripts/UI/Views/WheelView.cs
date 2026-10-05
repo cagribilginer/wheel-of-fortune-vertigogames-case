@@ -85,7 +85,7 @@ namespace Vertigo.Wheel.UI.Views
         }
         private void RaiseSpinClicked()
         {
-            SpinClicked?.Invoke();
+            if (SpinClicked != null) SpinClicked();
         }
         #endregion
 

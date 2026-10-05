@@ -34,7 +34,7 @@ namespace Vertigo.Wheel.UI.Views
 
         private void RaiseExit()
         {
-            ExitClicked?.Invoke();
+            if (ExitClicked != null) ExitClicked();
         }
 
         public void SetExitInteractable(bool interactable)

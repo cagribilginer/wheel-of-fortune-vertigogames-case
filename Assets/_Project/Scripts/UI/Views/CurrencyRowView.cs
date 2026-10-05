@@ -33,7 +33,7 @@ namespace Vertigo.Wheel.UI.Views
         /// <summary>Shows the balance outright. The regular setter is needed for the thousands separator: TMP's zero-alloc SetText does not honour ":N0".</summary>
         public void SetAmount(int amount)
         {
-            _tween?.Kill();
+            if (_tween != null) _tween.Kill();
             _shown = amount;
             _initialised = true;
             _ui_text_popup_currency_value.text = amount.ToString("N0");
@@ -48,7 +48,7 @@ namespace Vertigo.Wheel.UI.Views
                 return;
             }
 
-            _tween?.Kill();
+            if (_tween != null) _tween.Kill();
 
             Tween countUp = DOVirtual.Int(_shown, target, duration, value =>
                 {

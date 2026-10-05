@@ -74,11 +74,16 @@ namespace Vertigo.Wheel.Data.Configs
         }
 
 #if UNITY_EDITOR
+        // An empty list slot sorts last.
+        private static int BandSortKey(ZoneBandOverride band)
+        {
+            return band != null ? band.FromZone : int.MaxValue;
+        }
+
         private void OnValidate()
         {
             // Sorting here means ResolveConfig can rely on "last match wins" rather than re-sorting per spin.
-            _bandOverrides.Sort((a, b) =>
-                (a?.FromZone ?? int.MaxValue).CompareTo(b?.FromZone ?? int.MaxValue));
+            _bandOverrides.Sort((a, b) => BandSortKey(a).CompareTo(BandSortKey(b)));
 
             if (_superZoneInterval % _safeZoneInterval != 0)
                 Debug.LogWarning(

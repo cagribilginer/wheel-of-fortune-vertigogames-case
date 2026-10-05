@@ -47,7 +47,7 @@ namespace Vertigo.Wheel.Core.States
                 {
                     IGameState next = _states[_pending.Dequeue()];
 
-                    Current?.Exit();
+                    if (Current != null) Current.Exit();
                     Current = next;
                     Current.Enter();
                 }

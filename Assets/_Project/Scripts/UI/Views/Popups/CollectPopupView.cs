@@ -63,11 +63,11 @@ namespace Vertigo.Wheel.UI.Views.Popups
 
         private void RaiseConfirm()
         {
-            ConfirmClicked?.Invoke();
+            if (ConfirmClicked != null) ConfirmClicked();
         }
         private void RaiseCancel()
         {
-            CancelClicked?.Invoke();
+            if (CancelClicked != null) CancelClicked();
         }
         #endregion
 
@@ -102,7 +102,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
 
         private void OnClaimHoldElapsed()
         {
-            _onClaimFinished?.Invoke();
+            if (_onClaimFinished != null) _onClaimFinished();
             Hide();
         }
 

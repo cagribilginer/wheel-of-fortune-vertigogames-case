@@ -56,11 +56,11 @@ namespace Vertigo.Wheel.UI.Views
 
         private void RaiseSafe()
         {
-            SafeMilestoneClicked?.Invoke();
+            if (SafeMilestoneClicked != null) SafeMilestoneClicked();
         }
         private void RaiseSuper()
         {
-            SuperMilestoneClicked?.Invoke();
+            if (SuperMilestoneClicked != null) SuperMilestoneClicked();
         }
 
         /// <summary>

@@ -230,13 +230,13 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             /// <summary>Jumps the running count to its target, which also reports its flight as done.</summary>
             public void FinishCounting()
             {
-                _count?.Kill(complete: true);
+                if (_count != null) _count.Kill(complete: true);
             }
 
             /// <summary>Abandons the running count without reporting anything.</summary>
             public void StopCounting()
             {
-                _count?.Kill();
+                if (_count != null) _count.Kill();
             }
 
             private void SetDisplayed(int value)
@@ -354,7 +354,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 if (_finished) return;
 
                 // Only a flight still in the air owns a live tween; a landed one's tween is finished and may be recycled.
-                _tween?.Kill();
+                if (_tween != null) _tween.Kill();
                 _tween = null;
                 ReleaseGhost();
                 Finish();

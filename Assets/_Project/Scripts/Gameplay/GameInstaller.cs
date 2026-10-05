@@ -143,13 +143,13 @@ namespace Vertigo.Wheel.Gameplay
         #region Teardown
         private void OnDestroy()
         {
-            _milestonePreviewPresenter?.Dispose();
-            _wheelPresenter?.Dispose();
-            _actionBarPresenter?.Dispose();
-            _popupPresenter?.Dispose();
-            _presentation?.Dispose();
+            if (_milestonePreviewPresenter != null) _milestonePreviewPresenter.Dispose();
+            if (_wheelPresenter != null) _wheelPresenter.Dispose();
+            if (_actionBarPresenter != null) _actionBarPresenter.Dispose();
+            if (_popupPresenter != null) _popupPresenter.Dispose();
+            if (_presentation != null) _presentation.Dispose();
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            _debugPresenter?.Dispose();
+            if (_debugPresenter != null) _debugPresenter.Dispose();
 #endif
 
             // Released last, once nothing that was built from these configs is still being torn down.

@@ -51,7 +51,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
 
         private void RaiseClose()
         {
-            CloseClicked?.Invoke();
+            if (CloseClicked != null) CloseClicked();
         }
 
         public void Show(bool isSuper)

@@ -73,15 +73,15 @@ namespace Vertigo.Wheel.UI.Views.Popups
 
         private void RaiseGiveUp()
         {
-            GiveUpClicked?.Invoke();
+            if (GiveUpClicked != null) GiveUpClicked();
         }
         private void RaiseContinue()
         {
-            ContinueClicked?.Invoke();
+            if (ContinueClicked != null) ContinueClicked();
         }
         private void RaiseAdContinue()
         {
-            AdContinueClicked?.Invoke();
+            if (AdContinueClicked != null) AdContinueClicked();
         }
         #endregion
 

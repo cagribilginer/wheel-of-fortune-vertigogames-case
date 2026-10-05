@@ -100,7 +100,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _vfx.PlayBombImpact();
             _audio.PlayBombImpact();
             // The bank stays as it was behind the vignette; HideGameOver refreshes it once the player chooses.
-            _bombDelay?.Kill();
+            if (_bombDelay != null) _bombDelay.Kill();
 
             // Dropped on kill: with recycling on, a stale reference would kill whichever tween reuses the object.
             Tween delay = DOVirtual.DelayedCall(_juice.BombImpactHoldDuration, new TweenCallback(onComplete));
@@ -141,7 +141,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         #region Lifetime
         public void Dispose()
         {
-            _bombDelay?.Kill();
+            if (_bombDelay != null) _bombDelay.Kill();
         }
         #endregion
     }
