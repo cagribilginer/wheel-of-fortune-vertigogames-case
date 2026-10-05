@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using Vertigo.Wheel.Core.Rewards;
 
@@ -23,7 +23,8 @@ namespace Vertigo.Wheel.Data.Configs
         [Tooltip("Colour of this reward's number where it is shown as a wallet balance.")]
         [SerializeField] private Color _balanceColor = Color.white;
 
-        [SerializeField] private RewardCategory _category = RewardCategory.Points;
+        [Tooltip("What kind of reward this is: whether it stacks, its per-drop ceiling and whether it is a wallet currency.")]
+        [SerializeField] private RewardCategoryDefinition _category;
 
         [Tooltip("Amount granted at zone 1, before zone scaling.")]
         [Min(1)]
@@ -45,43 +46,31 @@ namespace Vertigo.Wheel.Data.Configs
         {
             get { return _balanceColor; }
         }
-        public RewardCategory Category
+        public RewardCategoryDefinition Category
         {
-            get { return _category; }
+            get
+            {
+                if (!_category)
+                    throw new InvalidOperationException($"Reward '{name}' has no category assigned.");
+
+                return _category;
+            }
         }
         public int DefaultBaseAmount
         {
             get { return _defaultBaseAmount; }
         }
 
-        /// <summary>The shard ceiling from the design brief: Points rewards never exceed this.</summary>
-        public const int POINTS_CEILING = 5;
-
-        /// <summary>
-        /// Stackability and per-drop ceiling, one row per category. A new category must add a row here,
-        /// so no reward can be quietly authored as stackable.
-        /// </summary>
-        private static readonly Dictionary<RewardCategory, (bool Stackable, int MaxAmountPerDrop)> CATEGORY_RULES =
-            new Dictionary<RewardCategory, (bool Stackable, int MaxAmountPerDrop)>
-            {
-                { RewardCategory.Points, (true, POINTS_CEILING) },
-                { RewardCategory.Weapon, (false, 0) },
-                { RewardCategory.Consumable, (true, 0) },
-                { RewardCategory.Cosmetic, (false, 0) },
-                { RewardCategory.Currency, (true, 0) },
-                { RewardCategory.Chest, (false, 0) },
-            };
-
-        /// <summary>Whether more than one of this reward can be granted at once. See <see cref="CATEGORY_RULES"/>.</summary>
+        /// <summary>Whether more than one of this reward can be granted at once. Decided by its category asset.</summary>
         public bool IsStackable
         {
-            get { return CATEGORY_RULES[_category].Stackable; }
+            get { return Category.Stackable; }
         }
 
-        /// <summary>Hard ceiling on a single drop's count after zone scaling, or 0 for no ceiling. See <see cref="CATEGORY_RULES"/>.</summary>
+        /// <summary>Hard ceiling on a single drop's count after zone scaling, or 0 for no ceiling. Decided by its category asset.</summary>
         public int MaxAmountPerDrop
         {
-            get { return CATEGORY_RULES[_category].MaxAmountPerDrop; }
+            get { return Category.MaxAmountPerDrop; }
         }
 
 #if UNITY_EDITOR
@@ -92,19 +81,25 @@ namespace Vertigo.Wheel.Data.Configs
             if (!_icon)
                 Debug.LogWarning($"[Vertigo] Reward '{name}' has no icon assigned.", this);
 
+            if (!_category)
+            {
+                Debug.LogError($"[Vertigo] Reward '{name}' has no category assigned.", this);
+                return;
+            }
+
             // A unique drop is a single item by definition; a non-1 base amount here is a mistake and would
             // otherwise show a misleading count in the inspector and on the wheel.
             if (!IsStackable && _defaultBaseAmount != 1)
             {
                 Debug.LogWarning(
-                    $"[Vertigo] Reward '{name}' is {_category} (not stackable) but its base amount is " +
+                    $"[Vertigo] Reward '{name}' is {_category.name} (not stackable) but its base amount is " +
                     $"{_defaultBaseAmount}; forcing it to 1.", this);
                 _defaultBaseAmount = 1;
             }
             else if (MaxAmountPerDrop > 0 && _defaultBaseAmount > MaxAmountPerDrop)
             {
                 Debug.LogWarning(
-                    $"[Vertigo] Reward '{name}' is {_category}, capped at {MaxAmountPerDrop} per drop, but its " +
+                    $"[Vertigo] Reward '{name}' is {_category.name}, capped at {MaxAmountPerDrop} per drop, but its " +
                     $"base amount is {_defaultBaseAmount}; clamping it to {MaxAmountPerDrop}.", this);
                 _defaultBaseAmount = MaxAmountPerDrop;
             }

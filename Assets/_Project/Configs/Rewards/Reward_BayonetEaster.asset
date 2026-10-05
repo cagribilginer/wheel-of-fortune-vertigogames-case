@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: Reward_BayonetEaster
   _icon: {fileID: 21300000, guid: 05641e3b7e982489589d6fbcdb2e9b34, type: 3}
-  _category: 3
+  _category: {fileID: 11400000, guid: b62fa8128b1a4f7ab7839140632ec031, type: 2}
   _defaultBaseAmount: 1

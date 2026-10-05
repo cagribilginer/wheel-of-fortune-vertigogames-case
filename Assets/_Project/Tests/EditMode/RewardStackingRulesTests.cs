@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Reflection;
 using NUnit.Framework;
 using UnityEditor;
@@ -9,35 +10,37 @@ using Vertigo.Wheel.Data.Configs;
 namespace Vertigo.Wheel.Tests.EditMode
 {
     /// <summary>
-    /// The "unique drops don't stack or scale" rule: consumables and currencies are the only categories
+    /// The "unique drops don't stack or scale" rule: a category asset decides whether its rewards stack, how many
+    /// one drop may carry and whether they are wallet currencies. Consumables and currencies are the only kinds
     /// whose amounts grow with zone depth; everything else is a single item.
     /// </summary>
     [TestFixture]
     public sealed class RewardStackingRulesTests
     {
-        private RewardDefinition _reward;
+        private const string CATEGORY_FOLDER = "Assets/_Project/Configs/Categories/";
+        private const int SHARD_CEILING = 5;
+
+        private readonly List<Object> _created = new();
 
         [TearDown]
         public void TearDown()
         {
-            if (_reward != null) Object.DestroyImmediate(_reward);
+            foreach (Object created in _created)
+                if (created != null) Object.DestroyImmediate(created);
+            _created.Clear();
         }
 
-        [TestCase(RewardCategory.Consumable, true)]
-        [TestCase(RewardCategory.Currency, true)]
-        [TestCase(RewardCategory.Points, true)]
-        [TestCase(RewardCategory.Weapon, false)]
-        [TestCase(RewardCategory.Cosmetic, false)]
-        [TestCase(RewardCategory.Chest, false)]
-        public void IsStackable_FollowsCategory(RewardCategory category, bool expected)
+        [TestCase(true)]
+        [TestCase(false)]
+        public void IsStackable_FollowsTheCategory(bool stackable)
         {
-            Assert.That(Make(category, baseAmount: 5).IsStackable, Is.EqualTo(expected));
+            Assert.That(Make(Category(stackable, 0), baseAmount: 5).IsStackable, Is.EqualTo(stackable));
         }
 
         [Test]
         public void OnValidate_ForcesANonStackableBaseAmountBackToOne()
         {
-            RewardDefinition weapon = Make(RewardCategory.Weapon, baseAmount: 12);
+            RewardDefinition weapon = Make(Category(stackable: false), baseAmount: 12);
             Invoke(weapon, "OnValidate");
 
             Assert.That(weapon.DefaultBaseAmount, Is.EqualTo(1));
@@ -46,34 +49,34 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void OnValidate_LeavesAStackableBaseAmountAlone()
         {
-            RewardDefinition cash = Make(RewardCategory.Currency, baseAmount: 50);
+            RewardDefinition cash = Make(Category(stackable: true, isWalletCurrency: true), baseAmount: 50);
             Invoke(cash, "OnValidate");
 
             Assert.That(cash.DefaultBaseAmount, Is.EqualTo(50));
         }
 
         [Test]
-        public void OnValidate_ClampsAShardBaseAmountToItsCeiling()
+        public void OnValidate_ClampsABaseAmountToTheCategoryCeiling()
         {
-            RewardDefinition shard = Make(RewardCategory.Points, baseAmount: 10);
+            RewardDefinition shard = Make(Category(stackable: true, maxAmountPerDrop: SHARD_CEILING), baseAmount: 10);
             Invoke(shard, "OnValidate");
 
-            Assert.That(shard.DefaultBaseAmount, Is.EqualTo(RewardDefinition.POINTS_CEILING));
+            Assert.That(shard.DefaultBaseAmount, Is.EqualTo(SHARD_CEILING));
         }
 
         [Test]
-        public void WheelSliceEntry_ClampsAShardOverrideToItsCeiling_SoTheBlueprintBuilds()
+        public void WheelSliceEntry_ClampsAnOverrideToTheCategoryCeiling_SoTheBlueprintBuilds()
         {
-            WheelSliceEntry entry = MakeEntry(Make(RewardCategory.Points, baseAmount: 1), baseAmountOverride: 12);
+            WheelSliceEntry entry = MakeEntry(Make(Category(true, SHARD_CEILING), baseAmount: 1), baseAmountOverride: 12);
 
-            Assert.That(entry.ResolveBaseAmount(), Is.EqualTo(RewardDefinition.POINTS_CEILING));
-            Assert.That(entry.ToBlueprint().BaseAmount, Is.EqualTo(RewardDefinition.POINTS_CEILING));
+            Assert.That(entry.ResolveBaseAmount(), Is.EqualTo(SHARD_CEILING));
+            Assert.That(entry.ToBlueprint().BaseAmount, Is.EqualTo(SHARD_CEILING));
         }
 
         [Test]
         public void WheelSliceEntry_ClampsANonStackableRewardToOne_EvenWithAnOverride()
         {
-            WheelSliceEntry entry = MakeEntry(Make(RewardCategory.Weapon, baseAmount: 8), baseAmountOverride: 40);
+            WheelSliceEntry entry = MakeEntry(Make(Category(stackable: false), baseAmount: 8), baseAmountOverride: 40);
 
             Assert.That(entry.ResolveBaseAmount(), Is.EqualTo(1));
 
@@ -85,44 +88,78 @@ namespace Vertigo.Wheel.Tests.EditMode
         [Test]
         public void WheelSliceEntry_KeepsAStackableRewardScalable()
         {
-            WheelSliceEntry entry = MakeEntry(Make(RewardCategory.Consumable, baseAmount: 3), baseAmountOverride: 0);
+            WheelSliceEntry entry = MakeEntry(Make(Category(stackable: true), baseAmount: 3), baseAmountOverride: 0);
 
             Assert.That(entry.ResolveBaseAmount(), Is.EqualTo(3));
             Assert.That(entry.ToBlueprint().Scalable, Is.True);
         }
 
-        [TestCase(RewardCategory.Points, RewardDefinition.POINTS_CEILING)]
-        [TestCase(RewardCategory.Currency, 0)]
-        [TestCase(RewardCategory.Consumable, 0)]
-        [TestCase(RewardCategory.Weapon, 0)]
-        public void MaxAmountPerDrop_CapsOnlyShards(RewardCategory category, int expected)
-        {
-            Assert.That(Make(category, baseAmount: 1).MaxAmountPerDrop, Is.EqualTo(expected));
-        }
-
         [Test]
-        public void WheelSliceEntry_CarriesTheShardCeilingIntoTheBlueprint()
+        public void WheelSliceEntry_CarriesTheCategoryCeilingIntoTheBlueprint()
         {
-            WheelSliceEntry entry = MakeEntry(Make(RewardCategory.Points, baseAmount: 1), baseAmountOverride: 0);
+            WheelSliceEntry entry = MakeEntry(Make(Category(true, SHARD_CEILING), baseAmount: 1), baseAmountOverride: 0);
 
             SliceBlueprint blueprint = entry.ToBlueprint();
             Assert.That(blueprint.Scalable, Is.True);
-            Assert.That(blueprint.MaxAmount, Is.EqualTo(RewardDefinition.POINTS_CEILING));
-            Assert.That(blueprint.ToSlice(99, new LinearRewardScaling()).Amount,
-                Is.EqualTo(RewardDefinition.POINTS_CEILING));
+            Assert.That(blueprint.MaxAmount, Is.EqualTo(SHARD_CEILING));
+            Assert.That(blueprint.ToSlice(99, new LinearRewardScaling()).Amount, Is.EqualTo(SHARD_CEILING));
         }
 
-        private RewardDefinition Make(RewardCategory category, int baseAmount)
+        [Test]
+        public void ARewardWithoutACategory_FailsByName()
         {
-            _reward = ScriptableObject.CreateInstance<RewardDefinition>();
-            _reward.name = "Reward_Test";
+            var reward = ScriptableObject.CreateInstance<RewardDefinition>();
+            reward.name = "Reward_NoCategory";
+            _created.Add(reward);
 
-            var so = new SerializedObject(_reward);
-            so.FindProperty("_category").enumValueIndex = (int)category;
+            var error = Assert.Throws<System.InvalidOperationException>(() => { var _ = reward.IsStackable; });
+            StringAssert.Contains("Reward_NoCategory", error.Message);
+        }
+
+        /// <summary>The shipped category assets carry the design brief's rules, so a retune there is a deliberate edit.</summary>
+        [TestCase("Points", true, SHARD_CEILING, false)]
+        [TestCase("Weapon", false, 0, false)]
+        [TestCase("Consumable", true, 0, false)]
+        [TestCase("Cosmetic", false, 0, false)]
+        [TestCase("Currency", true, 0, true)]
+        [TestCase("Chest", false, 0, false)]
+        public void TheShippedCategoryAssets_CarryTheBriefsRules(string name, bool stackable, int ceiling, bool currency)
+        {
+            var category = AssetDatabase.LoadAssetAtPath<RewardCategoryDefinition>($"{CATEGORY_FOLDER}Category_{name}.asset");
+
+            Assert.That(category, Is.Not.Null, $"Category_{name}.asset is missing.");
+            Assert.That(category.Stackable, Is.EqualTo(stackable));
+            Assert.That(category.MaxAmountPerDrop, Is.EqualTo(ceiling));
+            Assert.That(category.IsWalletCurrency, Is.EqualTo(currency));
+        }
+
+        private RewardCategoryDefinition Category(bool stackable, int maxAmountPerDrop = 0, bool isWalletCurrency = false)
+        {
+            var category = ScriptableObject.CreateInstance<RewardCategoryDefinition>();
+            category.name = "Category_Test";
+            _created.Add(category);
+
+            var so = new SerializedObject(category);
+            so.FindProperty("_stackable").boolValue = stackable;
+            so.FindProperty("_maxAmountPerDrop").intValue = maxAmountPerDrop;
+            so.FindProperty("_isWalletCurrency").boolValue = isWalletCurrency;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            return category;
+        }
+
+        private RewardDefinition Make(RewardCategoryDefinition category, int baseAmount)
+        {
+            var reward = ScriptableObject.CreateInstance<RewardDefinition>();
+            reward.name = "Reward_Test";
+            _created.Add(reward);
+
+            var so = new SerializedObject(reward);
+            so.FindProperty("_category").objectReferenceValue = category;
             so.FindProperty("_defaultBaseAmount").intValue = baseAmount;
             so.ApplyModifiedPropertiesWithoutUndo();
 
-            return _reward;
+            return reward;
         }
 
         private static WheelSliceEntry MakeEntry(RewardDefinition reward, int baseAmountOverride)

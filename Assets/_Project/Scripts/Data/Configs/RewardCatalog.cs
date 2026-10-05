@@ -18,7 +18,7 @@ namespace Vertigo.Wheel.Data.Configs
         [SerializeField] private List<RewardDefinition> _all = new List<RewardDefinition>();
 
         // Referenced, not named: revive pricing keys off this reward's id, and an asset reference survives a
-        // rename or an Id edit that a hard-coded id string would silently miss. Every other Currency reward
+        // rename or an Id edit that a hard-coded id string would silently miss. Every other wallet-currency reward
         // needs no entry here: cash-out banks all of them (see CurrencyIds).
         [Tooltip("The currency gold revives are paid in.")]
         [SerializeField] private RewardDefinition _goldCurrency;
@@ -36,7 +36,7 @@ namespace Vertigo.Wheel.Data.Configs
             get { return CurrencyId(_goldCurrency, "gold"); }
         }
 
-        /// <summary>Every reward in the Currency category: what a cash-out banks into the wallet.</summary>
+        /// <summary>Every reward whose category is a wallet currency: what a cash-out banks into the wallet.</summary>
         public IReadOnlyCollection<RewardId> CurrencyIds
         {
             get
@@ -44,7 +44,7 @@ namespace Vertigo.Wheel.Data.Configs
                 var ids = new List<RewardId>();
                 for (int i = 0; i < _all.Count; i++)
                 {
-                    if (_all[i] && _all[i].Category == RewardCategory.Currency) ids.Add(_all[i].RewardId);
+                    if (_all[i] && _all[i].Category.IsWalletCurrency) ids.Add(_all[i].RewardId);
                 }
                 return ids;
             }
@@ -130,10 +130,10 @@ namespace Vertigo.Wheel.Data.Configs
         {
             if (!currency)
                 Debug.LogError($"[Vertigo] Catalog '{name}' has no {role} currency assigned.", this);
-            else if (currency.Category != RewardCategory.Currency)
+            else if (!currency.Category.IsWalletCurrency)
                 Debug.LogError(
                     $"[Vertigo] Catalog '{name}' uses '{currency.Id}' as its {role} currency, but it is a " +
-                    $"{currency.Category}, not a Currency.", this);
+                    $"{currency.Category.name}, which is not a wallet currency category.", this);
             else if (!_all.Contains(currency))
                 Debug.LogError(
                     $"[Vertigo] Catalog '{name}' uses '{currency.Id}' as its {role} currency, but it is not " +

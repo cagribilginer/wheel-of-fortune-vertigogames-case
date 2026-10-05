@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: Reward_AviatorGlasses
   _icon: {fileID: 21300000, guid: a3dde4e6b03144d358640f43eff4f732, type: 3}
-  _category: 3
+  _category: {fileID: 11400000, guid: b62fa8128b1a4f7ab7839140632ec031, type: 2}
   _defaultBaseAmount: 1
