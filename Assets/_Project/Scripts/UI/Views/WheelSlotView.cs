@@ -11,9 +11,9 @@ namespace Vertigo.Wheel.UI.Views
     public sealed class WheelSlotView : UIViewBase
     {
         // Offsets inside the wheel hole, in screen-upright space around the slot centre (slot-local would push content outward).
-        private static readonly Vector2 ICON_AREA_SIZE = new(70f, 52f);
-        private static readonly Vector2 ICON_CENTER = new(0f, 10f);
-        private static readonly Vector2 TEXT_CENTER = new(0f, -32f);
+        private static readonly Vector2 s_iconAreaSize = new(70f, 52f);
+        private static readonly Vector2 s_iconCenter = new(0f, 10f);
+        private static readonly Vector2 s_textCenter = new(0f, -32f);
 
         [SerializeField] private Image _ui_image_slot_icon_value;
         [SerializeField] private TextMeshProUGUI _ui_text_slot_amount_value;
@@ -57,10 +57,10 @@ namespace Vertigo.Wheel.UI.Views
             RectTransform textRect = _ui_text_slot_amount_value.rectTransform;
 
             iconRect.rotation = Quaternion.identity;
-            iconRect.localPosition = toSlotSpace * (Vector3)ICON_CENTER;
+            iconRect.localPosition = toSlotSpace * (Vector3)s_iconCenter;
 
             textRect.rotation = Quaternion.identity;
-            textRect.localPosition = toSlotSpace * (Vector3)TEXT_CENTER;
+            textRect.localPosition = toSlotSpace * (Vector3)s_textCenter;
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Vertigo.Wheel.UI.Views
             _ui_image_slot_icon_value.preserveAspect = true;
             _ui_image_slot_icon_value.maskable = false; // never inside a mask — the wheel itself isn't clipped
             _ui_image_slot_icon_value.color = Color.white;
-            _ui_image_slot_icon_value.rectTransform.sizeDelta = ICON_AREA_SIZE;
+            _ui_image_slot_icon_value.rectTransform.sizeDelta = s_iconAreaSize;
         }
     }
 }

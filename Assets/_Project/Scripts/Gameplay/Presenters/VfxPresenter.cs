@@ -12,7 +12,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     /// </summary>
     public sealed class VfxPresenter
     {
-        private static readonly Color BOMB_FLASH_COLOR = new(1f, 0.2f, 0.2f, 1f);
+        private static readonly Color s_bombFlashColor = new(1f, 0.2f, 0.2f, 1f);
 
         private readonly VfxView _view;
         private readonly JuiceConfig _juice;
@@ -33,7 +33,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                     _juice.BombShakeVibrato, _juice.BombShakeRandomness, fadeOut: true)
                 .SetLink(shake.gameObject, LinkBehaviour.KillOnDestroy);
 
-            Flash(_view.Flash, BOMB_FLASH_COLOR);
+            Flash(_view.Flash, s_bombFlashColor);
         }
 
         public void PlayRewardBurst()

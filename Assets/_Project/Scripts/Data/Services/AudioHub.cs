@@ -9,19 +9,19 @@ namespace Vertigo.Wheel.Data.Services
     /// </summary>
     public static class AudioHub
     {
-        private static IAudioService _service = NullAudioService.Instance;
-        private static AudioLibrary _library;
+        private static IAudioService s_service = NullAudioService.Instance;
+        private static AudioLibrary s_library;
 
         /// <summary>Called once by <c>GameInstaller.Awake()</c>.</summary>
         public static void Initialize(IAudioService service, AudioLibrary library)
         {
-            _service = service ?? NullAudioService.Instance;
-            _library = library;
+            s_service = service ?? NullAudioService.Instance;
+            s_library = library;
         }
 
         public static void PlayButtonClick()
         {
-            _service.PlayOneShot(_library ? _library.ButtonClick : null);
+            s_service.PlayOneShot(s_library ? s_library.ButtonClick : null);
         }
     }
 }
