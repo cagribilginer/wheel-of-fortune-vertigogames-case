@@ -16,7 +16,12 @@ namespace Vertigo.Wheel.Core.States.Flow
 
             Context.Spin.PlaySpin(
                 Context.PendingOutcome.SlotIndex,
-                () => Machine.Change<ResolvingState>());
+                OnSpinStopped);
+        }
+
+        private void OnSpinStopped()
+        {
+            Machine.Change<ResolvingState>();
         }
     }
 }

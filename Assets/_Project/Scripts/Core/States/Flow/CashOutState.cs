@@ -34,7 +34,12 @@ namespace Vertigo.Wheel.Core.States.Flow
 
             // Credit the wallet, then read the new balances back for the count-up. A fresh run boots after the celebration.
             Context.Run.CashOut();
-            Context.CashOut.ClaimCashOut(Context.Run.Balances, () => Machine.Change<BootState>());
+            Context.CashOut.ClaimCashOut(Context.Run.Balances, OnClaimFinished);
+        }
+
+        private void OnClaimFinished()
+        {
+            Machine.Change<BootState>();
         }
 
         public void OnCancelled()

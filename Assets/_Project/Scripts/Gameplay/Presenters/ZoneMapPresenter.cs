@@ -117,7 +117,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _view.Content.DOAnchorPosX(target, _juice.ZoneScrollDuration)
                 .SetEase(Ease.OutCubic)
                 .SetLink(_view.Content.gameObject, LinkBehaviour.KillOnDestroy)
-                .OnComplete(() => onComplete());
+                .OnComplete(new TweenCallback(onComplete));
         }
         #endregion
     }

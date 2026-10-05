@@ -32,6 +32,8 @@ namespace Vertigo.Wheel.UI.Views.Popups
             get { return _ui_row_popup_collect_currency; }
         }
 
+        private Action _onClaimFinished;
+
         public event Action ConfirmClicked;
         public event Action CancelClicked;
 
@@ -94,11 +96,14 @@ namespace Vertigo.Wheel.UI.Views.Popups
             _ui_transform_popup_collect_anim.localScale = Vector3.one;
             _ui_transform_popup_collect_anim.DOPunchScale(Vector3.one * Juice.CardPunchScale, Juice.CardPunchDuration).SetLink(gameObject, LinkBehaviour.KillOnDestroy);
 
-            DOVirtual.DelayedCall(Juice.ClaimHoldDuration, () =>
-            {
-                onComplete?.Invoke();
-                Hide();
-            }).SetLink(gameObject);
+            _onClaimFinished = onComplete;
+            DOVirtual.DelayedCall(Juice.ClaimHoldDuration, OnClaimHoldElapsed).SetLink(gameObject);
+        }
+
+        private void OnClaimHoldElapsed()
+        {
+            _onClaimFinished?.Invoke();
+            Hide();
         }
 
         public void Hide()

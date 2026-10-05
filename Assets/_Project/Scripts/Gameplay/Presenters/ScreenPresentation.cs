@@ -29,6 +29,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         // The bomb-impact hold has no view to SetLink to, so it is killed before a new one starts and on Dispose.
         private Tween _bombDelay;
 
+        // The zone the strip scrolls to once the wheel has finished its transition, and who to tell afterwards.
+        private int _zoneBeingShown;
+        private Action _onZoneShown;
+
         public ScreenPresentation(
             WheelPresenter wheel, ZoneMapPresenter zoneMap, BankPresenter bank,
             ActionBarPresenter actionBar, PopupPresenter popups, VfxPresenter vfx, AudioPresenter audio,
@@ -52,8 +56,14 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
             // The wheel exits, re-themes off-screen and returns; then the strip scrolls and the flow reaches Idle.
             _audio.PlayWheelTransition();
-            _wheel.PlayZoneTransition(
-                wheel, _progression.ThemeFor(zone, zoneType), () => _zoneMap.ShowZone(zone, onComplete));
+            _zoneBeingShown = zone;
+            _onZoneShown = onComplete;
+            _wheel.PlayZoneTransition(wheel, _progression.ThemeFor(zone, zoneType), OnWheelTransitioned);
+        }
+
+        private void OnWheelTransitioned()
+        {
+            _zoneMap.ShowZone(_zoneBeingShown, _onZoneShown);
         }
 
         public void SetInputState(InputState state)
@@ -93,7 +103,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _bombDelay?.Kill();
 
             // Dropped on kill: with recycling on, a stale reference would kill whichever tween reuses the object.
-            Tween delay = DOVirtual.DelayedCall(_juice.BombImpactHoldDuration, () => onComplete());
+            Tween delay = DOVirtual.DelayedCall(_juice.BombImpactHoldDuration, new TweenCallback(onComplete));
             delay.OnKill(() => { if (_bombDelay == delay) _bombDelay = null; });
             _bombDelay = delay;
         }

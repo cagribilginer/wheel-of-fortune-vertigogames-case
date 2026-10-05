@@ -9,11 +9,13 @@ namespace Vertigo.Wheel.Core.States.Flow
 
         public override void Enter()
         {
-            Context.Spin.PlayReveal(Context.PendingOutcome, Context.Run.CurrentZoneType, () =>
-            {
-                if (Context.PendingOutcome.IsBomb) Machine.Change<BombHitState>();
-                else Machine.Change<RewardGrantedState>();
-            });
+            Context.Spin.PlayReveal(Context.PendingOutcome, Context.Run.CurrentZoneType, OnRevealed);
+        }
+
+        private void OnRevealed()
+        {
+            if (Context.PendingOutcome.IsBomb) Machine.Change<BombHitState>();
+            else Machine.Change<RewardGrantedState>();
         }
     }
 }

@@ -28,6 +28,13 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly IAudioService _audio;
         private readonly JuiceConfig _juice;
         private readonly Tween _tickTween;
+
+        // The continuation of the one transition / spin / highlight in flight. The state machine runs them strictly
+        // one at a time, so a field per kind is enough and each completion is a named handler, not a closure.
+        private WheelModel _transitionWheel;
+        private WheelThemeConfig _transitionTheme;
+        private Action _onZoneEntered;
+        private Action _onSpinStopped;
         private readonly Tween _breatheTween;
 
         private GameStateMachine _machine;
@@ -100,6 +107,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             RectTransform root = _view.Root;
             root.DOComplete();
 
+            _transitionWheel = wheel;
+            _transitionTheme = theme;
+            _onZoneEntered = onComplete;
+
             Sequence seq = DOTween.Sequence().SetLink(root.gameObject, LinkBehaviour.KillOnDestroy);
 
             if (_hasShownZone)
@@ -107,13 +118,20 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             else
                 root.anchoredPosition = new Vector2(root.anchoredPosition.x, _hiddenY);
 
-            seq.AppendCallback(() => SetTheme(wheel, theme));
+            seq.AppendCallback(ApplyTransitionTheme);
             seq.Append(root.DOAnchorPosY(_homeY, _juice.ZoneEnterDuration).SetEase(Ease.OutBack));
-            seq.OnComplete(() =>
-            {
-                _hasShownZone = true;
-                onComplete();
-            });
+            seq.OnComplete(OnZoneEntered);
+        }
+
+        private void ApplyTransitionTheme()
+        {
+            SetTheme(_transitionWheel, _transitionTheme);
+        }
+
+        private void OnZoneEntered()
+        {
+            _hasShownZone = true;
+            _onZoneEntered();
         }
 
         public void SetTheme(WheelModel wheel, WheelThemeConfig theme)
@@ -218,20 +236,24 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             int turns = UnityEngine.Random.Range(_spinConfig.MinTurns, _spinConfig.MaxTurns + 1);
             float endValue = current + delta + turns * 360f;
 
+            _onSpinStopped = onComplete;
+
             _view.Rotor.DOComplete();
             _view.Rotor
                 .DOLocalRotate(new Vector3(0f, 0f, endValue), _spinConfig.Duration, RotateMode.FastBeyond360)
                 .SetEase(_spinConfig.SpinEase)
                 .SetLink(_view.Rotor.gameObject, LinkBehaviour.KillOnDestroy)
                 .OnUpdate(EmitTicks)
-                .OnComplete(() =>
-                {
-                    _view.Rotor.DOPunchRotation(
-                            new Vector3(0f, 0f, _spinConfig.SettlePunchDegrees),
-                            _juice.SettlePunchDuration, _juice.SettlePunchVibrato, _juice.SettlePunchElasticity)
-                        .SetLink(_view.Rotor.gameObject, LinkBehaviour.KillOnDestroy);
-                    onComplete();
-                });
+                .OnComplete(OnSpinTweenFinished);
+        }
+
+        private void OnSpinTweenFinished()
+        {
+            _view.Rotor.DOPunchRotation(
+                    new Vector3(0f, 0f, _spinConfig.SettlePunchDegrees),
+                    _juice.SettlePunchDuration, _juice.SettlePunchVibrato, _juice.SettlePunchElasticity)
+                .SetLink(_view.Rotor.gameObject, LinkBehaviour.KillOnDestroy);
+            _onSpinStopped();
         }
 
         public void HighlightSlot(int slotIndex, Action onComplete)
@@ -244,7 +266,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 .DOScale(_juice.HighlightScale, _juice.HighlightDuration)
                 .SetLoops(2, LoopType.Yoyo)
                 .SetLink(slotRect.gameObject, LinkBehaviour.KillOnDestroy)
-                .OnComplete(() => onComplete());
+                .OnComplete(new TweenCallback(onComplete));
         }
 
         private void EmitTicks()

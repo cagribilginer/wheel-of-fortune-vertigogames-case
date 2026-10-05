@@ -8,7 +8,12 @@ namespace Vertigo.Wheel.Core.States.Flow
         public override void Enter()
         {
             Context.Run.Detonate();
-            Context.Spin.PlayBomb(() => Machine.Change<GameOverState>());
+            Context.Spin.PlayBomb(OnBombPlayed);
+        }
+
+        private void OnBombPlayed()
+        {
+            Machine.Change<GameOverState>();
         }
     }
 }
