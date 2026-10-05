@@ -169,19 +169,32 @@ namespace Vertigo.Wheel.Core.Run
         }
 
         /// <summary>
+        /// What a cash-out would actually keep: the bank's currency rows, in bank order. Every other reward
+        /// (weapons, chests, points) belongs to the run and is gone when it ends, so the cash-out summary
+        /// lists exactly this and nothing more.
+        /// </summary>
+        public IReadOnlyList<BankEntry> WalletGains
+        {
+            get
+            {
+                var gains = new List<BankEntry>();
+                foreach (BankEntry entry in Bank.Entries)
+                {
+                    if (entry.Amount > 0 && _currencies.Contains(entry.Reward)) gains.Add(entry);
+                }
+                return gains;
+            }
+        }
+
+        /// <summary>
         /// Walk away with the haul. Banked gold and cash convert into the persistent wallet; everything else
         /// (weapons, cosmetics, chests) is left behind with the rest of the run. This is the only way either
         /// wallet balance ever grows — so a continue is always paid for by a previous successful run.
         /// </summary>
         public void CashOut()
         {
-            IReadOnlyList<BankEntry> entries = Bank.Entries;
-            for (int i = 0; i < entries.Count; i++)
-            {
-                BankEntry entry = entries[i];
-                if (entry.Amount > 0 && _currencies.Contains(entry.Reward))
-                    _wallet.Add(entry.Reward, entry.Amount);
-            }
+            foreach (BankEntry gain in WalletGains)
+                _wallet.Add(gain.Reward, gain.Amount);
         }
 
         /// <summary>Back to zone 1 with an empty bank. This is what "restart" means.</summary>

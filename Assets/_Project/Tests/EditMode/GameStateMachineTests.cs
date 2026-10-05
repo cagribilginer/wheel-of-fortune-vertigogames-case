@@ -1,3 +1,4 @@
+using System.Linq;
 using NUnit.Framework;
 using Vertigo.Wheel.Core.Rewards;
 using Vertigo.Wheel.Core.Run;
@@ -133,7 +134,19 @@ namespace Vertigo.Wheel.Tests.EditMode
 
             Assert.That(_machine.IsIn<CashOutState>(), Is.True);
             Assert.That(_view.CashOutVisible, Is.True);
-            Assert.That(_view.CashOutHaul, Is.Not.Empty, "The summary must list the haul before it is cleared.");
+        }
+
+        [Test]
+        public void TheCashOutSummary_ListsOnlyWhatTheClaimKeeps()
+        {
+            AdvanceToZone(5);                              // the run banked Pistol/Rifle points on the way
+            _run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Gold, 30));
+
+            _machine.RequestExit();
+
+            Assert.That(_view.CashOutHaul.Select(e => e.Reward), Is.EqualTo(new[] { TestWheels.Gold }),
+                "Weapons, chests and points are gone when the run ends, so the claim screen must not list them.");
+            Assert.That(_view.CashOutHaul[0].Amount, Is.EqualTo(30));
         }
 
         [Test]

@@ -112,9 +112,9 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _popups.HideGameOver();
         }
 
-        public void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared, WalletBalances wallet)
+        public void ShowCashOut(IReadOnlyList<BankEntry> gains, int zonesCleared, WalletBalances wallet)
         {
-            _popups.ShowCashOut(haul, zonesCleared, wallet);
+            _popups.ShowCashOut(gains, zonesCleared, wallet);
         }
 
         public void HideCashOut()

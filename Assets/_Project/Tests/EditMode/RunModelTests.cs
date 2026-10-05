@@ -124,6 +124,21 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
+        public void WalletGains_ListsOnlyTheCurrencyRows_AndIsWhatCashOutCredits()
+        {
+            _run.Grant(new SpinOutcome(1, SliceKind.Reward, TestWheels.Pistol, 999));
+            _run.Grant(new SpinOutcome(2, SliceKind.Reward, TestWheels.Gold, 40));
+            _run.Grant(new SpinOutcome(3, SliceKind.Reward, TestWheels.Cash, 50));
+
+            Assert.That(_run.WalletGains.Select(e => e.Reward), Is.EqualTo(new[] { TestWheels.Gold, TestWheels.Cash }));
+
+            _run.CashOut();
+
+            foreach (BankEntry gain in _run.WalletGains)
+                Assert.That(_wallet.BalanceOf(gain.Reward), Is.EqualTo(gain.Amount));
+        }
+
+        [Test]
         public void CashOut_OnlyBanksGoldAndCash()
         {
             // Pistol is neither of the two wallet currencies, so it must survive the run's end without

@@ -82,9 +82,9 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         #endregion
 
         #region Cash out
-        public void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared, WalletBalances wallet)
+        public void ShowCashOut(IReadOnlyList<BankEntry> gains, int zonesCleared, WalletBalances wallet)
         {
-            _collectHaul.Show(haul);
+            _collectHaul.Show(gains);
 
             _audio.PlayPopupOpen();
 

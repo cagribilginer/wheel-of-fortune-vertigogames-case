@@ -8,8 +8,11 @@ namespace Vertigo.Wheel.Core.States
     /// <summary>The cash-out summary and its claim celebration.</summary>
     public interface ICashOutPresentation
     {
-        /// <summary>Shows the live haul and the wallet as it stands before the claim. Nothing is committed yet.</summary>
-        void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared, WalletBalances wallet);
+        /// <summary>
+        /// Shows what the claim will keep (<paramref name="gains"/>, the currency part of the haul) and the wallet as
+        /// it stands before the claim. Nothing is committed yet.
+        /// </summary>
+        void ShowCashOut(IReadOnlyList<BankEntry> gains, int zonesCleared, WalletBalances wallet);
 
         /// <summary>Plain dismissal: the player cancelled, so no reward flourish.</summary>
         void HideCashOut();

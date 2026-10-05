@@ -103,13 +103,13 @@ namespace Vertigo.Wheel.Tests.EditMode.Doubles
             GameOverVisible = false;
         }
 
-        public virtual void ShowCashOut(IReadOnlyList<BankEntry> haul, int zonesCleared, WalletBalances wallet)
+        public virtual void ShowCashOut(IReadOnlyList<BankEntry> gains, int zonesCleared, WalletBalances wallet)
         {
             CashOutVisible = true;
             CashOutZonesCleared = zonesCleared;
             CashOutBalancesShown = wallet;
             CashOutHaul.Clear();
-            for (int i = 0; i < haul.Count; i++) CashOutHaul.Add(haul[i]);
+            for (int i = 0; i < gains.Count; i++) CashOutHaul.Add(gains[i]);
         }
 
         public virtual void HideCashOut()

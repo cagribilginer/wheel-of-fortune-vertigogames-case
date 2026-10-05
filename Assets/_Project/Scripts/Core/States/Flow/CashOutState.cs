@@ -21,9 +21,10 @@ namespace Vertigo.Wheel.Core.States.Flow
 
             // The wheel is blocked while the summary is up because this state accepts no spin input. The bank
             // stays untouched so a cancel is a genuine no-op.
-            // CurrentZone is the one being stood on, so cleared zones are one fewer. The wallet shows as before the claim.
+            // Only what the claim will keep is listed. CurrentZone is the one being stood on, so cleared zones are
+            // one fewer. The wallet shows as before the claim.
             Context.CashOut.ShowCashOut(
-                Context.Run.Bank.Entries, Context.Run.CurrentZone - 1, Context.Run.Balances);
+                Context.Run.WalletGains, Context.Run.CurrentZone - 1, Context.Run.Balances);
         }
 
         public override void OnConfirmed()
