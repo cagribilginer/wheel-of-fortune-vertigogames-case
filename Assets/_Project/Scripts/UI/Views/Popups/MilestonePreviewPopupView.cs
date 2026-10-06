@@ -20,9 +20,6 @@ namespace Vertigo.Wheel.UI.Views.Popups
         [SerializeField] private RectTransform _rowPopupMilestoneSuper;
         [SerializeField] private Button _buttonPopupMilestoneClose;
 
-        private const string SAFE_DESCRIPTION = "Win special rewards in bomb-free Safe Zones!";
-        private const string SUPER_DESCRIPTION = "Win super rewards in bomb-free Super Zones!";
-
         public event Action CloseClicked;
 
         protected override void CacheReferences()
@@ -59,8 +56,8 @@ namespace Vertigo.Wheel.UI.Views.Popups
             _rowPopupMilestoneSafe.gameObject.SetActive(!isSuper);
             _rowPopupMilestoneSuper.gameObject.SetActive(isSuper);
 
-            _textPopupMilestoneTitleValue.text = isSuper ? "SUPER ZONE" : "SAFE ZONE";
-            _textPopupMilestoneDescValue.text = isSuper ? SUPER_DESCRIPTION : SAFE_DESCRIPTION;
+            _textPopupMilestoneTitleValue.text = isSuper ? ViewText.SUPER_ZONE_TITLE : ViewText.SAFE_ZONE_TITLE;
+            _textPopupMilestoneDescValue.text = isSuper ? ViewText.SUPER_ZONE_DESCRIPTION : ViewText.SAFE_ZONE_DESCRIPTION;
 
             PlayOpen(_imagePopupMilestoneBackdrop, _transformPopupMilestoneAnim);
         }

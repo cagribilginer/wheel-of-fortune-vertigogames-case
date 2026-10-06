@@ -2,6 +2,7 @@ using System;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
+using Vertigo.Wheel.Data.Configs;
 
 namespace Vertigo.Wheel.UI.Views
 {
@@ -12,16 +13,10 @@ namespace Vertigo.Wheel.UI.Views
     [RequireComponent(typeof(Button))]
     public sealed class UIButtonPunch : MonoBehaviour
     {
-        // Every interactable button shares this exact feel, so it is named here rather than threaded
-        // through a config — unlike JuiceConfig's values, there is nothing per-screen to tune.
-        private const float PUNCH_SCALE = -0.18f;
-        private const float PUNCH_DURATION = 0.28f;
-        private const int PUNCH_VIBRATO = 8;
-        private const float PUNCH_ELASTICITY = 0.75f;
-
         [SerializeField] private RectTransform _animTarget;
 
         private Button _button;
+        private JuiceConfig _juice;
         private Action _onClicked;
 
         private void Awake()
@@ -30,9 +25,10 @@ namespace Vertigo.Wheel.UI.Views
             if (!_animTarget) _animTarget = FindAnimChild();
         }
 
-        /// <summary>The installer hands over what to do for the click sound; the view never reaches for a service itself.</summary>
-        public void Configure(Action onClicked)
+        /// <summary>The installer hands over the shared punch feel and what to do for the click sound; the view never reaches for a service itself.</summary>
+        public void Configure(JuiceConfig juice, Action onClicked)
         {
+            _juice = juice;
             _onClicked = onClicked;
         }
 
@@ -51,12 +47,14 @@ namespace Vertigo.Wheel.UI.Views
         {
             if (_onClicked != null) _onClicked();
 
-            if (!_animTarget) return;
+            if (!_animTarget || !_juice) return;
 
             _animTarget.DOKill();
             _animTarget.localScale = Vector3.one;
             // DOPunchScale's spring-back reads as "the button reacted"; a plain short DOScale would not.
-            _animTarget.DOPunchScale(Vector3.one * PUNCH_SCALE, PUNCH_DURATION, vibrato: PUNCH_VIBRATO, elasticity: PUNCH_ELASTICITY)
+            _animTarget.DOPunchScale(
+                    Vector3.one * _juice.ButtonPunchScale, _juice.ButtonPunchDuration,
+                    _juice.ButtonPunchVibrato, _juice.ButtonPunchElasticity)
                 .SetLink(gameObject, LinkBehaviour.KillOnDestroy);
         }
 

@@ -88,11 +88,11 @@ namespace Vertigo.Wheel.UI.Views.Popups
         #region Presentation
         public void Show(GameOverSummary summary)
         {
-            _textPopupBombZoneValue.SetText("You reached Zone {0}", summary.ZoneReached);
+            _textPopupBombZoneValue.SetText(ViewText.BOMB_ZONE_REACHED, summary.ZoneReached);
 
             // SetText's zero-alloc formatter does not honour ":N0" (it prints the literal characters), so the
             // thousands separator has to come from the regular setter.
-            _textPopupBombContinueValue.text = summary.GoldReviveCost.ToString("N0");
+            _textPopupBombContinueValue.text = summary.GoldReviveCost.ToString(ViewText.AMOUNT_FORMAT);
 
             _textPopupBombEmptyValue.gameObject.SetActive(summary.LostHaul.Count == 0);
 

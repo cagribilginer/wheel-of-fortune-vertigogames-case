@@ -38,6 +38,14 @@ namespace Vertigo.Wheel.Data.Configs
         [Range(0f, 1f)] [SerializeField] private float _flashOutDuration = 0.45f;
         [Range(0f, 1f)] [SerializeField] private float _flashPeakAlpha = 0.85f;
         [Range(0f, 1f)] [SerializeField] private float _bombImpactHoldDuration = 0.4f;
+        [SerializeField] private Color _bombFlashColor = new(1f, 0.2f, 0.2f, 1f);
+
+        [Header("Button click")]
+        [Tooltip("Every interactable button shares this punch; negative squeezes, positive pops.")]
+        [Range(-0.5f, 0.5f)] [SerializeField] private float _buttonPunchScale = -0.18f;
+        [Range(0f, 1f)] [SerializeField] private float _buttonPunchDuration = 0.28f;
+        [Range(0, 20)] [SerializeField] private int _buttonPunchVibrato = 8;
+        [Range(0f, 2f)] [SerializeField] private float _buttonPunchElasticity = 0.75f;
 
         [Header("Bank")]
         [Range(0f, 1f)] [SerializeField] private float _bankFlyDuration = 0.5f;
@@ -147,6 +155,26 @@ namespace Vertigo.Wheel.Data.Configs
         public float BombImpactHoldDuration
         {
             get { return _bombImpactHoldDuration; }
+        }
+        public Color BombFlashColor
+        {
+            get { return _bombFlashColor; }
+        }
+        public float ButtonPunchScale
+        {
+            get { return _buttonPunchScale; }
+        }
+        public float ButtonPunchDuration
+        {
+            get { return _buttonPunchDuration; }
+        }
+        public int ButtonPunchVibrato
+        {
+            get { return _buttonPunchVibrato; }
+        }
+        public float ButtonPunchElasticity
+        {
+            get { return _buttonPunchElasticity; }
         }
         public int TargetFrameRate
         {

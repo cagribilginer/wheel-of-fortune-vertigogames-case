@@ -69,8 +69,8 @@ namespace Vertigo.Wheel.UI.Views
         /// </summary>
         public void SetMilestoneTargets(int nextSafeZone, int nextSuperZone)
         {
-            _textZonemapMilestoneSuperValue.SetText("SUPER ZONE {0}", nextSuperZone);
-            _textZonemapMilestoneSafeValue.SetText("SAFE ZONE {0}", nextSafeZone);
+            _textZonemapMilestoneSuperValue.SetText(ViewText.SUPER_ZONE_TARGET, nextSuperZone);
+            _textZonemapMilestoneSafeValue.SetText(ViewText.SAFE_ZONE_TARGET, nextSafeZone);
         }
     }
 }

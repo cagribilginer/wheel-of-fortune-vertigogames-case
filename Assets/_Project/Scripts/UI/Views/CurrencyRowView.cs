@@ -36,7 +36,7 @@ namespace Vertigo.Wheel.UI.Views
             if (_tween != null) _tween.Kill();
             _shown = amount;
             _isInitialised = true;
-            _textPopupCurrencyValue.text = amount.ToString("N0");
+            _textPopupCurrencyValue.text = amount.ToString(ViewText.AMOUNT_FORMAT);
         }
 
         /// <summary>The first value shows outright, later ones count up from what is on screen.</summary>
@@ -53,7 +53,7 @@ namespace Vertigo.Wheel.UI.Views
             Tween countUp = DOVirtual.Int(_shown, target, duration, value =>
                 {
                     _shown = value;
-                    _textPopupCurrencyValue.text = value.ToString("N0");
+                    _textPopupCurrencyValue.text = value.ToString(ViewText.AMOUNT_FORMAT);
                 })
                 .SetEase(Ease.OutCubic)
                 .SetLink(gameObject);

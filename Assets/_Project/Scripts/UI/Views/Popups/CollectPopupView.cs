@@ -74,7 +74,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
         #region Presentation
         public void Show(int zonesCleared)
         {
-            _textPopupCollectZoneValue.SetText("Cleared {0} zones", zonesCleared);
+            _textPopupCollectZoneValue.SetText(ViewText.COLLECT_ZONES_CLEARED, zonesCleared);
 
             // A fresh summary is fully interactive again.
             _buttonPopupCollectConfirm.interactable = true;

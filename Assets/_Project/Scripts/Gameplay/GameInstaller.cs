@@ -64,11 +64,11 @@ namespace Vertigo.Wheel.Gameplay
             DOTween.Init(recycleAllByDefault: true, useSafeMode: true, logBehaviour: LogBehaviour.ErrorsOnly)
                    .SetCapacity(tweenersCapacity: 120, sequencesCapacity: 40);
 
-            var catalog = LoadConfig<RewardCatalog>("Configs/Settings/RewardCatalog");
-            var spinConfig = LoadConfig<WheelSpinConfig>("Configs/Settings/WheelSpin_Default");
-            var progression = LoadConfig<ZoneProgressionConfig>("Configs/Settings/ZoneProgression_Default");
-            var continueConfig = LoadConfig<ContinueConfig>("Configs/Settings/Continue_Default");
-            var juice = LoadConfig<JuiceConfig>("Configs/Settings/Juice_Default");
+            var catalog = LoadConfig<RewardCatalog>(ConfigAddresses.REWARD_CATALOG);
+            var spinConfig = LoadConfig<WheelSpinConfig>(ConfigAddresses.WHEEL_SPIN);
+            var progression = LoadConfig<ZoneProgressionConfig>(ConfigAddresses.ZONE_PROGRESSION);
+            var continueConfig = LoadConfig<ContinueConfig>(ConfigAddresses.CONTINUE);
+            var juice = LoadConfig<JuiceConfig>(ConfigAddresses.JUICE);
 
             Application.targetFrameRate = juice.TargetFrameRate;
 
@@ -82,11 +82,11 @@ namespace Vertigo.Wheel.Gameplay
             var continueService = new ContinueService(wallet, goldRewardId, continueConfig.ToSettings());
             var runModel = new RunModel(classifier, wallet, catalog.CurrencyIds);
 
-            var audioLibrary = LoadConfig<AudioLibrary>("Configs/Settings/AudioLibrary");
+            var audioLibrary = LoadConfig<AudioLibrary>(ConfigAddresses.AUDIO_LIBRARY);
             IAudioService audioService = new AudioService(transform);
             var audioPresenter = new AudioPresenter(audioService, audioLibrary);
             for (int i = 0; i < _buttonPunches.Length; i++)
-                _buttonPunches[i].Configure(audioPresenter.PlayButtonClick);
+                _buttonPunches[i].Configure(juice, audioPresenter.PlayButtonClick);
 
             _bombPopup.Configure(juice);
             _collectPopup.Configure(juice);
