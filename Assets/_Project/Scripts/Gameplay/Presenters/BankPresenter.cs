@@ -313,7 +313,9 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 _hasGhost = true;
                 _ghost.Image.sprite = _owner._catalog.IconFor(Cell.Reward);
 
-                _tween = _ghost.Rect.DOMove(Cell.View.Rect.position, _owner._juice.BankFlyDuration)
+                // Both ends are given explicitly: a DOMove would read the ghost's position as its start before any
+                // OnStart could move it to the wheel, so the icon would take off from wherever the ghost last was.
+                _tween = DOVirtual.Vector3(_from, Cell.View.Rect.position, _owner._juice.BankFlyDuration, OnFlyStep)
                     .SetDelay(delay)
                     .SetEase(Ease.InBack)
                     .SetLink(_ghost.Rect.gameObject, LinkBehaviour.KillOnDestroy)
@@ -325,6 +327,11 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             {
                 _ghost.Rect.position = _from;
                 _ghost.Rect.gameObject.SetActive(true);
+            }
+
+            private void OnFlyStep(Vector3 position)
+            {
+                _ghost.Rect.position = position;
             }
 
             private void OnLanded()
