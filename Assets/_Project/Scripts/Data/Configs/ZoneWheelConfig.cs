@@ -18,7 +18,7 @@ namespace Vertigo.Wheel.Data.Configs
         [SerializeField] private List<WheelSliceEntry> _slices = new List<WheelSliceEntry>();
 
         [Tooltip("Off by default: a fixed slot order makes this list a literal picture of the wheel.")]
-        [SerializeField] private bool _shuffleSliceOrder;
+        [SerializeField] private bool _isShuffleEnabled;
 
         #region Accessors
         public WheelTier Tier
@@ -61,7 +61,7 @@ namespace Vertigo.Wheel.Data.Configs
                 blueprints.Add(entry.ToBlueprint());
             }
 
-            _cachedBlueprint = new WheelBlueprint(_tier, blueprints, _shuffleSliceOrder);
+            _cachedBlueprint = new WheelBlueprint(_tier, blueprints, _isShuffleEnabled);
             return _cachedBlueprint;
         }
 
