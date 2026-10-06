@@ -5,11 +5,8 @@ using Vertigo.Wheel.Core.Rewards;
 namespace Vertigo.Wheel.Data.Configs
 {
     /// <summary>
-    /// One authored reward: its stable id, its sprite, and what it is worth.
-    /// <para>
-    /// The core layer only ever sees <see cref="RewardId"/>; this asset is the single place a sprite is
-    /// attached to one. Adding a reward is a right-click in the Project window and no code at all.
-    /// </para>
+    /// One authored reward: its id, sprite and worth. The only place a sprite is attached to a
+    /// <see cref="RewardId"/>; adding a reward is a new asset, no code.
     /// </summary>
     [CreateAssetMenu(menuName = "Vertigo/Rewards/Reward Definition", fileName = "Reward_")]
     public sealed class RewardDefinition : ScriptableObject

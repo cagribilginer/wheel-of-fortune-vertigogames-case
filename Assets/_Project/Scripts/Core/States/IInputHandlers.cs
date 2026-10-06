@@ -1,9 +1,7 @@
 namespace Vertigo.Wheel.Core.States
 {
-    // One small capability per player input. A state implements exactly the ones it accepts, so what a state
-    // reacts to is stated in its declaration instead of being a list of overridden no-ops. The machine
-    // forwards an input only to a state that declares the matching handler; anything else is ignored on
-    // purpose, which is why double-tapping spin mid-spin cannot queue a second spin.
+    // One capability per player input; a state implements the ones it accepts and the machine ignores the rest
+    // on purpose, so double-tapping spin mid-spin cannot queue a second spin.
 
     /// <summary>The state accepts the SPIN button.</summary>
     public interface ISpinInputHandler

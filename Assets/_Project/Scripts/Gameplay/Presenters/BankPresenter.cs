@@ -12,15 +12,9 @@ using Vertigo.Wheel.UI.Views;
 namespace Vertigo.Wheel.Gameplay.Presenters
 {
     /// <summary>
-    /// The collected-rewards grid: a pooled <see cref="BankEntryViewMono"/> per stacked reward, and the icons that carry a
-    /// fresh reward from the wheel into its cell.
-    /// <para>
-    /// What the grid shows follows what has actually arrived, not the model. A new reward's cell is created hidden so the
-    /// layout reserves its slot, and is revealed when the first icon lands; an existing cell's number climbs when an
-    /// icon lands on it. Every icon has its own ghost, so one reward can send several icons and rewards can follow
-    /// each other before the earlier ones land without any flight completing another. The ghosts sit on the canvas
-    /// root, outside the layout group, so a layout rebuild cannot fight their tweens.
-    /// </para>
+    /// The collected-rewards grid and the icons that fly a reward from the wheel into its cell. The grid follows
+    /// what has arrived: a new cell is reserved hidden and revealed on the first landing, an existing number
+    /// climbs on a landing. Every icon owns a ghost on the canvas root, outside the layout group.
     /// </summary>
     public sealed class BankPresenter
     {

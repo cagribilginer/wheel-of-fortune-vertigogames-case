@@ -3,11 +3,8 @@ using Vertigo.Wheel.Core.Run;
 namespace Vertigo.Wheel.Core.States.Flow
 {
     /// <summary>
-    /// Walking away with the haul. The summary opens first and commits nothing: the player can still
-    /// cancel back to the wheel and keep spinning. Only on confirm does banked gold convert to the
-    /// persistent wallet — the one route by which the wallet ever grows — and a fresh run boots. The claim
-    /// celebration keeps this state current for its whole duration, so input arriving in that window must neither
-    /// credit the wallet a second time nor cancel a claim that already paid out.
+    /// Walking away with the haul. The summary commits nothing until the player confirms, which credits the
+    /// wallet and boots a fresh run. The claim keeps this state current, so input during it is ignored.
     /// </summary>
     public sealed class CashOutState : GameStateBase, IConfirmInputHandler, ICancelInputHandler
     {

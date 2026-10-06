@@ -3,11 +3,8 @@ using System;
 namespace Vertigo.Wheel.Core.Rewards
 {
     /// <summary>
-    /// Stable identity of a reward, decoupled from any Unity asset.
-    /// <para>
-    /// The core layer deals only in ids; turning an id back into a sprite is the presentation layer's job
-    /// (via the RewardCatalog). That separation is what lets the entire game loop be tested without a scene.
-    /// </para>
+    /// Stable identity of a reward, decoupled from any Unity asset. The core deals only in ids; the
+    /// RewardCatalog turns one back into a sprite, which keeps the whole game loop testable without a scene.
     /// </summary>
     public readonly struct RewardId : IEquatable<RewardId>
     {

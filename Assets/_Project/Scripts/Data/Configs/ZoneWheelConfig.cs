@@ -6,11 +6,7 @@ using Vertigo.Wheel.Core.Spin;
 namespace Vertigo.Wheel.Data.Configs
 {
     /// <summary>
-    /// An authored wheel: eight slices, a tier, and a theme.
-    /// <para>
-    /// This asset is the answer to "content of slices of each wheel should also be changeable from the
-    /// editor". Edit the list, press play, the wheel is different — no recompile.
-    /// </para>
+    /// An authored wheel: eight slices, a tier and a theme. Edit the list and the wheel changes, no recompile.
     /// </summary>
     [CreateAssetMenu(menuName = "Vertigo/Wheel/Zone Wheel Config", fileName = "Wheel_")]
     public sealed class ZoneWheelConfig : ScriptableObject

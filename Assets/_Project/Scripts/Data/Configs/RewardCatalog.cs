@@ -6,20 +6,16 @@ using Vertigo.Wheel.Core.Rewards;
 namespace Vertigo.Wheel.Data.Configs
 {
     /// <summary>
-    /// The only bridge from a core-layer <see cref="RewardId"/> back to a sprite.
-    /// <para>
-    /// The logic never sees a Sprite and the views never invent one; everything goes through here, which
-    /// is what keeps the rules testable without an asset database.
-    /// </para>
+    /// The only bridge from a core-layer <see cref="RewardId"/> back to a sprite, so the rules never need an
+    /// asset database.
     /// </summary>
     [CreateAssetMenu(menuName = "Vertigo/Config/Reward Catalog", fileName = "RewardCatalog")]
     public sealed class RewardCatalog : ScriptableObject
     {
         [SerializeField] private List<RewardDefinition> _all = new List<RewardDefinition>();
 
-        // Referenced, not named: revive pricing keys off this reward's id, and an asset reference survives a
-        // rename or an Id edit that a hard-coded id string would silently miss. Every other wallet-currency reward
-        // needs no entry here: cash-out banks all of them (see CurrencyIds).
+        // An asset reference, not an id string, so a rename cannot silently break revive pricing. Other wallet
+        // currencies need no entry here: cash-out banks all of them (see CurrencyIds).
         [Tooltip("The currency gold revives are paid in.")]
         [SerializeField] private RewardDefinition _goldCurrency;
 

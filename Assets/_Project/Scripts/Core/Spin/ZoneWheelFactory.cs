@@ -48,8 +48,7 @@ namespace Vertigo.Wheel.Core.Spin
                     $"No wheel blueprint was configured for zone {zone} ({zoneType}).");
 
             // The mode's headline promise: a normal zone carries exactly one bomb, a safe or super zone none.
-            // A bombless normal zone is a free run and a bombed safe zone breaks the zone's whole point, so a
-            // wheel that misses the count is a hard failure here, not something to notice on a play-through.
+            // A wheel that misses the count is a hard failure here, not something to notice in play.
             int expectedBombs = zoneType == ZoneType.Normal ? NORMAL_ZONE_BOMB_COUNT : 0;
             if (blueprint.BombCount != expectedBombs)
                 throw new InvalidOperationException(

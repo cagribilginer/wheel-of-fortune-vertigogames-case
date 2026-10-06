@@ -9,10 +9,8 @@ using Vertigo.Wheel.UI.Views;
 namespace Vertigo.Wheel.Gameplay.Presenters
 {
     /// <summary>
-    /// The horizontal zone strip: one tile per zone in a window built ahead of the player and scrolled to keep the
-    /// current zone centred. The strip only grows and a reset just moves the highlight back to zone 1, so no tile is
-    /// ever released and there is nothing to pool.
-    /// A number's colour and weight come from the theme of the wheel that zone uses, like the wheel itself.
+    /// The horizontal zone strip: a tile per zone in a window built ahead of the player and scrolled to keep the
+    /// current zone centred. It only grows, so nothing is pooled. Number style comes from the zone's wheel theme.
     /// </summary>
     public sealed class ZoneMapPresenter
     {

@@ -1,10 +1,8 @@
 namespace Vertigo.Wheel.Core.States.Flow
 {
     /// <summary>
-    /// The ways out of a bomb: give up and restart at zone one, or revive with gold or an ad, which restores
-    /// the snapshotted haul on the same zone. Gold has no per-run cap; the ad revive does. Every way out closes
-    /// the screen; a revive has already restored the haul by then, so the bank refresh on the way out shows what
-    /// the player kept, and a give-up boots a fresh run.
+    /// The ways out of a bomb: give up and boot a fresh run, or revive with gold or an ad, which restores the
+    /// snapshotted haul on the same zone. Gold has no per-run cap; the ad revive does.
     /// </summary>
     public sealed class GameOverState : GameStateBase, IRestartInputHandler, IContinueInputHandler, IAdContinueInputHandler
     {
