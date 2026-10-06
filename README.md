@@ -170,7 +170,7 @@ wheel is idle is the state machine's rule: only `IdleState` handles the exit inp
 ## 5. Testing Suite
 
 ```
-Assets/_Project/Tests/EditMode    217 tests          pure logic + full flow
+Assets/_Project/Tests/EditMode    218 tests          pure logic + full flow
 Assets/_Project/Tests/PlayMode      1 test            composition-root smoke test
 ```
 

@@ -19,6 +19,10 @@ namespace Vertigo.Wheel.Core.Run
         // Every reward that lands in the wallet on cash-out, in the order Balances reports them.
         private readonly List<RewardId> _currencies = new();
 
+        // The last snapshot Balances handed out and the wallet revision it was built at.
+        private WalletBalances _balances;
+        private int _balancesRevision = -1;
+
         private int _currentZone = 1;
         private int _goldRevivesUsed;
         private int _adRevivesUsed;
@@ -71,16 +75,25 @@ namespace Vertigo.Wheel.Core.Run
             get { return _lostHaul ?? (IReadOnlyList<BankEntry>)Array.Empty<BankEntry>(); }
         }
 
-        /// <summary>The persistent balance of every wallet currency as one value, for handing to the presentation.</summary>
+        /// <summary>
+        /// The persistent balance of every wallet currency as one immutable value. It is rebuilt only when the
+        /// wallet has changed, so reading it again between changes allocates nothing.
+        /// </summary>
         public WalletBalances Balances
         {
             get
             {
-                var rows = new BankEntry[_currencies.Count];
-                for (int i = 0; i < rows.Length; i++)
-                    rows[i] = new BankEntry(_currencies[i], _wallet.BalanceOf(_currencies[i]));
+                if (_balancesRevision != _wallet.Revision)
+                {
+                    var rows = new BankEntry[_currencies.Count];
+                    for (int i = 0; i < rows.Length; i++)
+                        rows[i] = new BankEntry(_currencies[i], _wallet.BalanceOf(_currencies[i]));
 
-                return new WalletBalances(rows);
+                    _balances = new WalletBalances(rows);
+                    _balancesRevision = _wallet.Revision;
+                }
+
+                return _balances;
             }
         }
 

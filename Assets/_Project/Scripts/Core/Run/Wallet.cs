@@ -10,6 +10,7 @@ namespace Vertigo.Wheel.Core.Run
     public sealed class Wallet
     {
         private readonly ISaveService _save;
+        private int _revision;
 
         public Wallet(ISaveService save)
         {
@@ -23,6 +24,12 @@ namespace Vertigo.Wheel.Core.Run
         public static string SaveKeyFor(RewardId currency)
         {
             return $"vertigo.wheel.wallet.{currency.Value}";
+        }
+
+        /// <summary>Counts every balance change, so a reader can tell whether a snapshot it holds is still current.</summary>
+        public int Revision
+        {
+            get { return _revision; }
         }
 
         public int BalanceOf(RewardId currency)
@@ -57,6 +64,7 @@ namespace Vertigo.Wheel.Core.Run
 
         private void Commit(RewardId currency, int newBalance)
         {
+            _revision++;
             _save.SetInt(SaveKeyFor(currency), newBalance);
             _save.Save();
         }

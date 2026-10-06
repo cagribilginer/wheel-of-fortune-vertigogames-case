@@ -247,6 +247,20 @@ namespace Vertigo.Wheel.Tests.EditMode
         }
 
         [Test]
+        public void Balances_IsReusedUntilTheWalletChanges_AndAnEarlierSnapshotStaysUntouched()
+        {
+            _wallet.Add(TestWheels.Gold, 10);
+            WalletBalances before = _run.Balances;
+
+            Assert.That(_run.Balances.Entries, Is.SameAs(before.Entries), "No wallet change, so no new snapshot.");
+
+            _wallet.Add(TestWheels.Gold, 5);
+
+            Assert.That(_run.Balances.AmountOf(TestWheels.Gold), Is.EqualTo(15));
+            Assert.That(before.AmountOf(TestWheels.Gold), Is.EqualTo(10), "A snapshot already handed out never changes.");
+        }
+
+        [Test]
         public void Balances_ListsEveryConfiguredCurrencyInOrder_WithoutAnyCodeChange()
         {
             var gems = new RewardId("gems");

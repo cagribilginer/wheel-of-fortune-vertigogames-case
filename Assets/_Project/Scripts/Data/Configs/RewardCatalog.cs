@@ -20,6 +20,7 @@ namespace Vertigo.Wheel.Data.Configs
         [SerializeField] private RewardDefinition _goldCurrency;
 
         private Dictionary<string, RewardDefinition> _byId;
+        private List<RewardId> _currencyIds;
 
         #region Lookup
         public IReadOnlyList<RewardDefinition> All
@@ -37,12 +38,14 @@ namespace Vertigo.Wheel.Data.Configs
         {
             get
             {
-                var ids = new List<RewardId>();
+                if (_currencyIds != null) return _currencyIds;
+
+                _currencyIds = new List<RewardId>();
                 for (int i = 0; i < _all.Count; i++)
                 {
-                    if (_all[i] && _all[i].Category.IsWalletCurrency) ids.Add(_all[i].RewardId);
+                    if (_all[i] && _all[i].Category.IsWalletCurrency) _currencyIds.Add(_all[i].RewardId);
                 }
-                return ids;
+                return _currencyIds;
             }
         }
 
@@ -94,6 +97,7 @@ namespace Vertigo.Wheel.Data.Configs
         private void OnEnable()
         {
             _byId = null;
+            _currencyIds = null;
         }
         #endregion
 
@@ -102,6 +106,7 @@ namespace Vertigo.Wheel.Data.Configs
         private void OnValidate()
         {
             _byId = null;
+            _currencyIds = null;
 
             var seen = new HashSet<string>();
             for (int i = 0; i < _all.Count; i++)
