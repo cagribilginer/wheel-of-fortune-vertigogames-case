@@ -7,10 +7,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     /// <summary>EXIT: forwards the click to the state machine and mirrors input legality.</summary>
     public sealed class ActionBarPresenter : IDisposable
     {
-        private readonly ActionBarView _view;
+        private readonly ActionBarViewMono _view;
         private GameStateMachine _machine;
 
-        public ActionBarPresenter(ActionBarView view)
+        public ActionBarPresenter(ActionBarViewMono view)
         {
             _view = view;
         }

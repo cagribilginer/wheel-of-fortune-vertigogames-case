@@ -8,7 +8,7 @@ namespace Vertigo.Wheel.UI.Views
     /// still bleed under the notch.
     /// </summary>
     [RequireComponent(typeof(RectTransform))]
-    public sealed class SafeAreaFitter : MonoBehaviour
+    public sealed class SafeAreaFitterMono : MonoBehaviour
     {
         private RectTransform _rect;
         private Rect _lastSafeArea;

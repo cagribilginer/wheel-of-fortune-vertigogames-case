@@ -8,7 +8,7 @@ namespace Vertigo.Wheel.UI.Views
     /// The right-column collected-rewards grid. Entry pooling is the presenter's job; this view exposes the
     /// grid content transform and the empty-state placeholder text.
     /// </summary>
-    public sealed class BankView : UIViewBase
+    public sealed class BankViewMono : UIViewBaseMono
     {
         [SerializeField] private ScrollRect _scrollBank;
         [SerializeField] private RectTransform _contentBank;

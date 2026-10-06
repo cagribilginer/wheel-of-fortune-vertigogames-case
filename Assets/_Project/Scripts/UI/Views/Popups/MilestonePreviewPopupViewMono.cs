@@ -9,7 +9,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
     /// The teaser opened by a top-right milestone badge: preview cards and a one-line description of the zone tier.
     /// Purely informational, so <c>MilestonePreviewPresenter</c> drives it straight off the badge clicks.
     /// </summary>
-    public sealed class MilestonePreviewPopupView : PopupViewBase
+    public sealed class MilestonePreviewPopupViewMono : PopupViewBaseMono
     {
         [SerializeField] private Image _imagePopupMilestoneBackdrop;
         [SerializeField] private Button _buttonPopupMilestoneBackdrop;

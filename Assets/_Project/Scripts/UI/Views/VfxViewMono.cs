@@ -8,7 +8,7 @@ namespace Vertigo.Wheel.UI.Views
     /// presenter fades in and out. Purely passive — every color and offset change is driven from
     /// <c>VfxPresenter</c>; this view only exposes the three nodes.
     /// </summary>
-    public sealed class VfxView : UIViewBase
+    public sealed class VfxViewMono : UIViewBaseMono
     {
         [SerializeField] private RectTransform _transformVfxScreenshake;
         [SerializeField] private Image _imageVfxFlash;

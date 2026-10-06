@@ -7,7 +7,7 @@ namespace Vertigo.Wheel.UI.Views
     /// Base for every view: refs are found by child name and re-bound whenever the object is edited. The naming
     /// convention (<c>ui_&lt;widget&gt;_&lt;region&gt;_&lt;detail&gt;</c>) is the lookup key <see cref="Bind{T}"/> relies on.
     /// </summary>
-    public abstract class UIViewBase : MonoBehaviour
+    public abstract class UIViewBaseMono : MonoBehaviour
     {
         protected abstract void CacheReferences();
 

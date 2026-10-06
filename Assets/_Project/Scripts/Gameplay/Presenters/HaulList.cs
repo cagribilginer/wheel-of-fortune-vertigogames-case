@@ -13,15 +13,15 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     {
         private readonly RewardCatalog _catalog;
         private readonly RectTransform _content;
-        private readonly ObjectPool<BankEntryView> _pool;
-        private readonly List<BankEntryView> _active = new();
+        private readonly ObjectPool<BankEntryViewMono> _pool;
+        private readonly List<BankEntryViewMono> _active = new();
 
-        public HaulList(BankEntryView entryPrefab, RectTransform content, RewardCatalog catalog)
+        public HaulList(BankEntryViewMono entryPrefab, RectTransform content, RewardCatalog catalog)
         {
             _catalog = catalog;
             _content = content;
 
-            _pool = new ObjectPool<BankEntryView>(
+            _pool = new ObjectPool<BankEntryViewMono>(
                 () => Object.Instantiate(entryPrefab, _content),
                 entry => entry.gameObject.SetActive(true),
                 entry => entry.gameObject.SetActive(false),
@@ -35,7 +35,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
             for (int i = 0; i < haul.Count; i++)
             {
-                BankEntryView entry = _pool.Get();
+                BankEntryViewMono entry = _pool.Get();
                 entry.SetEntry(_catalog.IconFor(haul[i].Reward), haul[i].Amount);
                 entry.transform.SetSiblingIndex(i);
                 _active.Add(entry);

@@ -8,7 +8,7 @@ namespace Vertigo.Wheel.UI.Views
     /// The single EXIT action, wired with <c>AddListener</c>, never an Inspector OnClick. Interactable state comes
     /// from the presenter (CashOutPolicy); what EXIT triggers is a state-machine decision.
     /// </summary>
-    public sealed class ActionBarView : UIViewBase
+    public sealed class ActionBarViewMono : UIViewBaseMono
     {
         [SerializeField] private Button _buttonActionExit;
 

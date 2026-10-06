@@ -6,9 +6,9 @@ namespace Vertigo.Wheel.UI.Views
 {
     /// <summary>
     /// One of the eight fixed slots on the wheel rotor. Not pooled — a wheel always has exactly eight
-    /// slices, so the group holds eight permanent instances positioned by <see cref="WheelView.LayoutSlots"/>.
+    /// slices, so the group holds eight permanent instances positioned by <see cref="WheelViewMono.LayoutSlots"/>.
     /// </summary>
-    public sealed class WheelSlotView : UIViewBase
+    public sealed class WheelSlotViewMono : UIViewBaseMono
     {
         // Offsets inside the wheel hole, in screen-upright space around the slot centre (slot-local would push content outward).
         private static readonly Vector2 s_iconAreaSize = new(70f, 52f);

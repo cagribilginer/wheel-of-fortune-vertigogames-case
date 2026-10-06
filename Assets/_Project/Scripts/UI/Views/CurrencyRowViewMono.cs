@@ -9,7 +9,7 @@ namespace Vertigo.Wheel.UI.Views
     /// One wallet currency in a popup's HUD: an icon and its balance. Pooled by the presenter and shared by the
     /// bomb and cash-out popups, so a new currency is a catalog asset, not a new label in each view.
     /// </summary>
-    public sealed class CurrencyRowView : UIViewBase
+    public sealed class CurrencyRowViewMono : UIViewBaseMono
     {
         [SerializeField] private Image _imagePopupCurrencyIcon;
         [SerializeField] private TextMeshProUGUI _textPopupCurrencyValue;
@@ -58,7 +58,7 @@ namespace Vertigo.Wheel.UI.Views
                 .SetEase(Ease.OutCubic)
                 .SetLink(gameObject);
 
-            // DOTween recycles finished tweens (GameInstaller turns recycling on), so a reference kept
+            // DOTween recycles finished tweens (GameInstallerMono turns recycling on), so a reference kept
             // past its tween's death can end up pointing at an unrelated live tween — drop it on kill.
             countUp.OnKill(() => { if (_tween == countUp) _tween = null; });
             _tween = countUp;

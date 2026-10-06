@@ -48,8 +48,8 @@ scene, a camera, or the UI assembly.
 
 - **Model** — `RunModel`, `RewardBank`, `Wallet`, `ZoneClassifier`, `ContinueService`,
   `CashOutPolicy`. All pure logic.
-- **View** — `WheelView`, `BankView`, `BombPopupView`, `CollectPopupView`, … Each derives from
-  `UIViewBase` and wires its own child references **by GameObject name** (`Bind(ref field,
+- **View** — `WheelViewMono`, `BankViewMono`, `BombPopupViewMono`, `CollectPopupViewMono`, … Each derives from
+  `UIViewBaseMono` and wires its own child references **by GameObject name** (`Bind(ref field,
   "ui_node_name")`) — no dragging references in the Inspector, no `FindObjectOfType`.
 - **Presenter** — `ScreenPresentation` composed of per-region presenters (`WheelPresenter`,
   `BankPresenter`, `PopupPresenter`, `AudioPresenter`, …). Presenters own all
@@ -89,7 +89,7 @@ wheel is idle is the state machine's own rule; there is no second "phase" copy o
 
 ### Dependency injection — a composition root, not a container
 
-There is **no DI framework** (no Zenject / VContainer). `GameInstaller` is the single composition
+There is **no DI framework** (no Zenject / VContainer). `GameInstallerMono` is the single composition
 root: in `Awake()` it loads the configs through Addressables, constructs every Core service and
 Presenter with explicit `new`, wires them into one `GameStateMachine`, and starts the flow. Its
 View fields are scene references serialized in `Main.unity`. Constructor injection everywhere
@@ -201,7 +201,7 @@ no DOTween. Test doubles also cover the seams below Core:
 ### PlayMode — one test on purpose
 
 `BootstrapTests.Scene_Loads_AndReachesIdle_WithinTwoSeconds` loads `Main.unity`, lets
-`GameInstaller` wire everything for real, and asserts the flow reaches `IdleState`. Everything
+`GameInstallerMono` wire everything for real, and asserts the flow reaches `IdleState`. Everything
 else is proven faster in EditMode; this proves the composition root itself.
 
 ---
@@ -209,14 +209,14 @@ else is proven faster in EditMode; this proves the composition root itself.
 ## 6. Juice & Polish
 
 - **DOTween pipelines** — wheel spin easing, `DOPunchScale` on buttons and the collect card, popup open/close
-  scale+fade (`PopupViewBase`), reward icons flying from the wheel slot into their bank cell
+  scale+fade (`PopupViewBaseMono`), reward icons flying from the wheel slot into their bank cell
   (`BankPresenter.FlyIn`: a new cell appears exactly when its icon lands, every icon has its own ghost), the red bomb-alert vignette yoyo.
-- **Dynamic counters** — the collect popup's currency rows count up smoothly (`CurrencyRowView.CountTo`,
+- **Dynamic counters** — the collect popup's currency rows count up smoothly (`CurrencyRowViewMono.CountTo`,
   `DOVirtual.Int`, `Ease.OutCubic`) instead of snapping; the claim flow animates each one to the
   wallet's new post-claim total.
 - **Milestone UI** — Safe / Super badges on the zone bar open a preview modal showing that band's
   wheel tier and reward slots.
-- **Responsive layout** — `SafeAreaFitter` on the gameplay and popup layers keeps content clear of
+- **Responsive layout** — `SafeAreaFitterMono` on the gameplay and popup layers keeps content clear of
   the landscape notch / dynamic island (backdrops bleed back out to keep the dim full-screen);
   `GridEdgePadding` keeps the bank grid's left/right margins mirrored while it still fills
   left-to-right, at any aspect ratio under the `Expand` canvas scaler.
@@ -278,7 +278,7 @@ Assets/
       Core/        Run/ States/ States/Flow/ Zones/ Rewards/ Spin/
       Data/        Configs/ Services/
       UI/          Views/ Views/Popups/
-      Gameplay/    GameInstaller.cs  Presenters/
+      Gameplay/    GameInstallerMono.cs  Presenters/
       Editor/      BuildPipelineRunner, GameConfigValidator, UIHygieneValidator, ResetSaveMenuItem,
                    WheelSpriteImportPostprocessor, ZoneWheelConfigEditor
     Tests/         EditMode/ (+ Doubles/)  PlayMode/

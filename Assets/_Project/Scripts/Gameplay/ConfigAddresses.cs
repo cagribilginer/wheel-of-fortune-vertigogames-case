@@ -1,7 +1,7 @@
 namespace Vertigo.Wheel.Gameplay
 {
     /// <summary>
-    /// The Addressables addresses of the ScriptableObject configs <see cref="GameInstaller"/> loads. One place, so
+    /// The Addressables addresses of the ScriptableObject configs <see cref="GameInstallerMono"/> loads. One place, so
     /// moving or renaming a config asset is a one-line change and a typo cannot hide in the composition root.
     /// </summary>
     public static class ConfigAddresses

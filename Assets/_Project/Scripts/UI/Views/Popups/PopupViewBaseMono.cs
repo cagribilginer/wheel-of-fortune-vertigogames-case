@@ -6,7 +6,7 @@ using Vertigo.Wheel.Data.Configs;
 namespace Vertigo.Wheel.UI.Views.Popups
 {
     /// <summary>The backdrop fade and card scale every popup opens and closes with, tuned by <see cref="JuiceConfig"/>.</summary>
-    public abstract class PopupViewBase : UIViewBase
+    public abstract class PopupViewBaseMono : UIViewBaseMono
     {
         private JuiceConfig _juice;
 

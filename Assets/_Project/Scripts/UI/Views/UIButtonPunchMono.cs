@@ -11,7 +11,7 @@ namespace Vertigo.Wheel.UI.Views
     /// can carry an independent tween (the spin button's breathe). Wired with <c>AddListener</c>, never OnClick.
     /// </summary>
     [RequireComponent(typeof(Button))]
-    public sealed class UIButtonPunch : MonoBehaviour
+    public sealed class UIButtonPunchMono : MonoBehaviour
     {
         [SerializeField] private RectTransform _animTarget;
 
@@ -67,7 +67,7 @@ namespace Vertigo.Wheel.UI.Views
                     return (RectTransform)child;
             }
 
-            Debug.LogWarning("[Vertigo] UIButtonPunch: no '_anim' child found to animate.", this);
+            Debug.LogWarning("[Vertigo] UIButtonPunchMono: no '_anim' child found to animate.", this);
             return null;
         }
     }

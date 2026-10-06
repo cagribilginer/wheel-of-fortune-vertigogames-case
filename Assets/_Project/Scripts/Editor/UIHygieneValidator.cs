@@ -279,7 +279,7 @@ namespace Vertigo.Wheel.Editor
         /// <summary>
         /// The third legitimate reason a Graphic keeps RaycastTarget ON: a full-screen popup backdrop that
         /// exists specifically to swallow clicks behind the popup. Recognised by the naming convention
-        /// itself, the same way <see cref="UIViewBase.Bind{T}"/> treats the name as the contract.
+        /// itself, the same way <see cref="UIViewBaseMono.Bind{T}"/> treats the name as the contract.
         /// </summary>
         private static bool IsBackdrop(Graphic graphic)
         {

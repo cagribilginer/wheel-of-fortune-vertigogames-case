@@ -9,7 +9,7 @@ namespace Vertigo.Wheel.UI.Views
     /// the bank panel and the collect popup, which is the whole reuse story behind requirement 2's data-
     /// driven wheel content extending into the presentation layer too.
     /// </summary>
-    public sealed class BankEntryView : UIViewBase
+    public sealed class BankEntryViewMono : UIViewBaseMono
     {
         [SerializeField] private Image _imageBankEntryFrame;
         [SerializeField] private Image _imageBankEntryIconValue;

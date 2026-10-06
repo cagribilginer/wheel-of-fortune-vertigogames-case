@@ -22,15 +22,15 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         // The scroll target that puts a tile in the middle of the viewport.
         private const float VIEWPORT_CENTER = 0.5f;
 
-        private readonly ZoneMapView _view;
-        private readonly ZoneMapTileView _tilePrefab;
+        private readonly ZoneMapViewMono _view;
+        private readonly ZoneMapTileViewMono _tilePrefab;
         private readonly IZoneClassifier _classifier;
         private readonly ZoneProgressionConfig _progression;
         private readonly JuiceConfig _juice;
-        private readonly List<ZoneMapTileView> _active = new();
+        private readonly List<ZoneMapTileViewMono> _active = new();
 
         public ZoneMapPresenter(
-            ZoneMapView view, ZoneMapTileView tilePrefab, IZoneClassifier classifier,
+            ZoneMapViewMono view, ZoneMapTileViewMono tilePrefab, IZoneClassifier classifier,
             ZoneProgressionConfig progression, JuiceConfig juice)
         {
             _view = view;
@@ -58,7 +58,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         private void BuildTile(int zoneNumber)
         {
-            ZoneMapTileView tile = Object.Instantiate(_tilePrefab, _view.Content);
+            ZoneMapTileViewMono tile = Object.Instantiate(_tilePrefab, _view.Content);
             tile.SetZoneNumber(zoneNumber);
             tile.transform.SetSiblingIndex(_active.Count);
             _active.Add(tile);
@@ -66,7 +66,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         #endregion
 
         #region Style and scroll
-        private void ApplyStyle(ZoneMapTileView tile, int zoneNumber, int currentZone)
+        private void ApplyStyle(ZoneMapTileViewMono tile, int zoneNumber, int currentZone)
         {
             if (zoneNumber == currentZone)
             {

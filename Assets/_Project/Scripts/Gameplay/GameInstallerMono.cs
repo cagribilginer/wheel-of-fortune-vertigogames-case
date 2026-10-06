@@ -20,23 +20,23 @@ namespace Vertigo.Wheel.Gameplay
     /// The composition root: wires Core services, the ScriptableObject configs and the scene's views into one
     /// <see cref="GameStateMachine"/> with explicit <c>new</c>. No DI container, no singletons, no FindObjectOfType.
     /// </summary>
-    public sealed class GameInstaller : MonoBehaviour
+    public sealed class GameInstallerMono : MonoBehaviour
     {
-        [SerializeField] private WheelView _wheel;
-        [SerializeField] private ZoneMapView _zoneMap;
-        [SerializeField] private BankView _bank;
-        [SerializeField] private ActionBarView _actionBar;
-        [SerializeField] private BombPopupView _bombPopup;
-        [SerializeField] private CollectPopupView _collectPopup;
-        [SerializeField] private MilestonePreviewPopupView _milestonePopup;
-        [SerializeField] private VfxView _vfx;
-        [SerializeField] private DebugOverlayView _debugOverlay;
-        [SerializeField] private ZoneMapTileView _zoneMapTilePrefab;
-        [SerializeField] private BankEntryView _bankEntryPrefab;
-        [SerializeField] private CurrencyRowView _currencyRowPrefab;
+        [SerializeField] private WheelViewMono _wheel;
+        [SerializeField] private ZoneMapViewMono _zoneMap;
+        [SerializeField] private BankViewMono _bank;
+        [SerializeField] private ActionBarViewMono _actionBar;
+        [SerializeField] private BombPopupViewMono _bombPopup;
+        [SerializeField] private CollectPopupViewMono _collectPopup;
+        [SerializeField] private MilestonePreviewPopupViewMono _milestonePopup;
+        [SerializeField] private VfxViewMono _vfx;
+        [SerializeField] private DebugOverlayViewMono _debugOverlay;
+        [SerializeField] private ZoneMapTileViewMono _zoneMapTilePrefab;
+        [SerializeField] private BankEntryViewMono _bankEntryPrefab;
+        [SerializeField] private CurrencyRowViewMono _currencyRowPrefab;
         [SerializeField] private Transform _flightLayer;
         [SerializeField] private Sprite _bombSlotIcon;
-        [SerializeField] private UIButtonPunch[] _buttonPunches;
+        [SerializeField] private UIButtonPunchMono[] _buttonPunches;
 
         /// <summary>
         /// Exposed for the one Play Mode smoke test that proves this composition root actually reaches

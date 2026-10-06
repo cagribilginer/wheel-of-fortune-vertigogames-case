@@ -9,7 +9,7 @@ namespace Vertigo.Wheel.UI.Views
     /// The wheel hub: rotor, indicator, spin button and the eight fixed slots. Only <see cref="Rotor"/> gets a
     /// rotation tween, and every animated part lives on its own dedicated transform, never a shared or laid-out one.
     /// </summary>
-    public sealed class WheelView : UIViewBase
+    public sealed class WheelViewMono : UIViewBaseMono
     {
         /// <summary>Hole centres as a fraction of the wheel's width, measured off the bronze/silver/golden base art.</summary>
         private const float SLOT_RING_RADIUS = 0.2955f;
@@ -21,7 +21,7 @@ namespace Vertigo.Wheel.UI.Views
         [SerializeField] private RectTransform _transformWheelIndicator;
         [SerializeField] private Image _imageWheelIndicatorValue;
         [SerializeField] private Button _buttonWheelSpin;
-        [SerializeField] private WheelSlotView[] _slots = Array.Empty<WheelSlotView>();
+        [SerializeField] private WheelSlotViewMono[] _slots = Array.Empty<WheelSlotViewMono>();
 
         /// <summary>
         /// The panel root. Nothing else repositions it, so the zone-advance transition is free to slide it
@@ -51,7 +51,7 @@ namespace Vertigo.Wheel.UI.Views
         {
             get { return (RectTransform)_buttonWheelSpin.transform; }
         }
-        public IReadOnlyList<WheelSlotView> Slots
+        public IReadOnlyList<WheelSlotViewMono> Slots
         {
             get { return _slots; }
         }
@@ -71,8 +71,8 @@ namespace Vertigo.Wheel.UI.Views
             Bind(ref _buttonWheelSpin, "ui_button_wheel_spin");
 
             _slots = _groupWheelSlots
-                ? _groupWheelSlots.GetComponentsInChildren<WheelSlotView>(includeInactive: true)
-                : Array.Empty<WheelSlotView>();
+                ? _groupWheelSlots.GetComponentsInChildren<WheelSlotViewMono>(includeInactive: true)
+                : Array.Empty<WheelSlotViewMono>();
         }
 
         private void OnEnable()

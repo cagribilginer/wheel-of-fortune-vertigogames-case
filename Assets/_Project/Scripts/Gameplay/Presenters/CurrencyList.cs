@@ -8,17 +8,17 @@ using Vertigo.Wheel.UI.Views;
 namespace Vertigo.Wheel.Gameplay.Presenters
 {
     /// <summary>
-    /// A popup's currency HUD: one <see cref="CurrencyRowView"/> per wallet currency, in wallet order, with the
+    /// A popup's currency HUD: one <see cref="CurrencyRowViewMono"/> per wallet currency, in wallet order, with the
     /// icon and number colour taken from the catalog. Rows are created on first need and reused.
     /// </summary>
     public sealed class CurrencyList
     {
-        private readonly CurrencyRowView _rowPrefab;
+        private readonly CurrencyRowViewMono _rowPrefab;
         private readonly RectTransform _content;
         private readonly RewardCatalog _catalog;
-        private readonly List<CurrencyRowView> _rows = new();
+        private readonly List<CurrencyRowViewMono> _rows = new();
 
-        public CurrencyList(CurrencyRowView rowPrefab, RectTransform content, RewardCatalog catalog)
+        public CurrencyList(CurrencyRowViewMono rowPrefab, RectTransform content, RewardCatalog catalog)
         {
             _rowPrefab = rowPrefab;
             _content = content;

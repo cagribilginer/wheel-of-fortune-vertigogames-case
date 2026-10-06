@@ -11,10 +11,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     /// </summary>
     public sealed class MilestonePreviewPresenter : IDisposable
     {
-        private readonly ZoneMapView _zoneMap;
-        private readonly MilestonePreviewPopupView _popup;
+        private readonly ZoneMapViewMono _zoneMap;
+        private readonly MilestonePreviewPopupViewMono _popup;
 
-        public MilestonePreviewPresenter(ZoneMapView zoneMap, MilestonePreviewPopupView popup)
+        public MilestonePreviewPresenter(ZoneMapViewMono zoneMap, MilestonePreviewPopupViewMono popup)
         {
             _zoneMap = zoneMap;
             _popup = popup;

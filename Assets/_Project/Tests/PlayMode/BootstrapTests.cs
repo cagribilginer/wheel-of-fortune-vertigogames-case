@@ -14,7 +14,7 @@ namespace Vertigo.Wheel.Tests.PlayMode
 {
     /// <summary>
     /// The one Play Mode test in the suite (architecture plan §8): proves the composition root actually
-    /// wires up in a real scene — <c>GameInstaller</c> loads its Addressable configs, builds the state
+    /// wires up in a real scene — <c>GameInstallerMono</c> loads its Addressable configs, builds the state
     /// machine, and the flow reaches <c>IdleState</c> — rather than just that the pure logic behind it is
     /// correct in isolation. Everything else is proven cheaper and faster in Edit Mode; this file stays a
     /// suite of one on purpose.
@@ -37,13 +37,13 @@ namespace Vertigo.Wheel.Tests.PlayMode
             SceneManager.LoadScene(SCENE_PATH);
 #endif
 
-            // One frame for the freshly loaded scene's Awake() calls — GameInstaller's composition root in
+            // One frame for the freshly loaded scene's Awake() calls — GameInstallerMono's composition root in
             // particular — to actually run before anything below is safe to look up.
             yield return null;
 
-            var installer = Object.FindObjectOfType<GameInstaller>();
-            Assert.IsNotNull(installer, $"No GameInstaller found after loading '{SCENE_PATH}'.");
-            Assert.IsNotNull(installer.Machine, "GameInstaller.Awake() did not construct a GameStateMachine.");
+            var installer = Object.FindObjectOfType<GameInstallerMono>();
+            Assert.IsNotNull(installer, $"No GameInstallerMono found after loading '{SCENE_PATH}'.");
+            Assert.IsNotNull(installer.Machine, "GameInstallerMono.Awake() did not construct a GameStateMachine.");
 
             // BootState -> ZoneSetupState -> IdleState is not synchronous: ZoneSetupState's ShowZone call
             // only reaches IdleState once the zone map's scroll tween completes, so this has to poll rather
@@ -59,7 +59,7 @@ namespace Vertigo.Wheel.Tests.PlayMode
                 $"Expected IdleState within {TIMEOUT_SECONDS}s of loading '{SCENE_PATH}'; the state machine is " +
                 $"still in {installer.Machine.Current?.GetType().Name ?? "<none>"}.");
 
-            Assert.IsNotNull(Object.FindObjectOfType<WheelView>(), $"No WheelView found in '{SCENE_PATH}'.");
+            Assert.IsNotNull(Object.FindObjectOfType<WheelViewMono>(), $"No WheelViewMono found in '{SCENE_PATH}'.");
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Vertigo.Wheel.UI.Views
     /// One pooled tile in the zone strip. Purely passive: the presenter decides its number, colour, weight and whether
     /// it is current. The strip is one dark bar, so a tile is just the number plus a raised white marker on one tile.
     /// </summary>
-    public sealed class ZoneMapTileView : UIViewBase
+    public sealed class ZoneMapTileViewMono : UIViewBaseMono
     {
         [SerializeField] private Image _imageZonemapTileMarkerValue;
         [SerializeField] private TextMeshProUGUI _textZonemapTileNumberValue;

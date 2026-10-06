@@ -12,8 +12,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     /// <summary>Bomb and cash-out popups: population and input forwarding.</summary>
     public sealed class PopupPresenter : IDisposable
     {
-        private readonly BombPopupView _bomb;
-        private readonly CollectPopupView _collect;
+        private readonly BombPopupViewMono _bomb;
+        private readonly CollectPopupViewMono _collect;
         private readonly AudioPresenter _audio;
         private readonly JuiceConfig _juice;
         private readonly HaulList _bombHaul;
@@ -23,8 +23,8 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private GameStateMachine _machine;
 
         public PopupPresenter(
-            BombPopupView bomb, CollectPopupView collect, BankEntryView entryPrefab,
-            CurrencyRowView currencyPrefab, RewardCatalog catalog, AudioPresenter audio, JuiceConfig juice)
+            BombPopupViewMono bomb, CollectPopupViewMono collect, BankEntryViewMono entryPrefab,
+            CurrencyRowViewMono currencyPrefab, RewardCatalog catalog, AudioPresenter audio, JuiceConfig juice)
         {
             _bomb = bomb;
             _collect = collect;
@@ -95,7 +95,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public void HideCashOut()
         {
-            // The corner X only; it already plays the shared click cue via UIButtonPunch.
+            // The corner X only; it already plays the shared click cue via UIButtonPunchMono.
             _collect.Hide();
         }
 

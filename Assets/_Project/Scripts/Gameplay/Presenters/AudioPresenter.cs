@@ -45,7 +45,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _audio.PlayOneShot(_library ? _library.RewardChime : null);
         }
 
-        /// <summary>The shared click on every interactable button (handed to each <c>UIButtonPunch</c> by the installer).</summary>
+        /// <summary>The shared click on every interactable button (handed to each <c>UIButtonPunchMono</c> by the installer).</summary>
         public void PlayButtonClick()
         {
             _audio.PlayOneShot(_library ? _library.ButtonClick : null);

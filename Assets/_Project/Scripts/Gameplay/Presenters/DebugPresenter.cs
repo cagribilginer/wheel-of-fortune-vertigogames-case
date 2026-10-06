@@ -10,7 +10,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 {
     /// <summary>
     /// Wires the debug cheat bar to the real model and state machine. Only ever constructed in the editor
-    /// or a development build (see <see cref="GameInstaller"/>), so the cheats do not need their own
+    /// or a development build (see <see cref="GameInstallerMono"/>), so the cheats do not need their own
     /// guards — reaching them at all already means debug tooling is on.
     /// </summary>
     public sealed class DebugPresenter : IDisposable
@@ -31,7 +31,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly BankPresenter _bank;
         private readonly Random _rng = new();
 
-        private DebugOverlayView _view;
+        private DebugOverlayViewMono _view;
 
         public DebugPresenter(
             RunModel run, GameStateMachine machine, Wallet wallet, RewardId goldCurrency,
@@ -46,7 +46,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         }
 
         #region Input and lifetime
-        public void WireInput(DebugOverlayView view)
+        public void WireInput(DebugOverlayViewMono view)
         {
             _view = view;
             view.JumpToZone5Clicked += JumpToZone5;

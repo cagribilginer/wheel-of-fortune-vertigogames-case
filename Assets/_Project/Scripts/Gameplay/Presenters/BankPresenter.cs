@@ -12,7 +12,7 @@ using Vertigo.Wheel.UI.Views;
 namespace Vertigo.Wheel.Gameplay.Presenters
 {
     /// <summary>
-    /// The collected-rewards grid: a pooled <see cref="BankEntryView"/> per stacked reward, and the icons that carry a
+    /// The collected-rewards grid: a pooled <see cref="BankEntryViewMono"/> per stacked reward, and the icons that carry a
     /// fresh reward from the wheel into its cell.
     /// <para>
     /// What the grid shows follows what has actually arrived, not the model. A new reward's cell is created hidden so the
@@ -24,17 +24,17 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     /// </summary>
     public sealed class BankPresenter
     {
-        // Matches BankEntryView's own icon box closely enough that a ghost doesn't visibly resize when it lands
+        // Matches BankEntryViewMono's own icon box closely enough that a ghost doesn't visibly resize when it lands
         // (that box is 88x88, but the ghost also needs headroom to fly over other UI unclipped).
         private static readonly Vector2 s_ghostSize = new(72f, 72f);
 
-        private readonly BankView _view;
+        private readonly BankViewMono _view;
         private readonly RewardCatalog _catalog;
         private readonly RewardBank _bank;
         private readonly Transform _flightLayer;
         private readonly AudioPresenter _audio;
         private readonly JuiceConfig _juice;
-        private readonly ObjectPool<BankEntryView> _pool;
+        private readonly ObjectPool<BankEntryViewMono> _pool;
         private readonly List<BankCell> _cells = new();
         private readonly List<IconFlight> _flights = new();
         private readonly Stack<Ghost> _freeGhosts = new();
@@ -44,7 +44,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private int _generation;
 
         public BankPresenter(
-            BankView view, BankEntryView entryPrefab, RewardCatalog catalog, RewardBank bank,
+            BankViewMono view, BankEntryViewMono entryPrefab, RewardCatalog catalog, RewardBank bank,
             Transform flightLayer, AudioPresenter audio, JuiceConfig juice)
         {
             _view = view;
@@ -54,7 +54,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _audio = audio;
             _juice = juice;
 
-            _pool = new ObjectPool<BankEntryView>(
+            _pool = new ObjectPool<BankEntryViewMono>(
                 () => UnityEngine.Object.Instantiate(entryPrefab, _view.Content),
                 e => e.gameObject.SetActive(true),
                 e => e.gameObject.SetActive(false),
@@ -87,7 +87,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         private BankCell AddCell(RewardId reward, int amount, bool revealed)
         {
-            BankEntryView view = _pool.Get();
+            BankEntryViewMono view = _pool.Get();
             view.SetEntry(_catalog.IconFor(reward), amount);
             view.SetRevealed(revealed);
             view.transform.SetSiblingIndex(_cells.Count);
@@ -197,7 +197,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         #region Flight state
         private sealed class BankCell
         {
-            public readonly BankEntryView View;
+            public readonly BankEntryViewMono View;
             public readonly RewardId Reward;
             public bool IsRevealed;
 
@@ -210,7 +210,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             // Dropped on kill: with tween recycling on, a stale reference would kill whichever tween reuses the object.
             private Tween _count;
 
-            public BankCell(BankEntryView view, RewardId reward, int amount, bool revealed)
+            public BankCell(BankEntryViewMono view, RewardId reward, int amount, bool revealed)
             {
                 View = view;
                 Reward = reward;

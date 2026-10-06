@@ -10,7 +10,7 @@ namespace Vertigo.Wheel.UI.Views
     /// the scroll tween. The viewport is a bare RectMask2D with no Image, and the milestone badges are re-labelled
     /// by the presenter on every zone change.
     /// </summary>
-    public sealed class ZoneMapView : UIViewBase
+    public sealed class ZoneMapViewMono : UIViewBaseMono
     {
         [SerializeField] private ScrollRect _scrollZonemap;
         [SerializeField] private RectTransform _contentZonemap;

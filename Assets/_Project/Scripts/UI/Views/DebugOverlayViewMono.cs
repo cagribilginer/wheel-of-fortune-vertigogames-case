@@ -9,7 +9,7 @@ namespace Vertigo.Wheel.UI.Views
     /// do. It switches itself off outside the editor and development builds and starts hidden, toggled with
     /// <see cref="TOGGLE_KEY"/>.
     /// </summary>
-    public sealed class DebugOverlayView : UIViewBase
+    public sealed class DebugOverlayViewMono : UIViewBaseMono
     {
         // Tap-only landscape game — nothing else reads the keyboard, so a plain letter is safe here.
         private const KeyCode TOGGLE_KEY = KeyCode.D;

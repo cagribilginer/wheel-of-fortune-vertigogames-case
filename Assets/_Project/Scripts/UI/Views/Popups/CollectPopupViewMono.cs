@@ -7,11 +7,11 @@ using UnityEngine.UI;
 namespace Vertigo.Wheel.UI.Views.Popups
 {
     /// <summary>
-    /// The cash-out confirmation, listing the haul in pooled <see cref="BankEntryView"/> cells. Nothing is committed while
+    /// The cash-out confirmation, listing the haul in pooled <see cref="BankEntryViewMono"/> cells. Nothing is committed while
     /// it is open: cancel returns to the wheel with the haul intact, confirm runs <see cref="PlayClaim"/> and then the
     /// state machine resets the run.
     /// </summary>
-    public sealed class CollectPopupView : PopupViewBase
+    public sealed class CollectPopupViewMono : PopupViewBaseMono
     {
         [SerializeField] private Image _imagePopupCollectBackdrop;
         [SerializeField] private RectTransform _transformPopupCollectAnim;

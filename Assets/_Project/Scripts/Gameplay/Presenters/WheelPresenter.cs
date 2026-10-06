@@ -21,7 +21,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private const float MIN_LAID_OUT_WHEEL_SIZE = 50f;
         private const float TICK_VOLUME = 0.5f;
 
-        private readonly WheelView _view;
+        private readonly WheelViewMono _view;
         private readonly WheelSpinConfig _spinConfig;
         private readonly RewardCatalog _catalog;
         private readonly Sprite _bombIcon;
@@ -50,7 +50,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private bool _hasLaidOutSlots;
 
         public WheelPresenter(
-            WheelView view, WheelSpinConfig spinConfig, RewardCatalog catalog, Sprite bombIcon,
+            WheelViewMono view, WheelSpinConfig spinConfig, RewardCatalog catalog, Sprite bombIcon,
             IAudioService audio, IRandomProvider random, JuiceConfig juice)
         {
             _view = view;

@@ -12,10 +12,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     /// </summary>
     public sealed class VfxPresenter
     {
-        private readonly VfxView _view;
+        private readonly VfxViewMono _view;
         private readonly JuiceConfig _juice;
 
-        public VfxPresenter(VfxView view, JuiceConfig juice)
+        public VfxPresenter(VfxViewMono view, JuiceConfig juice)
         {
             _view = view;
             _juice = juice;

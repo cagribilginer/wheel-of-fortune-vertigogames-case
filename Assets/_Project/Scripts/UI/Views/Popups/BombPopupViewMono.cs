@@ -11,7 +11,7 @@ namespace Vertigo.Wheel.UI.Views.Popups
     /// The bomb defeat / revive screen: the lost haul, the currency HUD and three buttons on a near-black backdrop
     /// with a breathing red vignette. An unavailable revive is shown disabled, not removed, so the row never reflows.
     /// </summary>
-    public sealed class BombPopupView : PopupViewBase
+    public sealed class BombPopupViewMono : PopupViewBaseMono
     {
         [SerializeField] private Image _imagePopupBombBackdrop;
         [SerializeField] private Image _imagePopupBombVignette;
