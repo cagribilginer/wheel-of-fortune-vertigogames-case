@@ -49,7 +49,12 @@ namespace Vertigo.Wheel.UI.Views.Popups
             card.DOScale(_juice.PopupClosedScale, _juice.PopupFadeDuration)
                 .SetEase(Ease.InBack)
                 .SetLink(gameObject, LinkBehaviour.KillOnDestroy)
-                .OnComplete(() => gameObject.SetActive(false));
+                .OnComplete(OnCloseFinished);
+        }
+
+        private void OnCloseFinished()
+        {
+            gameObject.SetActive(false);
         }
     }
 }

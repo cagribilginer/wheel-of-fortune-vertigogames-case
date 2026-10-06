@@ -16,7 +16,6 @@ namespace Vertigo.Wheel.UI.Views
 
         private int _shown;
         private bool _isInitialised;
-        private Tween _tween;
 
         protected override void CacheReferences()
         {
@@ -33,7 +32,7 @@ namespace Vertigo.Wheel.UI.Views
         /// <summary>Shows the balance outright. The regular setter is needed for the thousands separator: TMP's zero-alloc SetText does not honour ":N0".</summary>
         public void SetAmount(int amount)
         {
-            if (_tween != null) _tween.Kill();
+            DOTween.Kill(this);
             _shown = amount;
             _isInitialised = true;
             _textPopupCurrencyValue.text = amount.ToString(ViewText.AMOUNT_FORMAT);
@@ -48,20 +47,20 @@ namespace Vertigo.Wheel.UI.Views
                 return;
             }
 
-            if (_tween != null) _tween.Kill();
+            // Found again by target, never by a kept reference: DOTween recycles finished tweens, so a stored
+            // one could end up pointing at an unrelated live tween.
+            DOTween.Kill(this);
 
-            Tween countUp = DOVirtual.Int(_shown, target, duration, value =>
-                {
-                    _shown = value;
-                    _textPopupCurrencyValue.text = value.ToString(ViewText.AMOUNT_FORMAT);
-                })
+            DOVirtual.Int(_shown, target, duration, ShowCountedAmount)
                 .SetEase(Ease.OutCubic)
+                .SetTarget(this)
                 .SetLink(gameObject);
+        }
 
-            // DOTween recycles finished tweens (GameInstallerMono turns recycling on), so a reference kept
-            // past its tween's death can end up pointing at an unrelated live tween — drop it on kill.
-            countUp.OnKill(() => { if (_tween == countUp) _tween = null; });
-            _tween = countUp;
+        private void ShowCountedAmount(int value)
+        {
+            _shown = value;
+            _textPopupCurrencyValue.text = value.ToString(ViewText.AMOUNT_FORMAT);
         }
     }
 }

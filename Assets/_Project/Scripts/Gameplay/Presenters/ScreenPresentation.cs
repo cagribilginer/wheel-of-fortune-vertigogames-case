@@ -26,9 +26,6 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly ZoneProgressionConfig _progression;
         private readonly JuiceConfig _juice;
 
-        // The bomb-impact hold has no view to SetLink to, so it is killed before a new one starts and on Dispose.
-        private Tween _bombDelay;
-
         // The zone the strip scrolls to once the wheel has finished its transition, and who to tell afterwards.
         private int _zoneBeingShown;
         private Action _onZoneShown;
@@ -100,12 +97,11 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _vfx.PlayBombImpact();
             _audio.PlayBombImpact();
             // The bank stays as it was behind the vignette; HideGameOver refreshes it once the player chooses.
-            if (_bombDelay != null) _bombDelay.Kill();
 
-            // Dropped on kill: with recycling on, a stale reference would kill whichever tween reuses the object.
-            Tween delay = DOVirtual.DelayedCall(_juice.BombImpactHoldDuration, new TweenCallback(onComplete));
-            delay.OnKill(() => { if (_bombDelay == delay) _bombDelay = null; });
-            _bombDelay = delay;
+            // The hold has no view to SetLink to, so it is tagged with this presenter: a new one replaces it, and
+            // Dispose kills it. Found by id, not a kept reference, since DOTween recycles finished tweens.
+            DOTween.Kill(this);
+            DOVirtual.DelayedCall(_juice.BombImpactHoldDuration, new TweenCallback(onComplete)).SetId(this);
         }
         #endregion
 
@@ -141,7 +137,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         #region Lifetime
         public void Dispose()
         {
-            if (_bombDelay != null) _bombDelay.Kill();
+            DOTween.Kill(this);
         }
         #endregion
     }

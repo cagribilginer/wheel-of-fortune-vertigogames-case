@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Pool;
 using UnityEngine.UI;
 using Vertigo.Wheel.Core.Rewards;
 using Vertigo.Wheel.Core.Spin;
@@ -28,7 +27,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly Transform _flightLayer;
         private readonly AudioPresenter _audio;
         private readonly JuiceConfig _juice;
-        private readonly ObjectPool<BankEntryViewMono> _pool;
+        private readonly EntryPool _pool;
         private readonly List<BankCell> _cells = new();
         private readonly List<IconFlight> _flights = new();
         private readonly Stack<Ghost> _freeGhosts = new();
@@ -48,11 +47,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _audio = audio;
             _juice = juice;
 
-            _pool = new ObjectPool<BankEntryViewMono>(
-                () => UnityEngine.Object.Instantiate(entryPrefab, _view.Content),
-                e => e.gameObject.SetActive(true),
-                e => e.gameObject.SetActive(false),
-                e => UnityEngine.Object.Destroy(e.gameObject));
+            _pool = new EntryPool(entryPrefab, _view.Content);
         }
 
         #region Bank grid

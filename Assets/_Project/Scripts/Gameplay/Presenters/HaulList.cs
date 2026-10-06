@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Pool;
 using UnityEngine.UI;
 using Vertigo.Wheel.Core.Rewards;
 using Vertigo.Wheel.Data.Configs;
@@ -13,7 +12,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
     {
         private readonly RewardCatalog _catalog;
         private readonly RectTransform _content;
-        private readonly ObjectPool<BankEntryViewMono> _pool;
+        private readonly EntryPool _pool;
         private readonly List<BankEntryViewMono> _active = new();
 
         public HaulList(BankEntryViewMono entryPrefab, RectTransform content, RewardCatalog catalog)
@@ -21,11 +20,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _catalog = catalog;
             _content = content;
 
-            _pool = new ObjectPool<BankEntryViewMono>(
-                () => Object.Instantiate(entryPrefab, _content),
-                entry => entry.gameObject.SetActive(true),
-                entry => entry.gameObject.SetActive(false),
-                entry => Object.Destroy(entry.gameObject));
+            _pool = new EntryPool(entryPrefab, content);
         }
 
         public void Show(IReadOnlyList<BankEntry> haul)
