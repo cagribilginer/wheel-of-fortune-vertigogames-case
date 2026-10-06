@@ -62,16 +62,12 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             _homeY = _view.Root.anchoredPosition.y;
             _hiddenY = _homeY - _juice.ZoneHiddenOffsetY;
 
-            // Slots are placed on the first SetTheme: the Canvas has not laid out yet at construction.
-
-            // Built once and restarted per tick: ~45 ticks a spin, so a paused, non-autokilled tween is the zero-alloc replay.
             _tickTween = _view.Indicator
                 .DOPunchRotation(new Vector3(0f, 0f, -_spinConfig.TickPunchDegrees), _juice.TickPunchDuration, 1, 0f)
                 .SetAutoKill(false)
                 .SetLink(_view.Indicator.gameObject, LinkBehaviour.KillOnDestroy)
                 .Pause();
 
-            // Targets the button's own rect, not its _anim child, so breathe and click punch never share a localScale.
             _breatheTween = _view.SpinButtonRect
                 .DOScale(_juice.BreatheScale, _juice.BreatheDuration)
                 .SetLoops(-1, LoopType.Yoyo)
@@ -142,7 +138,6 @@ namespace Vertigo.Wheel.Gameplay.Presenters
                 _tickClip = theme.Tick;
             }
 
-            // First zone setup: the Canvas has laid out by now, so the rotor rect is real.
             if (!_hasLaidOutSlots) LayoutSlots();
 
             PopulateSlots(wheel);
@@ -225,11 +220,14 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         #endregion
 
         #region Spin and ticks
+        /// <summary>
+        /// Turns the rotor to <paramref name="slotIndex"/>. Positive Z is counter-clockwise but slot index grows
+        /// clockwise, so a turn by the slot's own angle brings that slot to the top.
+        /// </summary>
         public void PlaySpin(int slotIndex, Action onComplete)
         {
             _lastTickIndex = int.MinValue;
 
-            // Positive Z is CCW but slot index grows clockwise, so a CCW turn by a slot's own angle brings it to the top.
             float targetLocal = slotIndex * _slotAngle;
             float current = _view.Rotor.localEulerAngles.z;
             float delta = Mathf.Repeat(targetLocal - current, 360f);

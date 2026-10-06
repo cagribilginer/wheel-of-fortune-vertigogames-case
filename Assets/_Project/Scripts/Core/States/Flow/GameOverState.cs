@@ -2,7 +2,9 @@ namespace Vertigo.Wheel.Core.States.Flow
 {
     /// <summary>
     /// The ways out of a bomb: give up and restart at zone one, or revive with gold or an ad, which restores
-    /// the snapshotted haul on the same zone. Gold has no per-run cap; the ad revive does.
+    /// the snapshotted haul on the same zone. Gold has no per-run cap; the ad revive does. Every way out closes
+    /// the screen; a revive has already restored the haul by then, so the bank refresh on the way out shows what
+    /// the player kept, and a give-up boots a fresh run.
     /// </summary>
     public sealed class GameOverState : GameStateBase, IRestartInputHandler, IContinueInputHandler, IAdContinueInputHandler
     {
@@ -23,8 +25,6 @@ namespace Vertigo.Wheel.Core.States.Flow
                 Context.ContinueService.IsAdReviveOffered(adUsed)));
         }
 
-        // Give up is a restart: close the screen and boot a fresh run. The bomb already emptied the bank, so the
-        // refresh on the way out shows it empty.
         public void OnRestartRequested()
         {
             Context.GameOver.HideGameOver();
@@ -35,7 +35,6 @@ namespace Vertigo.Wheel.Core.States.Flow
         {
             int zoneReached = Context.Run.CurrentZone;
 
-            // The purchase is the gate. If it fails the popup simply stays up.
             if (!Context.ContinueService.TryPurchase(zoneReached, Context.Run.GoldRevivesUsedThisRun)) return;
 
             Context.Run.ApplyGoldRevive();
@@ -44,7 +43,6 @@ namespace Vertigo.Wheel.Core.States.Flow
 
         public void OnAdContinueRequested()
         {
-            // No wallet debit — watching the video is the price. Capped per run.
             if (!Context.ContinueService.IsAdReviveOffered(Context.Run.AdRevivesUsedThisRun)) return;
 
             Context.Run.ApplyAdRevive();
@@ -53,8 +51,6 @@ namespace Vertigo.Wheel.Core.States.Flow
 
         private void Revive()
         {
-            // ApplyGold/AdRevive has already restored the haul, so the bank HideGameOver refreshes on its
-            // way out shows the rewards the player just kept, not the empty bank the bomb left behind.
             Context.GameOver.HideGameOver();
             Machine.Change<IdleState>();
         }
