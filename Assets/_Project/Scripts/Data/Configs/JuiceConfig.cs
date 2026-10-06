@@ -10,6 +10,10 @@ namespace Vertigo.Wheel.Data.Configs
     [CreateAssetMenu(menuName = "Vertigo/Config/Juice", fileName = "Juice_")]
     public sealed class JuiceConfig : ScriptableObject
     {
+        [Header("Display")]
+        [Tooltip("Frame rate the game asks the device for. 60 for a smooth wheel; 30 saves battery on weak devices.")]
+        [Range(30, 120)] [SerializeField] private int _targetFrameRate = 60;
+
         [Header("Wheel — idle & zone transition")]
         [Range(0f, 0.5f)] [SerializeField] private float _tickPunchDuration = 0.09f;
         [Range(1f, 1.2f)] [SerializeField] private float _breatheScale = 1.04f;
@@ -143,6 +147,10 @@ namespace Vertigo.Wheel.Data.Configs
         public float BombImpactHoldDuration
         {
             get { return _bombImpactHoldDuration; }
+        }
+        public int TargetFrameRate
+        {
+            get { return _targetFrameRate; }
         }
         public float BankFlyDuration
         {

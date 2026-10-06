@@ -69,6 +69,8 @@ namespace Vertigo.Wheel.Gameplay
             var continueConfig = LoadConfig<ContinueConfig>("Configs/Settings/Continue_Default");
             var juice = LoadConfig<JuiceConfig>("Configs/Settings/Juice_Default");
 
+            Application.targetFrameRate = juice.TargetFrameRate;
+
             IZoneClassifier classifier = progression.CreateClassifier();
             // The factory gets its own RNG so wedge dealing and slot resolution cannot perturb each other.
             var wheelFactory = new ZoneWheelFactory(
