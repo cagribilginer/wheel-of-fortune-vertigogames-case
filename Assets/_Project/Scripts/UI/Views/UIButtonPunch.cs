@@ -2,7 +2,6 @@ using System;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
-using Vertigo.Wheel.Data.Services;
 
 namespace Vertigo.Wheel.UI.Views
 {
@@ -23,11 +22,18 @@ namespace Vertigo.Wheel.UI.Views
         [SerializeField] private RectTransform _animTarget;
 
         private Button _button;
+        private Action _onClicked;
 
         private void Awake()
         {
             _button = GetComponent<Button>();
             if (!_animTarget) _animTarget = FindAnimChild();
+        }
+
+        /// <summary>The installer hands over what to do for the click sound; the view never reaches for a service itself.</summary>
+        public void Configure(Action onClicked)
+        {
+            _onClicked = onClicked;
         }
 
         private void OnEnable()
@@ -43,7 +49,7 @@ namespace Vertigo.Wheel.UI.Views
 
         private void Punch()
         {
-            AudioHub.PlayButtonClick();
+            if (_onClicked != null) _onClicked();
 
             if (!_animTarget) return;
 

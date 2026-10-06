@@ -36,6 +36,7 @@ namespace Vertigo.Wheel.Gameplay
         [SerializeField] private CurrencyRowView _currencyRowPrefab;
         [SerializeField] private Transform _flightLayer;
         [SerializeField] private Sprite _bombSlotIcon;
+        [SerializeField] private UIButtonPunch[] _buttonPunches;
 
         /// <summary>
         /// Exposed for the one Play Mode smoke test that proves this composition root actually reaches
@@ -83,14 +84,16 @@ namespace Vertigo.Wheel.Gameplay
 
             var audioLibrary = LoadConfig<AudioLibrary>("Configs/Settings/AudioLibrary");
             IAudioService audioService = new AudioService(transform);
-            AudioHub.Initialize(audioService, audioLibrary);
             var audioPresenter = new AudioPresenter(audioService, audioLibrary);
+            for (int i = 0; i < _buttonPunches.Length; i++)
+                _buttonPunches[i].Configure(audioPresenter.PlayButtonClick);
 
             _bombPopup.Configure(juice);
             _collectPopup.Configure(juice);
             _milestonePopup.Configure(juice);
             _milestonePreviewPresenter = new MilestonePreviewPresenter(_zoneMap, _milestonePopup);
-            var wheelPresenter = new WheelPresenter(_wheel, spinConfig, catalog, _bombSlotIcon, audioService, juice);
+            var wheelPresenter = new WheelPresenter(
+                _wheel, spinConfig, catalog, _bombSlotIcon, audioService, new UnityRandomProvider(), juice);
             var zoneMapPresenter = new ZoneMapPresenter(_zoneMap, _zoneMapTilePrefab, classifier, progression, juice);
             var bankPresenter = new BankPresenter(
                 _bank, _bankEntryPrefab, catalog, runModel.Bank, _flightLayer, audioPresenter, juice);

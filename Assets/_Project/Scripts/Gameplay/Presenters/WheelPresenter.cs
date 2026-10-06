@@ -26,6 +26,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private readonly RewardCatalog _catalog;
         private readonly Sprite _bombIcon;
         private readonly IAudioService _audio;
+        private readonly IRandomProvider _random;
         private readonly JuiceConfig _juice;
         private readonly Tween _tickTween;
 
@@ -50,13 +51,14 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         public WheelPresenter(
             WheelView view, WheelSpinConfig spinConfig, RewardCatalog catalog, Sprite bombIcon,
-            IAudioService audio, JuiceConfig juice)
+            IAudioService audio, IRandomProvider random, JuiceConfig juice)
         {
             _view = view;
             _spinConfig = spinConfig;
             _catalog = catalog;
             _bombIcon = bombIcon;
             _audio = audio;
+            _random = random;
             _juice = juice;
 
             _homeY = _view.Root.anchoredPosition.y;
@@ -231,7 +233,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             float targetLocal = slotIndex * _slotAngle;
             float current = _view.Rotor.localEulerAngles.z;
             float delta = Mathf.Repeat(targetLocal - current, 360f);
-            int turns = UnityEngine.Random.Range(_spinConfig.MinTurns, _spinConfig.MaxTurns + 1);
+            int turns = _spinConfig.MinTurns + _random.Next(_spinConfig.MaxTurns - _spinConfig.MinTurns + 1);
             float endValue = current + delta + turns * 360f;
 
             _onSpinStopped = onComplete;

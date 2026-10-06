@@ -12217,6 +12217,15 @@ MonoBehaviour:
   _currencyRowPrefab: {fileID: 4122392681864037966, guid: ffb7a73aecc94033a94536de1747fbe4, type: 3}
   _flightLayer: {fileID: 1253668213}
   _bombSlotIcon: {fileID: 21300000, guid: d9e52c0a5dfce4b5b84ecbb2a42bef75, type: 3}
+  _buttonPunches:
+  - {fileID: 26175699}
+  - {fileID: 139277108}
+  - {fileID: 328613907}
+  - {fileID: 549298709}
+  - {fileID: 695240244}
+  - {fileID: 862724765}
+  - {fileID: 1146919923}
+  - {fileID: 1750602021}
 --- !u!4 &1829774891
 Transform:
   m_ObjectHideFlags: 0
