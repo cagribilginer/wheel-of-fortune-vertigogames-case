@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Pool;
 using UnityEngine.UI;
 using Vertigo.Wheel.Core.Zones;
 using Vertigo.Wheel.Data.Configs;
@@ -10,8 +9,9 @@ using Vertigo.Wheel.UI.Views;
 namespace Vertigo.Wheel.Gameplay.Presenters
 {
     /// <summary>
-    /// The horizontal zone strip: one pooled tile per zone in a window built ahead of the player and scrolled to
-    /// keep the current zone centred. The strip only grows; a reset just moves the highlight back to zone 1.
+    /// The horizontal zone strip: one tile per zone in a window built ahead of the player and scrolled to keep the
+    /// current zone centred. The strip only grows and a reset just moves the highlight back to zone 1, so no tile is
+    /// ever released and there is nothing to pool.
     /// A number's colour and weight come from the theme of the wheel that zone uses, like the wheel itself.
     /// </summary>
     public sealed class ZoneMapPresenter
@@ -23,10 +23,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         private const float VIEWPORT_CENTER = 0.5f;
 
         private readonly ZoneMapView _view;
+        private readonly ZoneMapTileView _tilePrefab;
         private readonly IZoneClassifier _classifier;
         private readonly ZoneProgressionConfig _progression;
         private readonly JuiceConfig _juice;
-        private readonly ObjectPool<ZoneMapTileView> _pool;
         private readonly List<ZoneMapTileView> _active = new();
 
         public ZoneMapPresenter(
@@ -34,15 +34,10 @@ namespace Vertigo.Wheel.Gameplay.Presenters
             ZoneProgressionConfig progression, JuiceConfig juice)
         {
             _view = view;
+            _tilePrefab = tilePrefab;
             _classifier = classifier;
             _progression = progression;
             _juice = juice;
-
-            _pool = new ObjectPool<ZoneMapTileView>(
-                () => Object.Instantiate(tilePrefab, _view.Content),
-                tile => tile.gameObject.SetActive(true),
-                tile => tile.gameObject.SetActive(false),
-                tile => Object.Destroy(tile.gameObject));
         }
 
         #region Window
@@ -63,7 +58,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
 
         private void BuildTile(int zoneNumber)
         {
-            ZoneMapTileView tile = _pool.Get();
+            ZoneMapTileView tile = Object.Instantiate(_tilePrefab, _view.Content);
             tile.SetZoneNumber(zoneNumber);
             tile.transform.SetSiblingIndex(_active.Count);
             _active.Add(tile);
