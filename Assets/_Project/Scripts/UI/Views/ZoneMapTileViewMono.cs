@@ -32,7 +32,7 @@ namespace Vertigo.Wheel.UI.Views
 
         public void SetZoneNumber(int zone)
         {
-            _textZonemapTileNumberValue.SetText("{0}", zone);
+            _textZonemapTileNumberValue.SetText(ViewText.ZONE_NUMBER, zone);
         }
 
         /// <summary>A passed (or upcoming) zone: no marker, just the number in the presenter's colour/weight.</summary>

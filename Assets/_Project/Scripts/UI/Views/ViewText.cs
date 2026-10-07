@@ -6,8 +6,8 @@ namespace Vertigo.Wheel.UI.Views
     /// </summary>
     public static class ViewText
     {
-        public const string SUPER_ZONE_TARGET = "SUPER ZONE {0}";
-        public const string SAFE_ZONE_TARGET = "SAFE ZONE {0}";
+        /// <summary>A bare zone number: the strip tiles and the milestone badges, whose labels are static scene text.</summary>
+        public const string ZONE_NUMBER = "{0}";
 
         public const string SUPER_ZONE_TITLE = "SUPER ZONE";
         public const string SAFE_ZONE_TITLE = "SAFE ZONE";
