@@ -10,7 +10,6 @@ namespace Vertigo.Wheel.Data.Configs
     {
         [SerializeField] private Sprite _baseSprite;
         [SerializeField] private Sprite _indicatorSprite;
-        [SerializeField] private Color _accentColor = Color.white;
         [SerializeField] private Color _glowColor = Color.white;
         [SerializeField] private AudioClip _tick;
 
@@ -27,10 +26,6 @@ namespace Vertigo.Wheel.Data.Configs
         public Sprite IndicatorSprite
         {
             get { return _indicatorSprite; }
-        }
-        public Color AccentColor
-        {
-            get { return _accentColor; }
         }
         public Color GlowColor
         {

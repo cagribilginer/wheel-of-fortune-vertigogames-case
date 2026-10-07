@@ -90,12 +90,11 @@ namespace Vertigo.Wheel.UI.Views
         #endregion
 
         #region Presentation
-        public void SetTheme(Sprite baseSprite, Sprite indicatorSprite, Color accent, Color glow)
+        public void SetTheme(Sprite baseSprite, Sprite indicatorSprite, Color glow)
         {
             _imageWheelBaseValue.sprite = baseSprite;
             _imageWheelIndicatorValue.sprite = indicatorSprite;
             _imageWheelGlow.color = glow;
-            _buttonWheelSpin.image.color = accent;
         }
 
         public void SetSpinInteractable(bool interactable)

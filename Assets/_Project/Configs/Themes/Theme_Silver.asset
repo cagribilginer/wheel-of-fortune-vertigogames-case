@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _baseSprite: {fileID: 21300000, guid: 3b41202619bde4c41835f0d9b2a1e8f0, type: 3}
   _indicatorSprite: {fileID: 21300000, guid: d1b192551e32c4be7bfd9a606135d005, type: 3}
-  _accentColor: {r: 0.78, g: 0.82, b: 0.86, a: 1}
   _glowColor: {r: 0.78, g: 0.82, b: 0.86, a: 0.65}
   _stripNumberColor: {r: 0.4, g: 0.95, b: 0.45, a: 1}
   _isStripNumberBold: 1

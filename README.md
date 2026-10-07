@@ -106,7 +106,7 @@ and checked by `Tools ▸ Vertigo ▸ Validate Game Configs`:
 | --- | --- |
 | `ZoneProgressionConfig` | Safe/Super intervals, one wheel per special zone type, per-band overrides |
 | `ZoneWheelConfig` / `WheelSpinConfig` | Slice layout, weights, bomb placement per zone type |
-| `WheelThemeConfig` (Bronze / Silver / Golden) | Wheel sprite set, accent + glow colours, tick SFX, and the zone-strip number colour / weight for zones that use the theme |
+| `WheelThemeConfig` (Bronze / Silver / Golden) | Wheel sprite set, glow colour, tick SFX, and the zone-strip number colour / weight for zones that use the theme |
 | `RewardCategoryDefinition` | What a kind of reward may do: stackable, per-drop ceiling, is-wallet-currency. A new category is a new asset, not a code change |
 | `RewardCatalog` + `RewardDefinition` | The only bridge from a Core `RewardId` to a sprite; also names the gold (revive) currency. Every reward whose category is flagged as a wallet currency is a wallet currency: cash-out banks it, the popups list it, Reset Save clears it |
 | Scaling strategy (`LinearScalingSO`) | How a reward's base amount grows with zone depth (unit-tested) |

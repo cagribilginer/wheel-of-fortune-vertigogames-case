@@ -136,7 +136,7 @@ namespace Vertigo.Wheel.Gameplay.Presenters
         {
             if (theme)
             {
-                _view.SetTheme(theme.BaseSprite, theme.IndicatorSprite, theme.AccentColor, theme.GlowColor);
+                _view.SetTheme(theme.BaseSprite, theme.IndicatorSprite, theme.GlowColor);
                 _tickClip = theme.Tick;
             }
 
