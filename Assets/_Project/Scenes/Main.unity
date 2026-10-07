@@ -696,8 +696,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: +1000 Gold
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 01493b77ab3dd41958d59a5bb1fec082, type: 2}
+  m_sharedMaterial: {fileID: 3319180695428291763, guid: 01493b77ab3dd41958d59a5bb1fec082, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1214,8 +1214,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: DEBUG
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 01493b77ab3dd41958d59a5bb1fec082, type: 2}
+  m_sharedMaterial: {fileID: 3319180695428291763, guid: 01493b77ab3dd41958d59a5bb1fec082, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1602,8 +1602,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Trigger Bomb Defeat
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 01493b77ab3dd41958d59a5bb1fec082, type: 2}
+  m_sharedMaterial: {fileID: 3319180695428291763, guid: 01493b77ab3dd41958d59a5bb1fec082, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1737,8 +1737,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Jump to Zone 5
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 01493b77ab3dd41958d59a5bb1fec082, type: 2}
+  m_sharedMaterial: {fileID: 3319180695428291763, guid: 01493b77ab3dd41958d59a5bb1fec082, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2179,8 +2179,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Jump to Zone 30
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 01493b77ab3dd41958d59a5bb1fec082, type: 2}
+  m_sharedMaterial: {fileID: 3319180695428291763, guid: 01493b77ab3dd41958d59a5bb1fec082, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2314,8 +2314,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: +40 Random Items
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 01493b77ab3dd41958d59a5bb1fec082, type: 2}
+  m_sharedMaterial: {fileID: 3319180695428291763, guid: 01493b77ab3dd41958d59a5bb1fec082, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3005,6 +3005,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ui_panel_zonemap
       objectReference: {fileID: 0}
+    - target: {fileID: 4655871277456444396, guid: f84c315d42ffe4d47bae62f02c468791, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f84c315d42ffe4d47bae62f02c468791, type: 3}
 --- !u!1001 &5243076544540001817
@@ -3313,6 +3317,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 958019023}
     m_Modifications:
+    - target: {fileID: 8480320505219751835, guid: 6cfd35dd0b2a9471cbdab8f94eaa533d, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8480320505318102037, guid: 6cfd35dd0b2a9471cbdab8f94eaa533d, type: 3}
       propertyPath: m_Name
       value: ui_panel_bank
