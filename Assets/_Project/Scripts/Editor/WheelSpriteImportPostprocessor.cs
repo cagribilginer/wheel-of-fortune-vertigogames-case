@@ -37,6 +37,12 @@ namespace Vertigo.Wheel.Editor
                 { "ui_card_panel_zone_coming",        new Vector4(4, 0, 4, 0) },
                 { "ui_card_panel_zone_super",         new Vector4(4, 0, 4, 0) },
                 { "ui_card_panel_zone_white",         new Vector4(4, 0, 4, 0) },
+                // Generated chrome-and-plate set: the border covers each sprite's corner radius plus its edge line.
+                { "ui_frame_hairline_white",          new Vector4(16, 16, 16, 16) },
+                { "ui_frame_silver_cell",             new Vector4(16, 16, 16, 16) },
+                { "ui_panel_black_glass",             new Vector4(16, 16, 16, 16) },
+                { "ui_plate_orange",                  new Vector4(22, 22, 22, 22) },
+                { "ui_plate_green",                   new Vector4(22, 22, 22, 22) },
             };
 
         private void OnPreprocessTexture()
