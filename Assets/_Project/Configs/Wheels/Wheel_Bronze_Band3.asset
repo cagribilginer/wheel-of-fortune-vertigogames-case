@@ -24,7 +24,7 @@ MonoBehaviour:
     _baseAmountOverride: 0
     _weight: 1
   - _kind: 0
-    _reward: {fileID: 11400000, guid: 8df2220e52d9d48c4854ad88e96af182, type: 2}
+    _reward: {fileID: 11400000, guid: 94d200f6aec594afd921b06f15da205f, type: 2}
     _baseAmountOverride: 0
     _weight: 1
   - _kind: 0

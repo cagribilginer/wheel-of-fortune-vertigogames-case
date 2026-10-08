@@ -32,7 +32,7 @@ MonoBehaviour:
     _baseAmountOverride: 0
     _weight: 1
   - _kind: 0
-    _reward: {fileID: 11400000, guid: 64002e4eeea994ca8b1a17f05190f28a, type: 2}
+    _reward: {fileID: 11400000, guid: a92ee7aef2f9946d9bfe58841309eb0b, type: 2}
     _baseAmountOverride: 0
     _weight: 1
   - _kind: 0
