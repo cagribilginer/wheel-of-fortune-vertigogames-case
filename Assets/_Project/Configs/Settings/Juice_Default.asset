@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4390bd74440345dbb8ee5af67f1d575, type: 3}
   m_Name: Juice_Default
   m_EditorClassIdentifier: 
+  _targetFrameRate: 60
   _tickPunchDuration: 0.09
   _breatheScale: 1.04
   _breatheDuration: 1.1
@@ -29,10 +30,32 @@ MonoBehaviour:
   _bombShakeRandomness: 90
   _flashInDuration: 0.06
   _flashOutDuration: 0.45
+  _flashPeakAlpha: 0.85
   _bombImpactHoldDuration: 0.4
+  _bombFlashColor: {r: 1, g: 0.2, b: 0.2, a: 1}
+  _buttonPunchScale: -0.18
+  _buttonPunchDuration: 0.28
+  _buttonPunchVibrato: 8
+  _buttonPunchElasticity: 0.75
   _bankFlyDuration: 0.5
   _bankPunchScale: 0.2
   _bankPunchDuration: 0.2
   _bankCounterDuration: 0.4
+  _bankFlyIconsPerReward: 1
+  _bankFlyStagger: 0.08
   _zoneScrollDuration: 0.45
-  _bigRewardUnitValue: 60
+  _currentZoneTileScale: 1.3
+  _currentZoneTextColor: {r: 0.12, g: 0.13, b: 0.16, a: 1}
+  _passedZoneAlpha: 0.5
+  _popupBackdropAlpha: 0.82
+  _popupFadeDuration: 0.2
+  _popupClosedScale: 0.85
+  _popupOpenDuration: 0.3
+  _bombBackdropAlpha: 0.86
+  _vignetteMinAlpha: 0.5
+  _vignettePeakAlpha: 0.9
+  _vignetteBreatheDuration: 0.85
+  _claimHoldDuration: 0.8
+  _cardPunchScale: 0.25
+  _cardPunchDuration: 0.35
+  _countUpDuration: 0.5
