@@ -252,6 +252,7 @@ Or in-editor: **Window ▸ General ▸ Test Runner**.
 Tools ▸ Vertigo ▸ Validate UI Hygiene     raycast targets, the Maskable/RectMask2D trap, 9-slice sprites
 Tools ▸ Vertigo ▸ Validate Game Configs    config asset integrity
 Tools ▸ Vertigo ▸ Reset Save               clear the persistent wallet (every currency)
+Tools ▸ Vertigo ▸ Capture Aspect Screenshots   in Play Mode: saves 20:9, 16:9 and 4:3 PNGs to Screenshots/
 ```
 
 ### Build the APK
